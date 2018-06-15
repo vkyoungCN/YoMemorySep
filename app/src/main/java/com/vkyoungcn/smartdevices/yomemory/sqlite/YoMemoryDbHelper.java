@@ -58,6 +58,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + YoMemoryContract.LearningLogs.TABLE_NAME + " (" +
                     YoMemoryContract.LearningLogs._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG + " INTEGER, "+
+                    YoMemoryContract.LearningLogs.COLUMN_IS_EFFECTIVE + " BOOLEAN, "+
                     YoMemoryContract.LearningLogs.COLUMN_GROUP_ID + " INTEGER REFERENCES "+
                     YoMemoryContract.Group.TABLE_NAME+"("+ YoMemoryContract.Group._ID+") " +
                     "ON DELETE CASCADE)"; //外键采用级联删除
@@ -429,12 +430,12 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         return items;
     }
 
-//【2018.6.8修改到此。D2】
-
     /*
     * 建立新分组的时候，必须将所属items置为已抽取；所以需要tableSuffix
+    * 新建的分组没由学习记录，不需要向Logs表写内容。
+    * 新版Group类已不再持有所含Items的id列表，因而需要额外传入
     * */
-    public long createGroup(DBGroup dbGroup, String tableSuffix){
+    public long createGroup(DBGroup dbGroup, ArrayList<Integer> subItemIds, String tableSuffix){
         long l;
         getWritableDatabaseIfClosedOrNull();
 
@@ -442,17 +443,12 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         values.put(YoMemoryContract.Group.COLUMN_DESCRIPTION, dbGroup.getDescription());
-        values.put(YoMemoryContract.Group.COLUMN_DOUBLE_KILL, dbGroup.isDoubleKill());
-        values.put(YoMemoryContract.Group.COLUMN_TRIPLE_KILL, dbGroup.isTripleKill());
-        values.put(YoMemoryContract.Group.COLUMN_INIT_LEARNING_LONG, dbGroup.getInitLearningLong());
         values.put(YoMemoryContract.Group.COLUMN_MISSION_ID, dbGroup.getMission_id());
-        values.put(YoMemoryContract.Group.COLUMN_RE_PICKING_TIMES_30, dbGroup.getRePickingTimes_30m());
-        values.put(YoMemoryContract.Group.COLUMN_RE_PICKING_TIMES_EARLY, dbGroup.getEarlyTimeRePickingTimes());
-        values.put(YoMemoryContract.Group.COLUMN_SUB_ITEM_IDS, dbGroup.getSubItemIdsStr());
+        values.put(YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG, dbGroup.getSettingUptimeInLong());
 
         l = mSQLiteDatabase.insert(YoMemoryContract.Group.TABLE_NAME, null, values);
 
-        setItemsChose(tableSuffix, dbGroup.getSubItemIdsStr());
+        setItemsChose(tableSuffix, subItemIds);
         mSQLiteDatabase.setTransactionSuccessful();
         mSQLiteDatabase.endTransaction();
 
@@ -460,26 +456,32 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         return l;
     }
 
-    public List<DBGroup> getAllGroupsByMissionId(int missionsId){
-        List<DBGroup> groups = new ArrayList<>();
+    /*
+    * 需要读取两个表，group表获取4个字段、Logs表（经计算）获取两个字段
+    * */
+    public ArrayList<DBGroup> getAllGroupsByMissionId(int missionsId){
+        ArrayList<DBGroup> groups = new ArrayList<>();
         String selectQuery = "SELECT * FROM "+ YoMemoryContract.Group.TABLE_NAME+
                 " WHERE "+ YoMemoryContract.Group.COLUMN_MISSION_ID+" = "+missionsId;
 
         getReadableDatabaseIfClosedOrNull();
+
+        //操作两个表的读取。【问：】读取不开事务也行吧？
+        mSQLiteDatabase.beginTransaction();
         Cursor cursor = mSQLiteDatabase.rawQuery(selectQuery, null);
 
         if(cursor.moveToFirst()){
             do{
                 DBGroup group = new DBGroup();
-                group.setId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Group._ID)));
+                int groupId = cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Group._ID));//需多次使用，改为实名变量。
+                group.setId(groupId);
                 group.setDescription(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_DESCRIPTION)));
-                group.setSubItemIdsStr(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_SUB_ITEM_IDS)));
-                group.setInitLearningLong(cursor.getLong(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_INIT_LEARNING_LONG)));
+                group.setSettingUptimeInLong(cursor.getLong(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG)));
                 group.setMission_id(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_MISSION_ID)));
-                group.setRePickingTimes_30m(cursor.getShort(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_RE_PICKING_TIMES_30)));
-                group.setEarlyTimeRePickingTimes(cursor.getShort(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_RE_PICKING_TIMES_EARLY)));
-                group.setDoubleKill(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_DOUBLE_KILL))==1);
-                group.setTripleKill(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_TRIPLE_KILL))==1);
+
+                //【？】能否在cursor循环下读另外一张表
+                group.setLastLearningTime(getLastLearningTimeInLong(groupId));
+                group.setEffectiveRePickingTimes(getEffectiveLearningTime(groupId));
 
                 groups.add(group);
             }while (cursor.moveToNext());
@@ -490,9 +492,58 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        mSQLiteDatabase.setTransactionSuccessful();
+        mSQLiteDatabase.endTransaction();
+
         closeDB();
         return groups;
     }
+
+    private long getLastLearningTimeInLong(int groupId){
+        Log.i(TAG, "getLastLearningTimeInLong: be.");
+        String selectLastTimeQuery = "SELECT "+YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG+
+                " FROM "+YoMemoryContract.LearningLogs.TABLE_NAME+" WHERE "+
+                YoMemoryContract.LearningLogs.COLUMN_GROUP_ID+" = "+groupId;
+        getWritableDatabaseIfClosedOrNull();//因为相关联的前一个方法之前已经打开了WDB，这里使用getW。
+
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectLastTimeQuery,null);
+
+        long resultLong = 0;
+        if(cursor.moveToFirst()){
+            resultLong = cursor.getLong(0);//毕竟只有1列的结果。【但是不知道是否从0起】
+        }
+
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //不能关DB，因为事务尚未完成。
+        return resultLong;
+    }
+
+    private byte getEffectiveLearningTime(int groupId){
+        Log.i(TAG, "getEffectiveLearningTime: be");
+        String selectCountEffectiveQuery = "SELECT COUNT(*) "+" FROM "+
+                YoMemoryContract.LearningLogs.TABLE_NAME+" WHERE "+
+                YoMemoryContract.LearningLogs.COLUMN_GROUP_ID+" = "+groupId;
+
+        getWritableDatabaseIfClosedOrNull();//同一事务的前一方法中尚有打开的wdb。
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectCountEffectiveQuery,null);
+
+        byte resultNumber = 0;
+        if(cursor.moveToFirst()){
+            resultNumber = (byte) cursor.getInt(0);
+        }
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return resultNumber;
+    }
+
 
     public DBGroup getGroupById(int groupId){
         DBGroup group = new DBGroup();
@@ -500,18 +551,18 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
                 " WHERE "+ YoMemoryContract.Group._ID+" = "+groupId;
 
         getReadableDatabaseIfClosedOrNull();
+        mSQLiteDatabase.beginTransaction();
         Cursor cursor = mSQLiteDatabase.rawQuery(selectQuery, null);
 
         if(cursor.moveToFirst()){
             group.setId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Group._ID)));
             group.setDescription(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_DESCRIPTION)));
-            group.setSubItemIdsStr(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_SUB_ITEM_IDS)));
-            group.setInitLearningLong(cursor.getLong(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_INIT_LEARNING_LONG)));
+            group.setSettingUptimeInLong(cursor.getLong(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG)));
             group.setMission_id(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_MISSION_ID)));
-            group.setRePickingTimes_30m(cursor.getShort(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_RE_PICKING_TIMES_30)));
-            group.setEarlyTimeRePickingTimes(cursor.getShort(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_RE_PICKING_TIMES_EARLY)));
-            group.setDoubleKill(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_DOUBLE_KILL))==1);
-            group.setTripleKill(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_TRIPLE_KILL))==1);
+
+            group.setLastLearningTime(getLastLearningTimeInLong(groupId));
+            group.setEffectiveRePickingTimes(getEffectiveLearningTime(groupId));
+
         }
 
         try {
@@ -519,78 +570,37 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        mSQLiteDatabase.setTransactionSuccessful();
+        mSQLiteDatabase.endTransaction();
+
         closeDB();
         return group;
     }
 
 
     /*
-    * 更新指定分组的Logs学习记录。
+    * 为指定分组新增一条Logs学习记录
+    * （在程序中提前判断好是否是“有效学习”，直接记在Log类中，此处直接使用。）
     * */
-    public long updateLogOfGroupById(int groupId,String newFullyLogs){
+    public long insertNewLearningLogOfGroup(int groupId,SingleLearningLog newLog){
         long lines;
         getWritableDatabaseIfClosedOrNull();
+
         ContentValues values = new ContentValues();
-        values.put(YoMemoryContract.Group.COLUMN_GROUP_LOGS,newFullyLogs);
-        lines = mSQLiteDatabase.update(YoMemoryContract.Group.TABLE_NAME,values,
-                YoMemoryContract.Group._ID+"=?",new String[]{String.valueOf(groupId)});
+        values.put(YoMemoryContract.LearningLogs.COLUMN_GROUP_ID,newLog.getGroupId());
+        values.put(YoMemoryContract.LearningLogs.COLUMN_IS_EFFECTIVE,newLog.isEffective());
+        values.put(YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG,newLog.getTimeInLong());
+
+        lines = mSQLiteDatabase.insert(YoMemoryContract.LearningLogs.TABLE_NAME, null, values);
+
         closeDB();
         return lines;
 
 
     }
 
-    public int updateExtraLearningOneAsTrue(int groupId){
-        int lines;
-        getWritableDatabaseIfClosedOrNull();
 
-        ContentValues values = new ContentValues();
-        values.put(YoMemoryContract.Group.COLUMN_EXTRA_1H,true);
-        lines = mSQLiteDatabase.update(YoMemoryContract.Group.TABLE_NAME,values,
-                YoMemoryContract.Group._ID+"=?",new String[]{String.valueOf(groupId)});
-        closeDB();
-        return lines;
-    }
-
-    public int updateExtraLearning24HourAsAddOne(int groupId){
-        int lines;
-        getWritableDatabaseIfClosedOrNull();
-
-        short oldTimes = getExtraLearningTimes(groupId);
-
-        ContentValues values = new ContentValues();
-        values.put(YoMemoryContract.Group.COLUMN_EXTRA_24H,oldTimes+1);
-        lines = mSQLiteDatabase.update(YoMemoryContract.Group.TABLE_NAME,values,
-                YoMemoryContract.Group._ID+"=?",new String[]{String.valueOf(groupId)});
-        closeDB();
-        return lines;
-    }
-
-    private short getExtraLearningTimes(int groupId){
-        short times = 0;
-        String selectQuery = "SELECT "+ YoMemoryContract.Group.COLUMN_EXTRA_24H+" FROM "
-                + YoMemoryContract.Group.TABLE_NAME+" WHERE "+ YoMemoryContract.Group._ID+" = "
-                +groupId;
-
-        getReadableDatabaseIfClosedOrNull();
-        Cursor cursor = mSQLiteDatabase.rawQuery(selectQuery, null);
-
-        if(cursor.moveToFirst()){
-            times = cursor.getShort(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_EXTRA_24H));
-        }
-
-        try {
-            cursor.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        closeDB();
-        return times;
-
-    }
-
-
-    public void removeGroupById(int groupId, String subItemIdsStr, String itemTableNameSuffix){
+/*    public void removeGroupById(int groupId, String subItemIdsStr, String itemTableNameSuffix){
         getWritableDatabaseIfClosedOrNull();
         String deleteSingleGroupSql = "DELETE FROM "+ YoMemoryContract.Group.TABLE_NAME+" WHERE "+
                 YoMemoryContract.Group._ID+" = "+groupId;
@@ -604,7 +614,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         mSQLiteDatabase.setTransactionSuccessful();
         mSQLiteDatabase.endTransaction();
         closeDB();
-    }
+    }*/
 
 
     /*
@@ -619,20 +629,24 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         closeDB();
     }*/
 
-    /*该方法将位于其他方法开启的事务内，因而不能有关DB操作*/
-    private void setItemsUnChose(String tableSuffix, String itemIds){
+
+
+    private void setItemsUnChose(String tableSuffix, ArrayList<Integer> itemIds){
         getWritableDatabaseIfClosedOrNull();
 
         if(itemIds==null||itemIds.isEmpty()){
             return;
         }
-        String[] str =  itemIds.split(";");
+
         StringBuilder sbr = new StringBuilder();
         sbr.append("( ");
-        for (String s: str) {
-            sbr.append(s);
+
+        for (int i :
+                itemIds) {
+            sbr.append(i);
             sbr.append(", ");
         }
+
         sbr.deleteCharAt(sbr.length()-2);
         sbr.append(")");
 
@@ -642,24 +656,24 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
                 " IN "+sbr.toString();
 
         mSQLiteDatabase.execSQL(itemsGiveBackSql);
+        //因为位于其他方法开启的事务内，所以不能关DB。
     }
 
-    /*
-    * 设为已抽取，该方法将位于其他方法开启的事务内，因而不能有关DB操作。
-    * */
-    private void setItemsChose(String tableSuffix, String itemIds){
+
+    private void setItemsChose(String tableSuffix, ArrayList<Integer> subItemIds){
         getWritableDatabaseIfClosedOrNull();
 
-        if(itemIds==null||itemIds.isEmpty()){
+        if(subItemIds==null||subItemIds.isEmpty()){
             return;
         }
-        String[] str =  itemIds.split(";");
+
         StringBuilder sbr = new StringBuilder();
         sbr.append("( ");
-        for (String s: str) {
-            sbr.append(s);
+        for (int i : subItemIds) {
+            sbr.append(i);
             sbr.append(", ");
         }
+
         sbr.deleteCharAt(sbr.length()-2);//【错误记录，这里原来误写成str，错得很隐蔽】
         sbr.append(")");
 
@@ -669,6 +683,8 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
                 " IN "+sbr.toString();
 
         mSQLiteDatabase.execSQL(itemsChoseSql);
+        //因为位于其他方法开启的事务内，所以不能关DB。
+
     }
 
     /*
@@ -773,22 +789,6 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
     }
 
-    private String getStingSubIdsWithParenthesisForWhereSql(String subItemsIdsStr){
-        if(subItemsIdsStr==null||subItemsIdsStr.isEmpty()){
-            return "()";
-        }
-        String[] strings =  subItemsIdsStr.split(";");
-        StringBuilder builder = new StringBuilder();
-        builder.append("( ");
-        for (String s: strings) {
-            builder.append(s);
-            builder.append(", ");
-        }
-        builder.deleteCharAt(builder.length()-2);
-        builder.append(")");
-        return builder.toString();
-
-    }
 
     private void getWritableDatabaseIfClosedOrNull(){
         if(mSQLiteDatabase==null || !mSQLiteDatabase.isOpen()) {

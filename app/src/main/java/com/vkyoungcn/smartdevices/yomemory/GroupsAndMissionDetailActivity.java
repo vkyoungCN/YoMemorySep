@@ -26,7 +26,7 @@ import com.vkyoungcn.smartdevices.yomemory.fragments.OnSimpleDFgButtonClickListe
 import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMission;
 import com.vkyoungcn.smartdevices.yomemory.spiralCore.GroupState;
-import com.vkyoungcn.smartdevices.yomemory.models.RvGroup;
+import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 import com.vkyoungcn.smartdevices.yomemory.spiralCore.GroupStateManager;
 import com.vkyoungcn.smartdevices.yomemory.spiralCore.LogList;
 import com.vkyoungcn.smartdevices.yomemory.spiralCore.RemainingTimeAmount;
@@ -44,7 +44,7 @@ import static com.vkyoungcn.smartdevices.yomemory.ItemLearningActivity.RESULT_EX
  * 单个Mission及其所属分组的详情页；
  * 页面上部是Mission详情；
  * 页面下部是所属分组的集合展示（Rv）；默认要按某种顺序（待定）
- * 本页面中：可以新建分组、
+ * 本页面中的其他任务：①新建分组；②开始学习。
  * 当分组删除时，所属词汇回归为未选中的Item。
  * 点击Rv中的条项可以进入学习/复习页面；会有确认框弹出提示。
  * 学习/复习完成或因超时而未能完成的，都会回到本页面；完成则更新RV列表的显示，
@@ -55,8 +55,9 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         ConfirmRemoveRedsDiaFragment.OnRemoveRedsConfirmClick, ConfirmDeletingDiaFragment.OnDeletingGroupDfgClickListener {
     private static final String TAG = "MissionDetailActivity";
 
-    public static final int PICKING_TYPE_INIT = 311;//新版的逻辑中，只需要区分是新学还是复习两组情况。不再需要传递具体状态，因再需要据此生成特殊Logs。
-    public static final int PICKING_TYPE_RE_PICK =312;
+    public static final int EFFECTIVE_PICKING = 316;//先判断好是否仍在有效时期内，然后直接传递给后续页面。（学习完成需要将新Log存入DB，Log需要此信息。）
+//    public static final int PICKING_TYPE_INIT = 311;//新版的逻辑中，只需要区分是新学还是复习两组情况。不再需要传递具体状态，因再需要据此生成特殊Logs。
+//    public static final int PICKING_TYPE_RE_PICK =312;
 
     public static final int MESSAGE_PRE_DB_FETCHED =5011;
     public static final int MESSAGE_UI_RE_FRESH = 5012;
@@ -66,8 +67,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
     public static final int REQUEST_CODE_LEARNING = 2011;//学习完成后，要回送然后更新Rv数据源和显示。
 
     private RvMission missionFromIntent;//从前一页面获取。后续页面需要mission的id，suffix字段。
-    List<DBGroup> dbGroups = new ArrayList<>();//DB原始数据源
-    List<RvGroup> rvGroups = new ArrayList<>();//分开设计的目的是避免适配器内部的转换。让转换在外部完成，适配器直接使用数据才能降低卡顿。
+    List<RVGroup> rvGroups = new ArrayList<>();//分开设计的目的是避免适配器内部的转换。让转换在外部完成，适配器直接使用数据才能降低卡顿。
     private YoMemoryDbHelper memoryDbHelper;
     private String tableItemSuffix;//由于各任务所属的Item表不同，后面所有涉及Item的操作都需要通过后缀才能构建出完整表名。
     private RecyclerView mRv;
@@ -92,28 +92,8 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         TextView missionDetailName = (TextView) findViewById(R.id.tv_mission_detail_name_GMDA);
         TextView missionDetailDescription = (TextView) findViewById(R.id.tv_mission_detail_description_GMDA);
         maskFrameLayout = (FrameLayout)findViewById(R.id.maskOverRv_MissionDetail_GMDA);
-        /*findViewById(R.id.groups_refresh_missionDetail).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //点击刷新分组列表按钮时，
-                //先停止计时更新（控制变量重设false）；清空旧adp
-                //设置刷新rv的控制变量为真（避免重新加载adp）
-                // 开启从DB获取数据的线程重获数据
-                //计时更新控制变量重设真
-                //完成后由其自动启动计时更新线程
-                uiRefreshingNeeded = false;
-                rvGroups.clear();
-
-                isRefreshingGroupRv = true;
-                new Thread(new PrepareForMissionDetailRunnable()).start();         // start thread
-                //控制变量uiRefreshingNeeded重设为true的操作在消息处理方法中进行
-            }
-        });*/
-
 
         missionFromIntent = getIntent().getParcelableExtra("Mission");
-
-
         if (missionFromIntent == null) {
             Toast.makeText(self, "任务信息传递失败", Toast.LENGTH_SHORT).show();
             return;
@@ -151,15 +131,15 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 
 
     final static class GroupOfMissionHandler extends Handler{
-        private final WeakReference<MissionDetailActivity> activityWeakReference;
+        private final WeakReference<GroupsAndMissionDetailActivity> activityWeakReference;
 
-        private GroupOfMissionHandler(MissionDetailActivity activity) {
+        private GroupOfMissionHandler(GroupsAndMissionDetailActivity activity) {
             this.activityWeakReference = new WeakReference<>(activity);
         }
 
         @Override
         public void handleMessage(Message msg) {
-            MissionDetailActivity missionDetailActivity = activityWeakReference.get();
+            GroupsAndMissionDetailActivity missionDetailActivity = activityWeakReference.get();
             if(missionDetailActivity!=null){
                 missionDetailActivity.handleMessage(msg);
             }
@@ -170,64 +150,61 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
      * 获取各分组原始数据，并进行排序、转换成RvGroup，然后返回给UI。
      * 提供两种排序方式：①衰减率最高的在前；②记忆存量最低的在前；
      */
+    //【已修改好】
     public class PrepareForGroupsAndMissionRunnable implements Runnable{
         @Override
         public void run() {
             //获取各分组原始数据
-            List<DBGroup> dbGroupsOrigin = memoryDbHelper.getAllGroupsByMissionId(missionFromIntent.getId());
+            ArrayList<DBGroup> dbGroupsOrigin = memoryDbHelper.getAllGroupsByMissionId(missionFromIntent.getId());
             //将各分组原始数据转换为UI所需数据，比较耗时。相关数据直接设置给Activity的成员。
 
-            //新版本中全部按当前时间与建组时间之间的差值大小排序，由小到大。
+            ArrayList<RVGroup> tempRVGroups = new ArrayList<>();
+            //暂时按记忆级别排序
+            for (DBGroup dbg : dbGroupsOrigin) {
+                RVGroup rvGroup = new RVGroup(dbg);
+                tempRVGroups.add(rvGroup);
+                //尝试过，但似乎无法在此直接排序。无法令最新项同之前所有项目进行比较。
+            }
 
-            /*
-            这个排序算法也用不到了。虽然还挺精巧的。
-            //5个临时分组
-            List<RvGroup> rvGroupsGreen = new ArrayList<>();//存放新建分组的临时list
-            List<RvGroup> rvGroupsBlueAndOrange = new ArrayList<>();//存放可复习分组的临时list
-            List<RvGroup> rvGroupsGrey = new ArrayList<>();//存放未到时分组的临时list
-            List<RvGroup> rvGroupsZero = new ArrayList<>();//存放已完成分组的临时list
-            List<RvGroup> rvGroupsRed = new ArrayList<>();//存放全失分组的临时list
-
-            for (DBGroup d : dbGroups) {
-                GroupState groupState = new GroupState(d.getGroupLogs());
-                RvGroup rvGroup = new RvGroup(d, groupState, missionFromIntent.getTableItem_suffix());//其中的时间字串信息是生成时获取的。
-
-                //依据新生成的rvGroup的颜色信息，加入不同的临时组
-                switch (rvGroup.getStateColorResId()){
-                    case R.color.colorGP_Newly:
-                        rvGroupsGreen.add(rvGroup);
-                        break;
-                    case R.color.colorGP_AVAILABLE:
-                    case R.color.colorGP_Miss_ONCE:
-                        rvGroupsBlueAndOrange.add(rvGroup);
-                        break;
-                    case R.color.colorGP_STILL_NOT:
-                        rvGroupsGrey.add(rvGroup);
-                        break;
-                    case 0:
-                        rvGroupsZero.add(rvGroup);
-                        break;
-                    case R.color.colorGP_Miss_TWICE:
-                        rvGroupsRed.add(rvGroup);
-                        break;
-                }
-            }*/
-
-            //将不同颜色的分组按设计的先后加入数据源中；其中部分分组需要再执行一次按时间排序的操作后再加入。
-            rvGroups.addAll(rvGroupsGreen);
-            rvGroups.addAll(GroupStateManager.ascOrderByRemainingTime(rvGroupsBlueAndOrange));
-            rvGroups.addAll(GroupStateManager.ascOrderByRemainingTime(rvGroupsGrey));
-            rvGroups.addAll(rvGroupsZero);
-            rvGroups.addAll(rvGroupsRed);
-            //至此已完成排序。
+            rvGroups = ascOrderByMemoryStage(tempRVGroups);
 
             Message message =new Message();
             message.what = MESSAGE_PRE_DB_FETCHED;
+            //数据通过全局变量直接传递。
 
             handler.sendMessage(message);
         }
     }
 
+    //【已改好】
+    public static ArrayList<RVGroup> ascOrderByMemoryStage(ArrayList<RVGroup> rvGroups){
+        ArrayList<RVGroup> resultRvGroups = new ArrayList<>();
+
+        //此排序属何种算法【？】
+        for (int i = 0; i < rvGroups.size(); ) {//不能i++，但size每次减少1。
+            RVGroup minRvGroup = rvGroups.get(i);//指针项（代表当前最小？暂时是第一项）。即使用new也是指针形式，最后都是重复数据（且提示new无意义）
+
+            for (int j = 1; j < rvGroups.size(); j++) {
+                //从第二项开始，和指针项比较，如果小于指针项，则令指针指向当前项。（所以循环一次后，是将指针指向了当前列中的最小项）
+                //因为都是引用类型，无法换值，只能移动指针。
+
+                if(rvGroups.get(j).getMemoryStage()< minRvGroup.getMemoryStage()){
+                    minRvGroup = rvGroups.get(j);//指针指向较小者
+                }
+            }
+
+            //将选出的最小项目复制到目标列表；然后再次开始循环，选除“次小”的项目。
+            try {
+                RVGroup gp = (RVGroup) minRvGroup.clone();//克隆方式复制（以免只复制地址）。
+                resultRvGroups.add(gp);
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+            rvGroups.remove(rvGroups.indexOf(minRvGroup));//源列中，最小的项目已删除；则再次的循环筛选将选出次小项。
+
+        }
+        return resultRvGroups;
+    }
     /*
      * 【经验证，线程在onPause后（回桌面）不停止计时】
      * 【从后续学习activity返回后，旧数据集仍能计时，但新学习的条目不计时】

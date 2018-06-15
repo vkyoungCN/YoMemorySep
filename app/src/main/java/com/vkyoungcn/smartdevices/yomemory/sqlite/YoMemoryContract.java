@@ -45,13 +45,14 @@ public final class YoMemoryContract {
     /*
      * 分组表
      * 分组的学习记录存储在单独的表中，所含items在Item表中反向记录。
+     * 注意，LAST_LEARNING_TIME_LONG、EFFECTIVE_LEARNING_TIMES不需设置，由Logs表计算得来。
      * */
     public static class Group implements BaseColumns {
         public static final String TABLE_NAME = "group_table";
         public static final String COLUMN_DESCRIPTION = "description";
         public static final String COLUMN_MISSION_ID = "mission_id";//属于哪个任务
-        public static final String COLUMN_SETTING_UP_TIME_LONG = "init_setting_time";//long型（DB整型）；初始学习时间。
-}
+        public static final String COLUMN_SETTING_UP_TIME_LONG = "init_setting_time";//long型（DB整型）；分组。
+    }
 
     /*
     * 用于分组的各次复习时间的记录表
@@ -61,6 +62,7 @@ public final class YoMemoryContract {
         public static final String TABLE_NAME = "learning_logs";
         public static final String COLUMN_TIME_IN_LONG = "long";
         public static final String COLUMN_GROUP_ID = "group_id";
+        public static final String COLUMN_IS_EFFECTIVE = "is_effective";
     }
 
     /*
