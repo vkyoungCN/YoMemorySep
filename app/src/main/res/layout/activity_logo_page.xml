@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LogoPageActivity"
+    android:orientation="vertical"
+    >
+
+    <TextView
+        android:id="@+id/logo_cn"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_gravity="center"
+        android:gravity="bottom|center_horizontal"
+        android:textSize="30sp"
+        android:text="@string/YouMemoryCN"
+        android:alpha="0.6"
+        />
+
+    <!--短横线-->
+    <TextView
+        android:layout_width="120dp"
+        android:layout_height="1dp"
+        android:background="#efefef"
+        android:layout_gravity="bottom|center_horizontal"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:textSize="12sp"
+        android:text="@string/alpha_testing_string"
+        />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_gravity="center"
+        android:gravity="top|center_horizontal"
+        android:textSize="16sp"
+        android:textColor="#1976d2"
+        android:text="@string/YouMemoryEn"
+        />
+
+    <!--<TextView
+        android:id="@+id/re_try_firstActivity"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:text="@string/re_try"
+        android:background="#eeeeee"
+        android:visibility="gone"
+        />-->
+
+</LinearLayout>

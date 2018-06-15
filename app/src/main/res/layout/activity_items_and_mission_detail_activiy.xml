@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.vkyoungcn.smartdevices.yomemory.ItemsAndMissionDetailActivity"
+    android:orientation="vertical">
+
+    <!--页面上部，横向llt-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="96dp"
+        android:orientation="horizontal">
+
+        <!--上部的左半llt-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="96dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_mission_detail_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:background="#f6f6f6f6"
+                android:padding="8dp"
+                android:text="@string/mission_name_default"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_mission_detail_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:lines="2"
+                android:padding="4dp"
+                android:text="@string/mission_description_extra"
+                android:textSize="14sp"
+
+                />
+
+
+        </LinearLayout>
+
+        <!--竖向分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#cdcdcd" />
+
+        <!--上部的右半区域-->
+        <LinearLayout
+            android:layout_width="90dp"
+            android:layout_height="96dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:padding="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:textSize="12sp"
+                android:text="@string/number_of_items"
+                />
+
+            <TextView
+                android:id="@+id/numberOfTotalItemsOfMission"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:textColor="#d84315"
+                android:text="@string/num_10800"
+                />
+
+            <TextView
+                android:padding="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:textSize="12sp"
+                android:text="@string/picked_percentage"
+                />
+
+            <TextView
+                android:id="@+id/learnedPercentageOfTotalItemsOfMission"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:textColor="#d84315"
+                android:text="@string/percentage_one"
+                />
+
+            <!--横向分割线-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#efefefef"
+                />
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+
+
+
+    <!--Rv部分上部的条纹分割线、题头，与Rv独立并列-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:orientation="vertical">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:src="@drawable/slash_bars_red"
+            android:scaleType="centerCrop"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="28dp"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:text="@string/resource_list"
+            />
+        <!--横向分割线-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#ff666666"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            >
+            <TextView
+                android:id="@+id/rv_id_itemOfMission"
+                android:padding="2dp"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/id"
+                android:ellipsize="end"
+                android:lines="1"
+                />
+
+            <!--分割线 -->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="36dp"
+                android:background="#cce0e0e0"
+                />
+            <TextView
+                android:id="@+id/rv_name_itemOfMission"
+                android:padding="2dp"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="match_parent"
+                android:text="@string/name"
+                android:ellipsize="end"
+                android:lines="1"
+                />
+
+            <!--分割线 -->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="36dp"
+                android:background="#cce0e0e0"
+                />
+            <TextView
+                android:id="@+id/rv_ex1_itemOfMission"
+                android:padding="2dp"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="4"
+                android:layout_height="match_parent"
+                android:text="@string/phonetic"
+                android:ellipsize="end"
+                android:lines="1"
+                />
+
+            <!--分割线 -->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="36dp"
+                android:background="#cce0e0e0"
+                />
+
+            <TextView
+                android:id="@+id/rv_is_chose_itemOfMission"
+                android:gravity="center"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:text="@string/chose"
+                />
+
+            <!--分割线 -->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="36dp"
+                android:background="#cce0e0e0"
+                />
+
+            <TextView
+                android:id="@+id/rv_is_learned_itemOfMission"
+                android:gravity="center"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:text="@string/learned"
+                />
+
+            <!--分割线 -->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="36dp"
+                android:background="#cce0e0e0"
+                />
+
+            <TextView
+                android:gravity="center"
+                android:layout_width="36dp"
+                android:layout_height="match_parent"
+                android:text="@string/E"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <!--下部，Rv区域。含遮盖区-->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!--遮盖区（可能已无存在必要，待删除。）-->
+        <FrameLayout
+            android:id="@+id/maskOverRv_MissionItemsDetail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:text="@string/hold_on_a_moment"/>
+        </FrameLayout>
+
+        <!--Rv部分-->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/items_of_mission_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+        <!--两个横排按钮，位于Fl底部-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginBottom="1dp"
+            android:layout_marginTop="1dp"
+            android:orientation="horizontal"
+            android:layout_gravity="bottom|center_horizontal"
+            android:elevation="2dp"
+            >
+
+            <!--占位-->
+            <!--<ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                />-->
+            <!--增-->
+            <ImageView
+                android:id="@+id/addItem_ItemAndMissionDetailActivity"
+                android:layout_width="64dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="24sp"
+                android:background="#dd00e676"
+                android:src="@drawable/add_plus_gray"
+                />
+
+            <!--删-->
+            <!--删除操作改为长按
+            <ImageView
+                android:id="@+id/deleteItem_ItemAndMissionDetailActivity"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:background="#bbd50000"
+                android:src="@drawable/delete_minus_gray"
+                />-->
+
+            <!--改-->
+            <!--
+            改的按钮改为直接设计在条项内
+            <ImageView
+                android:id="@+id/modifyItem_ItemAndMissionDetailActivity"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:background="#f9a825"
+                android:src="@drawable/modify_spot_light_gray"
+                />-->
+            <!--查-->
+            <ImageView
+                android:id="@+id/queryItem_ItemAndMissionDetailActivity"
+                android:layout_width="64dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:background="#f9a825"
+                android:src="@drawable/query_right_gray"
+                />
+
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+
+
+</LinearLayout>

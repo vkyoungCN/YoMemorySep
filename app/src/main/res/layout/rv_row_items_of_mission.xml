@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="90dp"
+    android:orientation="vertical"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        >
+        <TextView
+            android:id="@+id/rv_id_itemOfMission"
+            android:padding="2dp"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="@string/sharp_x2_default"
+            android:ellipsize="end"
+            android:lines="1"
+            />
+
+        <!--分割线 -->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="36dp"
+            android:background="#cce0e0e0"
+            />
+        <TextView
+            android:id="@+id/rv_name_itemOfMission"
+            android:padding="2dp"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="match_parent"
+            android:text="@string/sharp_x2_default"
+            android:ellipsize="end"
+            android:lines="1"
+            />
+
+        <!--分割线 -->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="36dp"
+            android:background="#cce0e0e0"
+            />
+        <TextView
+            android:id="@+id/rv_ex1_itemOfMission"
+            android:padding="2dp"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_weight="4"
+            android:layout_height="match_parent"
+            android:text="@string/sharp_x2_default"
+            android:ellipsize="end"
+            android:lines="1"
+            />
+
+        <!--分割线 -->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="36dp"
+            android:background="#cce0e0e0"
+            />
+
+        <TextView
+            android:id="@+id/rv_is_chose_itemOfMission"
+            android:gravity="center"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:text="@string/two_bars"
+            />
+
+        <!--分割线 -->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="36dp"
+            android:background="#cce0e0e0"
+            />
+
+        <TextView
+            android:id="@+id/rv_is_learned_itemOfMission"
+            android:gravity="center"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:text="@string/two_bars"
+            />
+
+        <!--分割线 -->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="36dp"
+            android:background="#cce0e0e0"
+            />
+
+        <TextView
+            android:id="@+id/rv_spell_error_times_itemOfMission"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/two_bars"
+            />
+        <Space
+            android:layout_width="12dp"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:id="@+id/rv_ex2_itemOfMission"
+            android:padding="2dp"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_weight="4"
+            android:layout_height="match_parent"
+            android:text="@string/sharp_x24_default"
+            android:ellipsize="end"
+            android:lines="1"
+            android:background="#efefef"
+            />
+
+        <!--分割线 -->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#cce0e0e0"
+            />
+
+        <TextView
+            android:id="@+id/rv_tv_group_id_itemOfMission"
+            android:gravity="center"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:textColor="#304ffe"
+            android:text="@string/sharp_x3_default"
+            />
+
+        <!--分割线 -->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#cce0e0e0"
+            />
+
+        <TextView
+            android:id="@+id/rv_priority_itemOfMission"
+            android:gravity="center"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:textColor="#d84315"
+            android:text="@string/sharp_x2_default"
+            />
+
+        <!--分割线 -->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#cce0e0e0"
+            />
+
+        <ImageView
+            android:id="@+id/rv_edit2_itemOfMission"
+            android:layout_width="40dp"
+            android:background="#dd4caf50"
+            android:layout_height="40dp"
+            android:layout_margin="4dp"
+            android:elevation="4dp"
+            android:src="@drawable/edit_white_arrow"
+            />
+    </LinearLayout>
+
+    <!--图片分割线 -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/vertical_bars_blue_720x8"
+        />
+
+</LinearLayout>
