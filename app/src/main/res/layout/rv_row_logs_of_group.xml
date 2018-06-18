@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:orientation="horizontal"
+        android:layout_margin="4dp"
+        android:gravity="center"
+        >
+
+        <TextView
+            android:id="@+id/tv_num_LG"
+            android:padding="2dp"
+            android:gravity="center"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:text="@string/sharp_x2_default"
+            android:ellipsize="end"
+            android:lines="1"
+            />
+
+        <!--分割线 -->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefef"
+            />
+
+        <TextView
+            android:id="@+id/tv_time_LG"
+            android:gravity="center"
+            android:padding="2dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/sharp_x2_default"
+            android:ellipsize="end"
+            android:lines="1"
+            />
+
+        <!--分割线 -->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefef"
+            />
+
+        <ImageView
+            android:id="@+id/tv_isEffect_LG"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/start_yellow"
+            />
+
+
+    </LinearLayout>
+
+    <!--横向分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="2dp"
+        android:background="#efefef"
+        />
+
+</LinearLayout>

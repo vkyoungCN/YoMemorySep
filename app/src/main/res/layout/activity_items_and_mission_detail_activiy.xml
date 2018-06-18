@@ -140,96 +140,56 @@
             android:orientation="horizontal"
             android:gravity="center_vertical"
             >
+            <!--列1：id-->
             <TextView
-                android:id="@+id/rv_id_itemOfMission"
-                android:padding="2dp"
+                android:padding="1dp"
                 android:gravity="center"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="36dp"
                 android:layout_height="match_parent"
                 android:text="@string/id"
-                android:ellipsize="end"
-                android:lines="1"
                 />
-
             <!--分割线 -->
             <TextView
                 android:layout_width="1dp"
                 android:layout_height="36dp"
                 android:background="#cce0e0e0"
                 />
+
+            <!--列2：资源名-->
             <TextView
-                android:id="@+id/rv_name_itemOfMission"
                 android:padding="2dp"
                 android:gravity="center"
                 android:layout_width="0dp"
                 android:layout_weight="2"
                 android:layout_height="match_parent"
                 android:text="@string/name"
-                android:ellipsize="end"
-                android:lines="1"
                 />
-
             <!--分割线 -->
             <TextView
                 android:layout_width="1dp"
                 android:layout_height="36dp"
                 android:background="#cce0e0e0"
                 />
+
+
+            <!--列3：音标-->
             <TextView
-                android:id="@+id/rv_ex1_itemOfMission"
+                android:padding="2dp"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="match_parent"
+                android:text="@string/phonetic"
+                />
+
+            <!--列4：释义-->
+            <TextView
                 android:padding="2dp"
                 android:gravity="center"
                 android:layout_width="0dp"
                 android:layout_weight="4"
                 android:layout_height="match_parent"
-                android:text="@string/phonetic"
-                android:ellipsize="end"
-                android:lines="1"
-                />
-
-            <!--分割线 -->
-            <TextView
-                android:layout_width="1dp"
-                android:layout_height="36dp"
-                android:background="#cce0e0e0"
-                />
-
-            <TextView
-                android:id="@+id/rv_is_chose_itemOfMission"
-                android:gravity="center"
-                android:layout_width="48dp"
-                android:layout_height="match_parent"
-                android:text="@string/chose"
-                />
-
-            <!--分割线 -->
-            <TextView
-                android:layout_width="1dp"
-                android:layout_height="36dp"
-                android:background="#cce0e0e0"
-                />
-
-            <TextView
-                android:id="@+id/rv_is_learned_itemOfMission"
-                android:gravity="center"
-                android:layout_width="48dp"
-                android:layout_height="match_parent"
-                android:text="@string/learned"
-                />
-
-            <!--分割线 -->
-            <TextView
-                android:layout_width="1dp"
-                android:layout_height="36dp"
-                android:background="#cce0e0e0"
-                />
-
-            <TextView
-                android:gravity="center"
-                android:layout_width="36dp"
-                android:layout_height="match_parent"
-                android:text="@string/E"
+                android:text="@string/translation02"
                 />
         </LinearLayout>
     </LinearLayout>

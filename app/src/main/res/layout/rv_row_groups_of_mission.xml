@@ -2,31 +2,28 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="48dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     >
-
-    <!--内容行（大规模Rv列表最好只设计为单行式，剩余信息在详情页展示）-->
     <LinearLayout
+        android:id="@+id/rvLlt_overall_groupOfMission"
         android:layout_width="match_parent"
-        android:layout_height="44dp"
+        android:layout_height="42dp"
         android:layout_margin="1dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         >
-
-        <!--列1：id-->
         <TextView
-            android:id="@+id/rv_id_itemOfMission"
-            android:padding="1dp"
+            android:id="@+id/rv_id_groupOfMission"
+            android:padding="2dp"
             android:gravity="center"
             android:layout_width="36dp"
             android:layout_height="match_parent"
             android:text="@string/sharp_x2_default"
-            android:textSize="12sp"
-            android:lines="1"
             android:ellipsize="end"
+            android:lines="1"
             />
+
         <!--分割线 -->
         <TextView
             android:layout_width="1dp"
@@ -34,18 +31,18 @@
             android:background="#cce0e0e0"
             />
 
-        <!--列2：资源名-->
         <TextView
-            android:id="@+id/rv_name_itemOfMission"
+            android:id="@+id/rv_description_groupOfMission"
             android:padding="2dp"
             android:gravity="center"
             android:layout_width="0dp"
-            android:layout_weight="2"
+            android:layout_weight="1"
             android:layout_height="match_parent"
             android:text="@string/sharp_x2_default"
             android:ellipsize="end"
             android:lines="1"
             />
+
         <!--分割线 -->
         <TextView
             android:layout_width="1dp"
@@ -53,49 +50,62 @@
             android:background="#cce0e0e0"
             />
 
-
-        <!--列3：音标-->
         <TextView
-            android:id="@+id/rv_phonetic_itemOfMission"
+            android:id="@+id/rv_NumSubs_groupOfMission"
             android:padding="2dp"
             android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_weight="2"
+            android:layout_width="36dp"
             android:layout_height="match_parent"
             android:text="@string/sharp_x2_default"
             android:ellipsize="end"
             android:lines="1"
             />
 
-        <!--列4：释义-->
-        <TextView
-            android:id="@+id/rv_translation_itemOfMission"
-            android:padding="2dp"
-            android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_weight="4"
-            android:layout_height="match_parent"
-            android:text="@string/sharp_x24_default"
-            android:ellipsize="end"
-            android:lines="1"
-            android:background="#efefef"
-            />
-
-        <!--白分割线 -->
+        <!--分割线 -->
         <TextView
             android:layout_width="1dp"
             android:layout_height="36dp"
+            android:background="#cce0e0e0"
             />
 
-        <!--列5：详情按钮-->
+        <TextView
+            android:id="@+id/rv_memory_stage_groupOfMission"
+            android:gravity="center"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:text="@string/sharp_x2_default"
+            />
+
+        <!--分割线 -->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="36dp"
+            android:background="#cce0e0e0"
+            />
+
+        <TextView
+            android:id="@+id/rv_RMA_groupOfMission"
+            android:gravity="center"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:text="@string/two_bars"
+            />
+
+        <!--分割线 -->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="36dp"
+            android:background="#cce0e0e0"
+            />
+
         <ImageView
-            android:id="@+id/rv_goDetail_itemOfMission"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="#f5f5f5"
-            android:src="@drawable/detail_rect_ts"
+            android:id="@+id/rv_goBtn_groupOfMission"
+            android:layout_width="42dp"
+            android:layout_height="match_parent"
+            android:padding="2dp"
+            android:src="@drawable/go_01"
+            android:scaleType="centerInside"
             />
-
     </LinearLayout>
 
     <!--图片分割线 -->
@@ -105,5 +115,8 @@
         android:scaleType="centerCrop"
         android:src="@drawable/vertical_bars_blue_720x8"
         />
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="2dp" />
 
 </LinearLayout>

@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".fragments.CreateGroupDiaFragment">
+
+    <!--
+        分组大小选择
+    -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="79dp"
+            android:layout_height="wrap_content"
+            android:text="@string/group_size"
+            android:gravity="center"
+            android:layout_gravity="center"/>
+
+        <!--竖向分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefefef"
+            />
+
+        <RadioGroup
+            android:id="@+id/rg_size_groupCreateDfg"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            >
+
+            <RadioButton
+                android:id="@+id/rb_16_groupCreate_dfg"
+                android:padding="2dp"
+                android:layout_margin="1dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/num_16"
+                android:checked="true"/>
+
+            <RadioButton
+                android:id="@+id/rb_24_groupCreate_dfg"
+                android:padding="2dp"
+                android:layout_margin="1dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/num_24"/>
+            <RadioButton
+                android:id="@+id/rb_32_groupCreate_dfg"
+                android:padding="2dp"
+                android:layout_margin="1dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/num_32"/>
+
+            <RadioButton
+                android:id="@+id/rb_8_groupCreate_dfg"
+                android:padding="2dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="1dp"
+                android:text="@string/num_8"/>
+        </RadioGroup>
+        <!--竖向分割线-->
+       <!-- <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefefef"
+            />
+
+        <EditText
+            android:id="@+id/numByHand_groupCreate_dfg"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:hint="@string/input_by_hand2"
+            android:lines="1"
+            android:inputType="number"
+            android:ellipsize="end"
+            android:textSize="12sp"
+
+            />-->
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="79dp"
+            android:layout_height="wrap_content"
+            android:text="@string/manner_of_item_picking"
+            android:gravity="center"
+            android:layout_gravity="center"/>
+
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefefef"
+            />
+
+        <RadioGroup
+            android:id="@+id/rg_manner_groupCreateDfg"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="2dp"
+            >
+
+            <RadioButton
+                android:id="@+id/rb_random_groupCreateDfg"
+                android:padding="2dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/random"
+                android:checked="true"/>
+            <RadioButton
+                android:id="@+id/rb_order_groupCreateDfg"
+                android:padding="2dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/Order"/>
+        </RadioGroup>
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/tv_createGroupDfg_explaining"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/explanations_02"
+        android:gravity="center"
+        android:padding="6dp"
+        android:paddingStart="36dp"
+        android:paddingEnd="36dp"
+        android:lines="2"
+        android:textColor="#ffe52525"
+        android:ellipsize="marquee"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="4dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:text="@string/desc_desc"
+            android:gravity="center"
+            android:layout_gravity="center"/>
+
+        <EditText
+            android:id="@+id/group_desc_in_create_dfg"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:lines="1"
+            android:hint="@string/default_group_decs3"
+            />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="4dp">
+
+        <TextView
+            android:id="@+id/btn_cancel_createGroupDfg"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:layout_margin="4dp"
+            android:text="@string/cancel"
+            android:textSize="16sp"
+            android:background="#55e5e5e5"
+
+            />
+
+        <TextView
+            android:id="@+id/btn_ok_createGroupDfg"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:layout_margin="4dp"
+            android:text="@string/add_new_group"
+            android:textSize="16sp"
+            android:textColor="#212121"
+            android:background="#cc64dd17"
+
+            />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

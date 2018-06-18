@@ -11,6 +11,9 @@ public class SingleLearningLog implements Parcelable{
     private int groupId = 0;
     private boolean isEffective = false;
 
+    public SingleLearningLog() {
+    }
+
     public SingleLearningLog(long timeInLong, int groupId, boolean isEffective) {
         this.timeInLong = timeInLong;
         this.groupId = groupId;

@@ -23,15 +23,20 @@ public class RVGroup implements Parcelable{
     private float RM_Amount = 0;//记忆存量（Retaining Memory Amount）
     private byte memoryStage = 0;//记忆级别，记忆级别越高，衰减越缓慢。等于DBGroup中的effectiveRePickingTime,二者相互等价，字段只设其一。
 
-    public RVGroup(int id, String description, int mission_id, long settingUptimeInLong, long lastLearningTime, byte RM_Amount, byte memoryStage) {
+    //以下一项是Item表提供给DBGroup的
+    private short totalItemsNum= 0;//本组所属资源总量
+
+    public RVGroup(int id, String description, int mission_id, long settingUptimeInLong, long lastLearningTime, float RM_Amount, byte memoryStage, short totalItemsNum) {
         this.id = id;
         this.description = description;
         this.mission_id = mission_id;
         this.settingUptimeInLong = settingUptimeInLong;
-        this.lastLearningTime = lastLearningTime;
 
+        this.lastLearningTime = lastLearningTime;
         this.RM_Amount = RM_Amount;
         this.memoryStage = memoryStage;
+
+        this.totalItemsNum = totalItemsNum;
     }
 
     /*
@@ -47,6 +52,7 @@ public class RVGroup implements Parcelable{
         this.memoryStage = dbGroup.getEffectiveRePickingTimes() ;//后一句会使用，注意顺序哦。
 
         this.RM_Amount = getCurrentRMAmount();//需要计算。需要使用刚刚获取的lastLearningTime、memoryStage数据。
+        this.totalItemsNum = dbGroup.getTotalItemNum();
 
     }
 
@@ -54,8 +60,8 @@ public class RVGroup implements Parcelable{
     /*
     * 用于为当前分组（当前分组的Logs记录），计算当前时点下的记忆存量
     * */
-    private  float getCurrentRMAmount(){
-        Log.i(TAG, "getCurrentRMAmount: be.");
+    private float getCurrentRMAmount(){
+//        Log.i(TAG, "getCurrentRMAmount: be.");
         //首先要获取要参与计算的m值，即实际有效的复习次数。直接使用之前已获得的数据。
 
         //获取当前时间和最后一条Log之间的时间间隔(这个只需要值最大的一条即可，不必管什么有效不有效)
@@ -75,12 +81,58 @@ public class RVGroup implements Parcelable{
         return rM_BD.setScale(1,BigDecimal.ROUND_HALF_UP).floatValue();
     }
 
+
+    /*
+    * 衰减到某个指定的M值之前还剩多长时间
+    * 在该时间内复习可以提升记忆等级MS，否则只是刷新记忆总量而已。
+    * 该指定的M值，取决于当前所处的MS。
+    * （由于设计中原realNum是对应复习，后来将学习和复习统一化，则m应从0其，初学次对应的m是0，对应的MS
+    * 记忆等级也是0）
+    * */
+    public static int minutesRemainTillThreshold( byte memoryStage){
+        float alpha = 2.5f;
+        float beta =2.05f;
+        int fakeNum = 3;
+
+        int target_RM ;
+        switch (memoryStage){
+            case 0:
+            case 1:
+            case 2:
+                target_RM =10;
+                break;
+            case 3:
+            case 4:
+                target_RM=12;
+                break;
+            case 5:
+                target_RM=24;
+                break;
+            case 6:
+                target_RM=36;
+                break;
+            default:
+                target_RM = 50;
+        }
+
+        double block_1 = (Math.pow((1+alpha),fakeNum))*(Math.pow((1+beta),memoryStage));
+        return (int)((100*block_1)/target_RM+1-block_1);
+    }
+
+
     /*
     * 用于刷新retainingAmount和memoryStage字段；
     * 从而用于Rv-UI显示的变更。
+    * 通过返回值告知调用方是否进行了实际的更新。
     * */
-    public void refreshRM(){
-
+    public boolean refreshRMA(){
+        float newRMA = getCurrentRMAmount();
+        if(this.RM_Amount == newRMA){
+            return false;//代表新旧值一致，无需更新
+        }else {
+            this.RM_Amount = newRMA;
+            return true;//新旧值不同，需更新
+        }
     }
 
     public int getId() {
@@ -139,6 +191,13 @@ public class RVGroup implements Parcelable{
         this.memoryStage = memoryStage;
     }
 
+    public short getTotalItemsNum() {
+        return totalItemsNum;
+    }
+
+    public void setTotalItemsNum(short totalItemsNum) {
+        this.totalItemsNum = totalItemsNum;
+    }
 
     @Override
     public Object clone() throws CloneNotSupportedException {
@@ -170,6 +229,7 @@ public class RVGroup implements Parcelable{
         parcel.writeSerializable(lastLearningTime);
         parcel.writeByte(memoryStage);
         parcel.writeFloat(RM_Amount);
+        parcel.writeInt(totalItemsNum);
     }
 
     public static final Parcelable.Creator<RVGroup> CREATOR = new Parcelable.Creator<RVGroup>(){
@@ -192,6 +252,7 @@ public class RVGroup implements Parcelable{
         lastLearningTime = in.readLong();
         memoryStage = in.readByte();
         RM_Amount = in.readFloat();
+        totalItemsNum = (short)in.readInt();
     }
 
 

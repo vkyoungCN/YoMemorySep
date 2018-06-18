@@ -391,9 +391,9 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     }
 
 
-    public List<SingleItem> getItemsByGroupId(int groupId, String tableNameSuffix){
+    public ArrayList<SingleItem> getItemsByGroupId(int groupId, String tableNameSuffix){
         Log.i(TAG, "getItemsByGroupId: before any.");
-        List<SingleItem> items = new ArrayList<>();
+        ArrayList<SingleItem> items = new ArrayList<>();
 
         String selectQuery = "SELECT * FROM "+ YoMemoryContract.ItemBasic.TABLE_NAME+tableNameSuffix
                 +" WHERE "+ YoMemoryContract.ItemBasic.COLUMN_GROUP_ID +" = "+groupId;
@@ -459,7 +459,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     /*
     * 需要读取两个表，group表获取4个字段、Logs表（经计算）获取两个字段
     * */
-    public ArrayList<DBGroup> getAllGroupsByMissionId(int missionsId){
+    public ArrayList<DBGroup> getAllGroupsByMissionId(int missionsId, String tableSuffix){
         ArrayList<DBGroup> groups = new ArrayList<>();
         String selectQuery = "SELECT * FROM "+ YoMemoryContract.Group.TABLE_NAME+
                 " WHERE "+ YoMemoryContract.Group.COLUMN_MISSION_ID+" = "+missionsId;
@@ -482,6 +482,8 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
                 //【？】能否在cursor循环下读另外一张表
                 group.setLastLearningTime(getLastLearningTimeInLong(groupId));
                 group.setEffectiveRePickingTimes(getEffectiveLearningTime(groupId));
+
+                group.setTotalItemNum(getTotalSubItemsNumOfGroup(groupId,tableSuffix));
 
                 groups.add(group);
             }while (cursor.moveToNext());
@@ -545,7 +547,30 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     }
 
 
-    public DBGroup getGroupById(int groupId){
+    private short getTotalSubItemsNumOfGroup(int groupId, String tableSuffix){
+        Log.i(TAG, "getTotalSubItemsNumOfGroup: be.");
+        String selectNumSubItemsQuery = "SELECT COUNT(*) "+" FROM "+
+                YoMemoryContract.ItemBasic.TABLE_NAME+tableSuffix+" WHERE "+
+                YoMemoryContract.ItemBasic.COLUMN_GROUP_ID+" = "+groupId;
+
+        getWritableDatabaseIfClosedOrNull();
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectNumSubItemsQuery,null);
+
+        short resultNum = 0;
+        if(cursor.moveToFirst()){
+            resultNum = cursor.getShort(0);
+        }
+
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return resultNum;
+    }
+
+    public DBGroup getGroupById(int groupId,String tableSuffix){
         DBGroup group = new DBGroup();
         String selectQuery = "SELECT * FROM "+ YoMemoryContract.Group.TABLE_NAME+
                 " WHERE "+ YoMemoryContract.Group._ID+" = "+groupId;
@@ -563,6 +588,8 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
             group.setLastLearningTime(getLastLearningTimeInLong(groupId));
             group.setEffectiveRePickingTimes(getEffectiveLearningTime(groupId));
 
+            group.setTotalItemNum(getTotalSubItemsNumOfGroup(groupId,tableSuffix));
+
         }
 
         try {
@@ -577,6 +604,43 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         return group;
     }
 
+    //取指定第几行上的数据
+    public DBGroup getGroupByLine(long line,String tableSuffix){
+        DBGroup group = new DBGroup();
+        String selectOneByLinesQuery = "SELECT * FROM "+ YoMemoryContract.Group.TABLE_NAME+
+                " LIMIT "+line+",1";
+        //【取最后一条的写法：】 " LIMIT (SELECT COUNT(*) FROM "+YoMemoryContract.Group.TABLE_NAME+" )-1,1";
+
+        getReadableDatabaseIfClosedOrNull();
+        mSQLiteDatabase.beginTransaction();
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectOneByLinesQuery, null);
+
+        if(cursor.moveToFirst()){
+            int groupId = cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Group._ID));
+
+            group.setId(groupId);
+            group.setDescription(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_DESCRIPTION)));
+            group.setSettingUptimeInLong(cursor.getLong(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG)));
+            group.setMission_id(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_MISSION_ID)));
+
+            group.setLastLearningTime(getLastLearningTimeInLong(groupId));
+            group.setEffectiveRePickingTimes(getEffectiveLearningTime(groupId));
+
+            group.setTotalItemNum(getTotalSubItemsNumOfGroup(groupId,tableSuffix));
+
+        }
+
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        mSQLiteDatabase.setTransactionSuccessful();
+        mSQLiteDatabase.endTransaction();
+
+        closeDB();
+        return group;
+    }
 
     /*
     * 为指定分组新增一条Logs学习记录
@@ -597,6 +661,40 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         return lines;
 
 
+    }
+
+
+    /*
+    * 获取指定分组的所有LearningLogs
+    * */
+    public ArrayList<SingleLearningLog> getAllLogsOfGroup(int groupId){
+        ArrayList<SingleLearningLog> learningLogs = new ArrayList<>();
+        String selectQuery = "SELECT * FROM "+ YoMemoryContract.LearningLogs.TABLE_NAME+
+                " WHERE "+ YoMemoryContract.LearningLogs.COLUMN_GROUP_ID+" = "+groupId;
+
+        getReadableDatabaseIfClosedOrNull();
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectQuery, null);
+
+        if(cursor.moveToFirst()){
+            do{
+                SingleLearningLog singleLog = new SingleLearningLog();
+
+                singleLog.setGroupId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.LearningLogs.COLUMN_GROUP_ID)));
+                singleLog.setTimeInLong(cursor.getLong(cursor.getColumnIndex(YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG)));
+                singleLog.setEffective(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.LearningLogs.COLUMN_IS_EFFECTIVE))==1);
+
+                learningLogs.add(singleLog);
+            }while (cursor.moveToNext());
+        }
+
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        closeDB();
+        return learningLogs;
     }
 
 
@@ -689,12 +787,12 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
     /*
     * 按顺序选取Item中前n项记录（的id），提供给任务组的生成。
-    * 要求是未抽取的
-    * 相应记录要置已抽取（标记为抽取的操作改由创建Group时进行，作为一个整体事务，以免取回itemId后创建失败。）
+    * 要求从尚未抽取的items中选取。
+    * 相应记录暂不该为“已抽取”，而由创建Group时的方法进行）
     * 未能选到任何结果时，返回null；
     * */
-    public List<Integer> getCertainAmountItemIdsOrderly(int amount, String tableNameSuffix){
-        List<Integer> ids = new ArrayList<>();
+    public ArrayList<Integer> getCertainAmountItemIdsOrderly(int amount, String tableNameSuffix){
+        ArrayList<Integer> ids = new ArrayList<>();
         String selectQueryInner = "SELECT "+ YoMemoryContract.ItemBasic._ID
                 +" FROM "+ YoMemoryContract.ItemBasic.TABLE_NAME+tableNameSuffix
                 +" WHERE "+ YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE +" =  0  OR "
@@ -733,8 +831,8 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
      * 未能选到任何结果时，返回null；
      * 【待】我怎么记得涉及到SQLite的ID的项目都需用long啊？！
      * */
-    public List<Integer> getCertainAmountItemIdsRandomly(int amount, String tableNameSuffix){
-        List<Integer> ids = new ArrayList<>();
+    public ArrayList<Integer> getCertainAmountItemIdsRandomly(int amount, String tableNameSuffix){
+        ArrayList<Integer> ids = new ArrayList<>();
         String selectQuery = "SELECT "+ YoMemoryContract.ItemBasic._ID
                 + " FROM "+ YoMemoryContract.ItemBasic.TABLE_NAME+tableNameSuffix
                 +" WHERE "+ YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE +" = 0 OR "

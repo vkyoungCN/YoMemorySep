@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".GroupDetailActivity"
+    android:orientation="vertical">
+
+    <!--上部（顶部区）-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:orientation="horizontal"
+
+        >
+        <!--列1：id-->
+        <TextView
+            android:id="@+id/tv_id_GD"
+            android:padding="2dp"
+            android:gravity="center"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:background="#efefef"
+            android:text="@string/sharp_x_id"
+            android:ellipsize="end"
+            android:lines="1"
+            />
+
+        <!--分隔空间-->
+        <Space
+            android:layout_width="2dp"
+            android:layout_height="match_parent" />
+        <!--列2：描述-->
+        <TextView
+            android:id="@+id/tv_description_GD"
+            android:padding="2dp"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:background="#efefef"
+            android:text="@string/sharp_xx_description"
+            android:ellipsize="end"
+            android:lines="1"
+            />
+
+        <!--分隔空间-->
+        <Space
+            android:layout_width="2dp"
+            android:layout_height="match_parent" />
+        <!--列3：组内资源数量-->
+        <TextView
+            android:id="@+id/tv_subNum_GD"
+            android:padding="2dp"
+            android:gravity="center"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:background="#efefef"
+            android:text="@string/sharp_x_num"
+            android:ellipsize="end"
+            android:lines="1"
+            />
+
+    </LinearLayout>
+
+    <!--横向分隔空间-->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
+    <!--上部第2行-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#efefef"
+        android:orientation="horizontal">
+        <!--题头3-->
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:gravity="center"
+            android:lines="1"
+            android:text="@string/str_groupSetTime"/>
+        <!--竖向小分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#ffffff"/>
+        <!--值文本3-->
+        <TextView
+            android:id="@+id/tv_setupTime_GD"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:padding="4dp"
+            android:lines="1"
+            android:gravity="center"
+            android:text="@string/str_sharp_time"/>
+
+
+    </LinearLayout>
+    <!--横向分隔空间-->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="2dp" />
+
+
+    <!--中部区域(上)：记忆信息。分左右两栏：1/2行合并，且只占据左侧；右侧待定 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <!--左侧-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content"
+            android:background="#efefef"
+            android:orientation="vertical">
+
+            <!--中部第一行-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:orientation="horizontal">
+                <!--题头1-->
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:gravity="center"
+                    android:lines="1"
+                    android:text="@string/str_MemoryStage"/>
+
+                <!--竖向小分割线-->
+                <TextView
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#ffffff"/>
+                <!--值文本1-->
+                <TextView
+                    android:id="@+id/tv_ms_GD"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="4dp"
+                    android:lines="1"
+                    android:gravity="center"
+                    android:text="@string/num_8"/>
+
+            </LinearLayout>
+            <!--横向分隔空间-->
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
+
+            <!--中部第二行-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:orientation="horizontal">
+                <!--题头2-->
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:gravity="center"
+                    android:lines="1"
+                    android:text="@string/str_RMAmount"/>
+                <!--竖向小分割线-->
+                <TextView
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#ffffff"/>
+                <!--值文本2-->
+                <TextView
+                    android:id="@+id/tv_rma_GD"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="4dp"
+                    android:lines="1"
+                    android:gravity="center"
+                    android:text="@string/num_8"/>
+
+            </LinearLayout>
+
+
+
+
+        </LinearLayout>
+
+        <!--分栏中央竖分割线-->
+        <ImageView
+            android:layout_width="3dp"
+            android:layout_marginStart="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/slash_bars_yellow_black_small2"
+            android:scaleType="centerCrop"
+            />
+
+
+        <!--右侧。暂时安置一个Tv，后期改为图像UI+Tv-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="match_parent"
+            >
+
+            <!--提示衰减到阈限还有多长时间-->
+            <TextView
+                android:id="@+id/tv_remainTime_GD"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:text="@string/str_pleaseRePickIn_xxTime"
+                />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+    <!--横向全屏分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ffffff"/>
+
+    <!--中部第3行-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="#efefef"
+        android:orientation="horizontal">
+        <!--题头3-->
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:gravity="center"
+            android:lines="1"
+            android:textSize="12sp"
+            android:text="@string/str_groupLastLearningTime"/>
+        <!--竖向小分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#ffffff"/>
+        <!--值文本3-->
+        <TextView
+            android:id="@+id/tv_lastLearningTime_GD"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:padding="4dp"
+            android:lines="1"
+            android:gravity="center"
+            android:text="@string/str_sharp_time"/>
+
+        <!--按钮：本组的所有学习记录-->
+        <ImageView
+            android:id="@+id/ivBtn_allLogs_GD"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:paddingTop="8dp"
+            android:background="#f5f5f5"
+            android:src="@drawable/three_points"
+            />
+
+
+
+    </LinearLayout>
+    <!--横向分隔空间-->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="2dp" />
+
+
+    <!--Rv部分上部的条纹分割线、题头，与Rv独立并列-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:orientation="vertical">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:src="@drawable/slash_bars_red"
+            android:scaleType="centerCrop"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="28dp"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:text="@string/resource_list"
+            />
+        <!--横向分割线-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#ff666666"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            >
+            <!--列1：id-->
+            <TextView
+                android:padding="1dp"
+                android:gravity="center"
+                android:layout_width="36dp"
+                android:layout_height="match_parent"
+                android:text="@string/id"
+                />
+            <!--分割线 -->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="36dp"
+                android:background="#cce0e0e0"
+                />
+
+            <!--列2：资源名-->
+            <TextView
+                android:padding="2dp"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="match_parent"
+                android:text="@string/name"
+                />
+            <!--分割线 -->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="36dp"
+                android:background="#cce0e0e0"
+                />
+
+
+            <!--列3：音标-->
+            <TextView
+                android:padding="2dp"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="match_parent"
+                android:text="@string/phonetic"
+                />
+
+            <!--列4：释义-->
+            <TextView
+                android:padding="2dp"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="4"
+                android:layout_height="match_parent"
+                android:text="@string/translation02"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_itemsOfGroup_GD"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+
+</LinearLayout>

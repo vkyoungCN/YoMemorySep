@@ -41,7 +41,7 @@ public class ItemsAndMissionDetailActivity extends AppCompatActivity {
     private static final String ITEM_TABLE_SUFFIX = "item_table_suffix";
 
     private RvMission missionFromIntent;//从前一页面获取。后续需要mission的id，suffix字段。
-    List<RvSingleItem> itemList = new ArrayList<>();//数据源
+    List<SingleItem> itemList = new ArrayList<>();//数据源
     private YoMemoryDbHelper memoryDbHelper;
     private String tableItemSuffix;//由于各任务所属的Item表不同，后面所有涉及Item的操作都需要通过后缀才能构建出完整表名。
     private RecyclerView mRv;
@@ -131,7 +131,7 @@ public class ItemsAndMissionDetailActivity extends AppCompatActivity {
                 fetched = true;//用于onResume中的判断。
                 //取消Rv区域的遮罩，从消息提取数据。
                 maskFrameLayout.setVisibility(View.GONE);
-                itemList = (ArrayList<RvSingleItem>)message.obj;
+                itemList = (ArrayList<SingleItem>)message.obj;
                 float percentageWithPoint = ((float) (message.arg1))/100;
 
                 //初始化Rv构造器，令UI加载Rv控件……

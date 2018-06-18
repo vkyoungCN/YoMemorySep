@@ -38,9 +38,9 @@ public class RvSingleItem implements Parcelable {
         this.translations = singleItem.getTranslations();
         this.isChose = singleItem.isChose()?"是":"否";
         this.isLearned = singleItem.isLearned()?"是":"否";
-        this.groupId = groupId;
-        this.priority = priority;
-        this.failedSpelling_times = failedSpelling_times;
+        this.groupId = singleItem.getGroupId();
+        this.priority = singleItem.getPriority();
+        this.failedSpelling_times = singleItem.getFailedSpelling_times();
     }
 
     public int getId() {
