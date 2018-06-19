@@ -1,5 +1,9 @@
 package com.vkyoungcn.smartdevices.yomemory.adapters;
 
+import android.app.Activity;
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +16,7 @@ import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.GroupDetailActivity;
 import com.vkyoungcn.smartdevices.yomemory.R;
+import com.vkyoungcn.smartdevices.yomemory.fragments.LearningLessFourDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 
 import java.util.ArrayList;
@@ -37,13 +42,13 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
 
         private ViewHolder(View itemView) {
             super(itemView);
-            tv_groupId = itemView.findViewById(R.id.rv_id_itemOfMission);
-            tv_groupDescription = itemView.findViewById(R.id.rv_name_itemOfMission);
-            tv_NumSub = itemView.findViewById(R.id.rv_phonetic_itemOfMission);
-            tv_Stage = itemView.findViewById(R.id.rv_translation_itemOfMission);
-            tv_RMA = itemView.findViewById(R.id.rv_is_chose_itemOfMission);
+            tv_groupId = itemView.findViewById(R.id.rv_id_groupOfMission);
+            tv_groupDescription = itemView.findViewById(R.id.rv_description_groupOfMission);
+            tv_NumSub = itemView.findViewById(R.id.rv_NumSubs_groupOfMission);
+            tv_Stage = itemView.findViewById(R.id.rv_memory_stage_groupOfMission);
+            tv_RMA = itemView.findViewById(R.id.rv_RMA_groupOfMission);
 
-            tv_btnGo = itemView.findViewById(R.id.rv_is_learned_itemOfMission);
+            tv_btnGo = itemView.findViewById(R.id.rv_goBtn_groupOfMission);
             tv_btnGo.setOnClickListener(this);
 
             llt_overall = itemView.findViewById(R.id.rvLlt_overall_groupOfMission);
@@ -55,8 +60,7 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.rv_goBtn_groupOfMission:
-                    //暂时没有动作。
-                    //考虑弹出DFG：
+                    //弹出DFG：
                     //
                     // 对于纯碎片分组的合并化处理思路（数量<4个）：提示“有…个同MS级别的碎片分组，将一同开启学习”
                     //如果没有其它同级碎片分组，则【毕竟不能不让学】开始学习（可能可以有提示，待定）；
@@ -65,9 +69,18 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
                     //DFG提示确认形式
                     // ①检测分组的容量（大于4个的按正常逻辑处理【RVG类直接有字段】）；
                     // ②拉取分组的id，所含资源项的id（可以由目的Activity负责）
-                    //
-                    // ，
-                    Toast.makeText(context, "转到分组学习页，施工中……", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "转到分组学习页", Toast.LENGTH_SHORT).show();
+
+                    groups.get(getAdapterPosition()).getId();
+                    if(groups.get(getAdapterPosition()).getTotalItemsNum()<5){
+                        //4个（含）以内的，推荐合并式学习
+                        FragmentTransaction transaction = ((Activity)context).getFragmentManager().beginTransaction();
+                        Fragment prev = ((Activity)context).getFragmentManager().findFragmentByTag("READY_TO_LEARN_LESS");
+
+                        DialogFragment dfg = LearningLessFourDiaFragment.newInstance();
+                        dfg.show(transaction, "READY_TO_LEARN_LESS");
+                    }
+
                     break;
 
                 case R.id.rvLlt_overall_groupOfMission:

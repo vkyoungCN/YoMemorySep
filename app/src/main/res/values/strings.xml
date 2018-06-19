@@ -151,4 +151,10 @@
     <string name="translation02">释义</string>
     <string name="str_pleaseRePickIn_xxTime">请在xx天xx小时xx分钟内完成复习</string>
     <string name="str_merge">将MS相同的若干小分组合并起来复习，生成为一个较大的分组</string>
+    <string name="title_dfg_learningAddInOrder">边学边建（顺序）</string>
+    <string name="explanations_learningAddInOrder">将顺序选取一定数量的词汇，根据最终的识记数量生成分组</string>
+    <string name="title_dfg_learningAddRandom">边学边建（随机）</string>
+    <string name="explanations_learningAddRandom">将随机选取一定数量的词汇，根据最终的识记数量生成分组</string>
+    <string name="title_dfg_start_learning">开始学习</string>
+    <string name="explanations_learningLess">分组数量小于5个，将优先采取合并方式复习（多个相同MS值的碎片分组合并））</string>
 </resources>

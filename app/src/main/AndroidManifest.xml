@@ -20,6 +20,7 @@
         <activity android:name=".GroupsAndMissionDetailActivity" />
         <activity android:name=".ItemsAndMissionDetailActivity"/>
         <activity android:name=".GroupDetailActivity"/>
+        <activity android:name=".LearningActivity"/>
     </application>
 
 </manifest>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context=".fragments.LearningAddInOrderDiaFragment">
+
+
+    <TextView
+        android:layout_width="240dp"
+        android:layout_height="36dp"
+        android:text="@string/title_dfg_learningAddInOrder"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="2dp"
+        android:paddingStart="36dp"
+        android:paddingEnd="36dp"
+        android:background="#efefef"
+        />
+
+
+
+    <TextView
+        android:layout_width="240dp"
+        android:layout_height="120dp"
+        android:text="@string/explanations_learningAddInOrder"
+        android:gravity="center"
+        android:layout_margin="2dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:lines="2"
+        android:textColor="#ffe52525"
+        android:ellipsize="marquee"/>
+
+
+    <LinearLayout
+        android:layout_width="240dp"
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:padding="4dp">
+
+        <TextView
+            android:id="@+id/btn_cancel_learningAddInOrder"
+            android:layout_width="64dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="1dp"
+            android:gravity="center"
+            android:text="@string/cancel"
+            android:textSize="16sp"
+            android:background="#efefef"
+            />
+
+        <TextView
+            android:id="@+id/btn_confirm_learningAddInOrder"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginStart="1dp"
+            android:gravity="center"
+            android:text="@string/confirm"
+            android:textSize="16sp"
+            android:background="#cc64dd17"
+
+            />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

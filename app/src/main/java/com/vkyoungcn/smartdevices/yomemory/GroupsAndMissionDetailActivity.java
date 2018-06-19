@@ -19,18 +19,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.adapters.GroupsOfMissionRvAdapter;
-import com.vkyoungcn.smartdevices.yomemory.fragments.ConfirmDeletingDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.ConfirmReadyLearningDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.ConfirmRemoveRedsDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.CreateGroupDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.OnSimpleDFgButtonClickListener;
+import com.vkyoungcn.smartdevices.yomemory.fragments.LearningAddInOrderDiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.LearningAddRandomDiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.OnLearningConfirmDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMission;
 import com.vkyoungcn.smartdevices.yomemory.spiralCore.GroupState;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 import com.vkyoungcn.smartdevices.yomemory.spiralCore.GroupStateManager;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
-import com.vkyoungcn.smartdevices.yomemory.sqlite.YouMemoryDbHelper;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -49,9 +47,8 @@ import static com.vkyoungcn.smartdevices.yomemory.ItemLearningActivity.RESULT_EX
  * 学习/复习完成或因超时而未能完成的，都会回到本页面；完成则更新RV列表的显示，
  * 失败则产生一条消息【待实现】。
  * */
-public class GroupsAndMissionDetailActivity extends AppCompatActivity implements OnSimpleDFgButtonClickListener,
-        CreateGroupDiaFragment.onCreateGroupDFgConfirmListner,ConfirmReadyLearningDiaFragment.OnConfirmClick,
-        ConfirmRemoveRedsDiaFragment.OnRemoveRedsConfirmClick, ConfirmDeletingDiaFragment.OnDeletingGroupDfgClickListener {
+public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
+        CreateGroupDiaFragment.onCreateGroupDFgConfirmListner,OnLearningConfirmDfgInteraction{
     private static final String TAG = "MissionDetailActivity";
 
     public static final int EFFECTIVE_PICKING = 316;//先判断好是否仍在有效时期内，然后直接传递给后续页面。（学习完成需要将新Log存入DB，Log需要此信息。）
@@ -113,7 +110,6 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         new Thread(new PrepareForGroupsAndMissionRunnable()).start();         // start thread
     }
 
-
     //需要采用在pause-resume中重启线程的方案
     // 否则（即使排除了其他BUG，依然）存在“新变更log的条目”不会随线程更新的BUG。
     @Override
@@ -156,7 +152,6 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
      * 获取各分组原始数据，并进行排序、转换成RVGroup，然后返回给UI。
      * 提供两种排序方式：①衰减率最高的在前；②记忆存量最低的在前；
      */
-    //【已修改好】
     public class PrepareForGroupsAndMissionRunnable implements Runnable{
         @Override
         public void run() {
@@ -181,8 +176,6 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
             handler.sendMessage(message);
         }
     }
-
-    //【已改好】
     public static ArrayList<RVGroup> ascOrderByMemoryStage(ArrayList<RVGroup> RVGroups){
         ArrayList<RVGroup> resultRVGroups = new ArrayList<>();
 
@@ -236,7 +229,6 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
             handler.sendMessage(message);
         }
     }
-
 
     /*
      * 每隔一段时间，更新（重新）RV数据，然后更新RV-UI的显示。
@@ -380,21 +372,41 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         Toast.makeText(self, "施工中，查询分组的方法。", Toast.LENGTH_SHORT).show();
     }
 
-
-
     public void learnAndAddInOrder(View view){
-        //启动“边学边建”，按顺序建组
-        //上限设计为36个，因而①先顺序方式获取36个词；②记录所学的范围；
-        // ③在三种结束方式结束时，将所学范围生成新组。
+        //启动DFG，在dfg中点击了确认后，再交互到本Activity下的onLDfgInteraction方法，然后再生成Intent跳转。
+        // 启动“边学边建”，按顺序建组
+        // 传递“顺序/随机”二选一；其余不传递
+        // 由LearningActivity负责拉取36个资源，记录学习位置，最后在完成Activity对已学部分生成新组。
+        // 学习中的暂停、非正常终止、正常终止逻辑都由LA负责。
         // （关于组内乱序：新建时还是按顺序学习比较好，不提供此选项）
-        Toast.makeText(self, "施工中，边学边建。", Toast.LENGTH_SHORT).show();
+        Toast.makeText(self, "按学习数量建立分组（顺序）", Toast.LENGTH_SHORT).show();
+
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag("LEARNING_ADD_IN_ORDER");
+
+        if (prev != null) {
+            Toast.makeText(self, "Old DialogFg still there, removing first...", Toast.LENGTH_SHORT).show();
+            transaction.remove(prev);
+        }
+        DialogFragment dfg = LearningAddInOrderDiaFragment.newInstance();
+        dfg.show(transaction, "LEARNING_ADD_IN_ORDER");
+
     }
 
     public void learnAndAddRandom(View view){
         //启动“边学边建”，随机顺序。
         Toast.makeText(self, "施工中，边学边建。", Toast.LENGTH_SHORT).show();
-    }
 
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag("LEARNING_ADD_RANDOM");
+
+        if (prev != null) {
+            Toast.makeText(self, "Old DialogFg still there, removing first...", Toast.LENGTH_SHORT).show();
+            transaction.remove(prev);
+        }
+        DialogFragment dfg = LearningAddRandomDiaFragment.newInstance();
+        dfg.show(transaction, "LEARNING_ADD_RANDOM");
+    }
 
     public void learnAndMerge(View view){
         //原则上只从数量小于4个的分组中抽取资源，（可以选择，可扩大到8个）
@@ -410,27 +422,10 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
     }
 
 
+
     /*
-     * 相应某按钮点击事件，跳转到新页面显示本任务所属全部items
-     * */
-    public void listingItems(View view){
-        Log.i(TAG, "listingItems: ");
-        Intent intent = new Intent(this,ItemsOfMissionActivity.class);
-        intent.putExtra("MissionTableSuffix",tableItemSuffix);
-        intent.putExtra("Mission",missionFromIntent);
-        startActivity(intent);
-
-    }
-
-
-    @Override
-    public void onDfgButtonClick(int viewId) {
-        switch (viewId) {
-            case R.id.ready_learningDfg_confirm:
-                break;
-        }
-    }
-
+    * 各DialogFragment交互方法
+    * */
     @Override
     public void onCreateGroupDFgConfirm(long lines) {
         Log.i(TAG, "onCreateGroupDFgConfirm: +1");
@@ -449,17 +444,37 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 
     }
 
-
     @Override
-    public void onConfirmClick(int position) {
-        this.clickPosition = position;
-        Intent intent = new Intent(this,ItemLearningActivity.class);
-        intent.putExtra("group_id",RVGroups.get(position).getId());
-        intent.putExtra(ITEM_TABLE_SUFFIX, tableItemSuffix);
-        intent.putExtra(GROUP_SUB_ITEM_ID_STR,RVGroups.get(position).getStrSubItemsIds());
-        intent.putExtra("learning_type",RVGroups.get(position).getStateColorResId());//在最后的DB操作中，蓝色、橙色的日志生成方式不同，无法统一做“复习”传递。
-        this.startActivityForResult(intent,REQUEST_CODE_LEARNING);
+    public void onLearningConfirmDfgInteraction(int dfgType, Bundle data) {
+        Intent intentToLA = new Intent(this,LearningActivity.class);
+
+        switch (dfgType){
+            case LEARNING_GENERAL:
+                intentToLA.putExtra("LEARNING_TYPE",LEARNING_GENERAL);
+                this.startActivity(intentToLA);
+                break;
+
+            case LEARNING_AND_CREATE_ORDER:
+
+                //需要传递标记
+                intentToLA.putExtra("LEARNING_TYPE",LEARNING_AND_CREATE_ORDER);
+                this.startActivity(intentToLA);
+                break;
+
+            case LEARNING_AND_CREATE_RANDOM:
+                intentToLA.putExtra("LEARNING_TYPE",LEARNING_AND_CREATE_RANDOM);
+                this.startActivity(intentToLA);
+                break;
+
+            case LEARNING_AND_MERGE:
+                intentToLA.putExtra("LEARNING_TYPE",LEARNING_AND_MERGE);
+                this.startActivity(intentToLA);
+                break;
+
+
+        }
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -501,33 +516,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    public void onConfirmRemoveRedsClick() {
-        ArrayList<Integer> redsPositions = new ArrayList<>();
-        for (RVGroup r :RVGroups) {
-            if(r.getStateColorResId()==R.color.colorGP_Miss_TWICE){
-                redsPositions.add(RVGroups.indexOf(r));
-            }
-        }
-        if (redsPositions.size()==0){
-            Toast.makeText(self, "没有需要移除的任务分组", Toast.LENGTH_SHORT).show();
-        }else {
-            for (Integer i :redsPositions) {
-                RVGroup rvToRemove = RVGroups.get(i);
-                memoryDbHelper.removeGroupById(rvToRemove.getId(),rvToRemove.getStrSubItemsIds(),tableItemSuffix);
-            }
-        }
-    }
 
-    //在Rv中对单项长按删除。长按后，弹出对话框，点击确认后调用本回调，删除单项。
-    @Override
-    public void onDeletingConfirmClick(int position) {
-//        Log.i(TAG, "onDeletingConfirmClick: position="+position);
-        RVGroup RVGroupToRemove = RVGroups.get(position);
-        memoryDbHelper.removeGroupById(RVGroupToRemove.getId(),RVGroupToRemove.getStrSubItemsIds(),tableItemSuffix);
-        RVGroups.remove(position);
-        adapter.notifyItemRemoved(position);
-    }
 }
 
 /*旧片段
