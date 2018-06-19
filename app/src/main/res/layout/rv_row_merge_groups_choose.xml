@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--两层结构构成的行UI-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:orientation="vertical"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:orientation="horizontal"
+        >
+
+        <CheckBox
+            android:id="@+id/ckb_isChose_rvMergeChoose"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            />
+        
+        <!--竖线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefef"
+            />
+
+        <!--分组id-->
+        <TextView
+            android:id="@+id/group_id_rvMergeChoose"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:padding="2dp"
+            android:gravity="center"
+            android:text="@string/sharp_x2_default"
+            />
+
+        <!--箭头-->
+        <TextView
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:padding="2dp"
+            android:gravity="center"
+            android:text="@string/arrows"
+            />
+
+        <!--数量-->
+        <TextView
+            android:id="@+id/group_num_rvMergeChoose"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:padding="2dp"
+            android:gravity="center"
+            android:text="@string/sharp_x2_default"
+            />
+    </LinearLayout>
+
+    <!--图片横线-->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_margin="1dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/vertical_bars_blue_720x8"
+        />
+
+
+
+</LinearLayout>

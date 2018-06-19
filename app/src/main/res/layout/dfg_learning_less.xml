@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="260dp"
+    android:layout_height="340dp"
     android:orientation="vertical"
     tools:context=".fragments.LearningAddInOrderDiaFragment">
 
 
+    <!--顶部标题栏-->
     <TextView
-        android:layout_width="240dp"
+        android:layout_width="260dp"
         android:layout_height="36dp"
         android:text="@string/title_dfg_start_learning"
         android:textSize="16sp"
         android:gravity="center"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="2dp"
         android:layout_marginBottom="2dp"
         android:paddingStart="36dp"
         android:paddingEnd="36dp"
@@ -21,22 +22,83 @@
         />
 
 
-
-    <TextView
-        android:layout_width="240dp"
-        android:layout_height="120dp"
-        android:text="@string/explanations_learningLess"
-        android:gravity="center"
-        android:layout_margin="2dp"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:textColor="#ffe52525"
-        />
-
-
+    <!--中间区域，分左右两栏，左Rv、右Tv-->
     <LinearLayout
-        android:layout_width="240dp"
-        android:layout_height="64dp"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:orientation="horizontal">
+
+        <!--左栏-->
+        <LinearLayout
+            android:layout_width="160dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!--左栏，上文本（区域标题）-->
+            <TextView
+                android:layout_width="160dp"
+                android:layout_height="24dp"
+                android:text="@string/choose_less_group"
+                android:gravity="center"
+                />
+
+            <!--左栏内，横分割线1-->
+            <TextView
+                android:layout_width="160dp"
+                android:layout_height="1dp"
+                android:background="#efefef"
+                />
+            <!--左，Rv-->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_groups_chose_DfgLearningLess"
+                android:layout_width="160dp"
+                android:layout_height="190dp"/>
+            <!--左栏内，横分割线2-->
+            <TextView
+                android:layout_width="160dp"
+                android:layout_height="1dp"
+                android:background="#efefef"
+                />
+
+            <!--左，底文本-->
+            <TextView
+                android:id="@+id/tv_total_items_DfgLearningLess"
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:text="@string/str_total_items"
+
+                />
+
+        </LinearLayout>
+
+
+        <!--中部分栏区的，中央竖分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_margin="1dp"
+            android:background="#efefef"
+            />
+
+
+        <!--中部右侧，单文本-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/explanations_learningLess"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:textColor="#ffe52525"
+            />
+
+    </LinearLayout>
+
+   <!--按钮区-->
+    <LinearLayout
+        android:layout_width="260dp"
+        android:layout_height="60dp"
         android:orientation="horizontal"
         android:padding="4dp">
 
@@ -67,9 +129,4 @@
     </LinearLayout>
 
 
-</LinearLayout><?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

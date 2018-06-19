@@ -156,5 +156,8 @@
     <string name="title_dfg_learningAddRandom">边学边建（随机）</string>
     <string name="explanations_learningAddRandom">将随机选取一定数量的词汇，根据最终的识记数量生成分组</string>
     <string name="title_dfg_start_learning">开始学习</string>
-    <string name="explanations_learningLess">分组数量小于5个，将优先采取合并方式复习（多个相同MS值的碎片分组合并））</string>
+    <string name="explanations_learningLess">由于本组容量过小\n将以合并方式开始复习\n\n请在右侧选择来源分组\n\n没有其他碎片组时\n不进行合并</string>
+    <string name="str_total_items">已选总量：xx</string>
+    <string name="choose_less_group">选择源分组</string>
+    <string name="arrows"><![CDATA[-->]]></string>
 </resources>
