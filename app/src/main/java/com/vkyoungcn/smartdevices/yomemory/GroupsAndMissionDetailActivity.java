@@ -22,8 +22,10 @@ import com.vkyoungcn.smartdevices.yomemory.adapters.GroupsOfMissionRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.fragments.CreateGroupDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningAddInOrderDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningAddRandomDiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.LearningMergeDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.OnLearningConfirmDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
+import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMission;
 import com.vkyoungcn.smartdevices.yomemory.spiralCore.GroupState;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
@@ -66,7 +68,10 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
     private boolean isFabPanelExtracted = false;//FAB面板组默认处于回缩状态。
 
     private RvMission missionFromIntent;//从前一页面获取。后续页面需要mission的id，suffix字段。
-    List<RVGroup> RVGroups = new ArrayList<>();//分开设计的目的是避免适配器内部的转换。让转换在外部完成，适配器直接使用数据才能降低卡顿。
+    List<RVGroup> rvGroups = new ArrayList<>();//分开设计的目的是避免适配器内部的转换。让转换在外部完成，适配器直接使用数据才能降低卡顿。
+
+    private ArrayList<FragGroupForMerge>[][] groupsInTwoDimensionArray;//用于后续DFG的数据装载，两个维度分别对应MS、同MS下<4,<8。
+
     private YoMemoryDbHelper memoryDbHelper;
     private String tableItemSuffix;//由于各任务所属的Item表不同，后面所有涉及Item的操作都需要通过后缀才能构建出完整表名。
     private RecyclerView mRv;
@@ -167,7 +172,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
                 //尝试过，但似乎无法在此直接排序。无法令最新项同之前所有项目进行比较。
             }
 
-            RVGroups = ascOrderByMemoryStage(tempRVGroups);
+            rvGroups = ascOrderByMemoryStage(tempRVGroups);
 
             Message message =new Message();
             message.what = MESSAGE_PRE_DB_FETCHED;
@@ -220,7 +225,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
                 //尝试过，但似乎无法在此直接排序。无法令最新项同之前所有项目进行比较。
             }
 
-            RVGroups = ascOrderByMemoryStage(tempRVGroups);
+            rvGroups = ascOrderByMemoryStage(tempRVGroups);
 
             Message message =new Message();
             message.what = MESSAGE_RE_FETCH_DONE;
@@ -263,10 +268,10 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 
                 //【待】总觉得这里存在问题——学习结束后，分组的信息是更新了的、而此Schedule更新也是更新，
                 // 可能存在两个操作对一个资源的污染问题。——并不，进入onPause()后会将标记置否吧。
-                for (RVGroup singleRVGroup :RVGroups) {
+                for (RVGroup singleRVGroup : rvGroups) {
                     if(singleRVGroup.refreshRMA()){
                         //新旧值不同，需要更新。（对于不需要更新的不再加以处理）
-                        refreshingNeededPositionsList.add(RVGroups.indexOf(singleRVGroup));
+                        refreshingNeededPositionsList.add(rvGroups.indexOf(singleRVGroup));
                     }
                 }
 
@@ -287,7 +292,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         //④开启从DB获取数据的线程获取新数据（不同于预获取的线程，是一个新）
         //完成后，计时更新控制变量重设真，再次启动计时更新线程【？】
         needForScheduleRefreshing = false;
-        RVGroups.clear();
+        rvGroups.clear();
 
         isHandyRefreshing = true;
         new Thread(new ReFetchForGroupsAndMissionRunnable()).start();         // start thread
@@ -303,7 +308,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
                 maskFrameLayout.setVisibility(View.GONE);
 
                 //初始化Rv构造器，令UI加载Rv控件……
-                adapter = new GroupsOfMissionRvAdapter(RVGroups, this, missionFromIntent.getTableItem_suffix());
+                adapter = new GroupsOfMissionRvAdapter(rvGroups, this, missionFromIntent.getTableItem_suffix());
                 mRv = findViewById(R.id.groups_in_single_mission_rv);
                 mRv.setLayoutManager(new LinearLayoutManager(this));
                 mRv.setAdapter(adapter);
@@ -418,7 +423,31 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         // 否则若第二遍没有时间进行，那么处理逻辑可就很麻烦了。
         //
         // 关于“组内乱序”，合并式操作不宜采用。
-        Toast.makeText(self, "施工中，边学边建。", Toast.LENGTH_SHORT).show();
+        Toast.makeText(self, "合并学习，正在准备数据，马上就好。", Toast.LENGTH_SHORT).show();
+
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag("READY_TO_LEARN_MERGE");
+
+        if (prev != null) {
+            transaction.remove(prev);
+        }
+
+        //本页有全部分组的信息，应在本页准备好数据（容量<4、<8）
+        // 后续页面只能直接从DB取数据，而SQL复杂不宜用。
+        for (RVGroup rvg : rvGroups) {
+            if(rvg.getTotalItemsNum()<4){
+                //一维上[0][x]是小于4的，x对应其不同MS；各元素本身就是一个ArrayList哦。
+                groupsInTwoDimensionArray[0][rvg.getMemoryStage()].add(new FragGroupForMerge(rvg));
+               //替代了switch，简洁。
+            }else if(rvg.getTotalItemsNum()<8){
+                groupsInTwoDimensionArray[1][rvg.getMemoryStage()].add(new FragGroupForMerge(rvg));
+            }
+        }
+
+        //数据已组织好，接下来是传递，以及DFG中的接收显示。
+
+        DialogFragment dfg = LearningMergeDiaFragment.newInstance();
+        dfg.show(transaction, "READY_TO_LEARN_MERGE");
     }
 
 
@@ -435,7 +464,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
             DBGroup dGroup = memoryDbHelper.getGroupByLine(lines,tableItemSuffix);
             RVGroup newRVGroup = new RVGroup(dGroup);
 
-            RVGroups.add(0,newRVGroup);//新增分组放在最前【逻辑便于处理】
+            rvGroups.add(0,newRVGroup);//新增分组放在最前【逻辑便于处理】
             adapter.notifyItemInserted(0);//（仍是0起算，但是加到最后时似乎比较奇怪）
             mRv.scrollToPosition(0);//设置增加后滚动到新增位置。【已查，从0起算】
         }else {
@@ -468,6 +497,9 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 
             case LEARNING_AND_MERGE:
                 intentToLA.putExtra("LEARNING_TYPE",LEARNING_AND_MERGE);
+                intentToLA.putExtra("BUNDLE_FOR_MERGE",data);//这里传递的是从DFG（及其选择Rv）传来的，
+                // 作为合并学习的来源碎片分组的分组id（构成的bundle，内部的key：IDS_GROUPS_READY_TO_MERGE）
+
                 this.startActivity(intentToLA);
                 break;
 
@@ -489,13 +521,13 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
                         // 所以最终接受到空串后，应直接返回，UI仍按原方式记录即可。
 
                         //通知adp变更显示
-                        RVGroup groupWithNewLog = RVGroups.get(clickPosition);
+                        RVGroup groupWithNewLog = rvGroups.get(clickPosition);
                         GroupState newGS = new GroupState(newLogsStr);
                         groupWithNewLog.setStateText(GroupStateManager.getCurrentStateTimeAmountStringFromUIGroup(newGS));
                         groupWithNewLog.setStateColorResId(newGS.getColorResId());
                         groupWithNewLog.setStrGroupLogs(newLogsStr);//UI的定时更新线程需要该字段做计算。否则本条无法按时更新。
 
-                        RVGroups.set(clickPosition,groupWithNewLog);
+                        rvGroups.set(clickPosition,groupWithNewLog);
                         adapter.notifyItemChanged(clickPosition);
                         break;
                     case ItemLearningActivity.RESULT_LEARNING_FAILED:

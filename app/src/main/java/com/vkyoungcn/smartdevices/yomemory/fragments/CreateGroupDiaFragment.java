@@ -83,9 +83,9 @@ public class CreateGroupDiaFragment extends DialogFragment implements View.OnCli
         /*radioGroup_manner.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                if(i==rb_manner_order.getId()){
+                if(i==rb_manner_order.getMsNum()){
                     tv_explanationArea.setText("按顺序选取，随机模式下已被抽走的项目不会添加。");
-                }else if(i==rb_manner_random.getId()){
+                }else if(i==rb_manner_random.getMsNum()){
                     tv_explanationArea.setText("随机选取");
                 }
             }

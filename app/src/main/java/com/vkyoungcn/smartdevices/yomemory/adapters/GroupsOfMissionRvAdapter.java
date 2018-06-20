@@ -16,7 +16,8 @@ import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.GroupDetailActivity;
 import com.vkyoungcn.smartdevices.yomemory.R;
-import com.vkyoungcn.smartdevices.yomemory.fragments.LearningLessFourDiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.LearningLessDiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 
 import java.util.ArrayList;
@@ -60,25 +61,55 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.rv_goBtn_groupOfMission:
-                    //弹出DFG：
                     //
-                    // 对于纯碎片分组的合并化处理思路（数量<4个）：提示“有…个同MS级别的碎片分组，将一同开启学习”
-                    //如果没有其它同级碎片分组，则【毕竟不能不让学】开始学习（可能可以有提示，待定）；
-                    // 【暂也不建议列入其他大分组中】【也暂不适于将碎组的Go键屏蔽（既费计算资源，又违反“不能不让学”原则）】
+                    // 先检测容量，<4个触发合并复习，弹出LESS版DFG（带选择功能）。（检索容量<8的同MS分组，以供选择；
+                    // 触发4、筛选8；后期可增加调节条件的字段）。如没有可选分组，可以开始学习【毕竟不能不让学】；
+                    // 如果是合并式学习——先在adp中准备好数据，因为按SubNum检索无法从DB直接进行（不是DB直接字段）因而DFG无法高效完成检索；
                     //
-                    //DFG提示确认形式
-                    // ①检测分组的容量（大于4个的按正常逻辑处理【RVG类直接有字段】）；
-                    // ②拉取分组的id，所含资源项的id（可以由目的Activity负责）
-                    Toast.makeText(context, "转到分组学习页", Toast.LENGTH_SHORT).show();
+                    //从本地List取数据后，传入Dfg以供选择，DFG中选好后只传gid到学习页。
+                    //
+                    // 正常分组正常模式学习，弹出普通DFG。两种DFG回传给本ACT的消息变量不同，将触发不同的学习页组织形式。
 
-                    groups.get(getAdapterPosition()).getId();
-                    if(groups.get(getAdapterPosition()).getTotalItemsNum()<5){
-                        //4个（含）以内的，推荐合并式学习
-                        FragmentTransaction transaction = ((Activity)context).getFragmentManager().beginTransaction();
-                        Fragment prev = ((Activity)context).getFragmentManager().findFragmentByTag("READY_TO_LEARN_LESS");
+                    Toast.makeText(context, "准备弹确认对话框", Toast.LENGTH_SHORT).show();
 
-                        DialogFragment dfg = LearningLessFourDiaFragment.newInstance();
+                    FragmentTransaction transaction = ((Activity)context).getFragmentManager().beginTransaction();
+                    Fragment prev_1 = ((Activity)context).getFragmentManager().findFragmentByTag("READY_TO_LEARN_LESS");
+                    Fragment prev_2 = ((Activity)context).getFragmentManager().findFragmentByTag("READY_TO_LEARN_GEL");
+
+                    if (prev_1 != null) {
+                        transaction.remove(prev_1);
+                    }
+                    if (prev_2 != null) {
+                        transaction.remove(prev_2);
+                    }
+
+                    RVGroup triggerGroup = groups.get(getAdapterPosition());
+                    int subNum = triggerGroup.getTotalItemsNum();
+                    byte msNum = triggerGroup.getMemoryStage();
+
+                    //由于DFG需要SubNum字段，若只传ID届时无法获取subNum，所以不能只传ids；
+                    // 而完整的Group类不含isCheck字段不能与DFG内的Rv很好的匹配，所以新建了一个专用的model类FragGFM。
+                    ArrayList<FragGroupForMerge> groupsListForChose = new ArrayList<>();
+                    groupsListForChose.add(new FragGroupForMerge(triggerGroup));//触发组作为第一个元素。
+
+                    if(subNum<5){
+                        //4个（含）以内的，触发合并式学习
+                        //准备数据
+                        for (RVGroup rgp :groups) {
+                            if(rgp.getTotalItemsNum()<9 && rgp.getMemoryStage()==msNum){
+                                //8个以下（含），且MS同级的分组，可选
+                                groupsListForChose.add(new FragGroupForMerge(rgp));
+                            }
+                        }
+
+                        //到合并学习的确认DFG。
+                        DialogFragment dfg = LearningLessDiaFragment.newInstance(groupsListForChose);
                         dfg.show(transaction, "READY_TO_LEARN_LESS");
+                    }else {
+                        //正常容量正常学习。此时只需传递正常的分组id即可
+                        DialogFragment dfg = LearningGelDiaFragment.newInstance(groupsListForChose);
+                        dfg.show(transaction, "READY_TO_LEARN_GEL");
+
                     }
 
                     break;

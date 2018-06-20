@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="270dp"
+    android:layout_height="428dp"
+    android:orientation="vertical"
+    tools:context=".fragments.LearningMergeDiaFragment">
+
+
+    <!--顶部标题栏-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp"
+        android:background="#efefef"
+        android:gravity="center"
+        android:paddingEnd="36dp"
+        android:paddingStart="36dp"
+        android:text="@string/title_dfg_choseSourceFrags"
+        android:textSize="16sp" />
+
+
+    <!--中间区域（很长），分左右两栏，左侧两个Rv、右侧若干Tv-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:orientation="horizontal">
+
+        <!--左栏-->
+        <LinearLayout
+            android:layout_width="180dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!--上部。这里发现没法采用Rv-Gird形式，因为两维行列头没法设置-->
+            <!--代码中动态添加-->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_category_chose_DfgLearningMerge"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"/>
+
+
+            <!--左，上区的底部。文本+两个筛选按钮（4/8）-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="1dp"
+                android:orientation="horizontal"
+                >
+
+                <TextView
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    />
+
+                <!--筛选键-4-->
+                <TextView
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/str_size4"
+                    android:background="#aa64dd17"
+                    />
+
+                <!--筛选键-8-->
+                <TextView
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/str_size8"
+                    android:background="#aa304ffe"
+
+                    />
+
+
+            </LinearLayout>
+
+            <!--左栏内，横分割线-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="1dp"
+                android:background="#efefef" />
+            <!--下部Rv，行形式-->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_group_chose_DfgLearningMerge"
+                android:layout_width="match_parent"
+                android:layout_height="160dp" />
+
+            <!--左，底文本+全选框-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginBottom="2dp"
+                android:background="#efefef"
+                android:orientation="horizontal"
+                android:paddingTop="4dp">
+
+                <TextView
+                    android:id="@+id/tv_total_items_DfgLearningMerge"
+                    android:layout_width="125dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:text="@string/str_total_items" />
+
+                <CheckBox
+                    android:id="@+id/ckb_all_DfgLearningMerge"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!--中部分栏区的，中央竖分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="1dp"
+            android:background="#efefef" />
+
+        <!--右栏-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!--右侧，顶部文本-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:gravity="start|center_vertical"
+                android:text="@string/str_choseCategory_dfgLearningMerge"
+                android:textColor="#f57f17" />
+
+            <!--横分割线-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#f57f17" />
+
+            <!--上部文本-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="129dp"
+                android:gravity="center"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:paddingTop="8dp"
+                android:text="@string/str_explanation_merge2"
+                android:textColor="#f57f17"
+                android:textSize="12sp" />
+            <!--右栏内，横分割线1-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginTop="4dp"
+                android:background="#efefef"
+                android:visibility="gone" />
+
+
+            <!--下部文本1-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:gravity="start|center_vertical"
+                android:text="@string/str_choseGroup_dfgLearningMerge"
+                android:textColor="#e52525" />
+            <!--横分割线-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#e52525" />
+
+            <!--下部文本-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:gravity="center"
+                android:paddingEnd="4dp"
+                android:paddingStart="4dp"
+                android:text="@string/str_explanation_merge3"
+                android:textColor="#e52525"
+                android:textSize="12sp" />
+
+            <!--填充色块，底边的阴影要大于顶部才好看-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#efefef" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <!--按钮区-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:orientation="horizontal"
+        android:padding="1dp">
+
+        <TextView
+            android:id="@+id/btn_cancel_dfgLearningMerge"
+            android:layout_width="64dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="1dp"
+            android:background="#e0e0e0"
+            android:gravity="center"
+            android:text="@string/cancel"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/btn_confirm_dfgLearningMerge"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="1dp"
+            android:background="#cc64dd17"
+            android:gravity="center"
+            android:text="@string/confirm"
+            android:textSize="16sp"
+
+            />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>
