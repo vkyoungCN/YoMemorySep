@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="240dp"
+    android:layout_height="300dp"
+    android:orientation="vertical"
+    tools:context=".fragments.LearningGelDiaFragment">
+
+
+    <!--顶部标题栏-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp"
+        android:background="#efefef"
+        android:gravity="center"
+        android:paddingEnd="36dp"
+        android:paddingStart="36dp"
+        android:text="@string/title_dfg_start_learning"
+        android:textSize="16sp" />
+
+
+    <!--中间区域，控制高度-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:orientation="vertical">
+
+        <!--中部，上文本-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:gravity="center"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:text="@string/explanations_learningGel"
+            android:textColor="#ffe52525"
+            android:textSize="12sp" />
+
+        <!--横分割线-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#efefef"
+            />
+        <!--中部，信息文本1-->
+        <TextView
+            android:id="@+id/tv_group_description_learningGel"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:gravity="top|center_horizontal"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:text="@string/group_info_learningGel"
+            android:textColor="#f57f17"
+            android:textSize="12sp" />
+        <!--横分割线-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#efefef"
+            />
+
+        <!--中部，信息文本2-->
+        <TextView
+            android:id="@+id/tv_group_lastTime_learningGel"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:gravity="top|center_horizontal"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:text="@string/group_info_learningGel"
+            android:textColor="#f57f17"
+            android:textSize="12sp" />
+
+
+
+    </LinearLayout>
+
+    <!--按钮区-->
+    <LinearLayout
+        android:layout_width="260dp"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:padding="2dp">
+
+        <TextView
+            android:id="@+id/btn_cancel_learningGel"
+            android:layout_width="64dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="1dp"
+            android:background="#efefef"
+            android:gravity="center"
+            android:text="@string/cancel"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/btn_confirm_learningGel"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginStart="1dp"
+            android:background="#cc64dd17"
+            android:gravity="center"
+            android:text="@string/confirm"
+            android:textSize="16sp"
+
+            />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

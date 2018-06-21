@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.GroupDetailActivity;
 import com.vkyoungcn.smartdevices.yomemory.R;
+import com.vkyoungcn.smartdevices.yomemory.fragments.LearningGelDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningLessDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
@@ -107,7 +108,7 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
                         dfg.show(transaction, "READY_TO_LEARN_LESS");
                     }else {
                         //正常容量正常学习。此时只需传递正常的分组id即可
-                        DialogFragment dfg = LearningGelDiaFragment.newInstance(groupsListForChose);
+                        DialogFragment dfg = LearningGelDiaFragment.newInstance(groups.get(getAdapterPosition()));
                         dfg.show(transaction, "READY_TO_LEARN_GEL");
 
                     }

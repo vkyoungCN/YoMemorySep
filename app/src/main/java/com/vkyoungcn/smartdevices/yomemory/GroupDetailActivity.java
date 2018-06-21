@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,7 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.adapters.ItemsOfMissionRvAdapter;
+import com.vkyoungcn.smartdevices.yomemory.fragments.LearningGelDiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.LessAndQuitDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LogsOfGroupDiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.OnLearningConfirmDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
@@ -22,13 +26,11 @@ import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 
-public class GroupDetailActivity extends Activity {
+public class GroupDetailActivity extends Activity implements OnLearningConfirmDfgInteraction {
 //    private static final String TAG = "GroupDetailActivity";
     private RVGroup rvGroup;
     private YoMemoryDbHelper memoryDbHelper;
@@ -134,6 +136,46 @@ public class GroupDetailActivity extends Activity {
         dialogFragment.show(transaction,"SHOW_LOGS");
     }
 
+
+    /*
+    * 某控件点击事件对应方法。用于弹出DFG，并通过确认后跳转至学习页，按照普通方式学习（GEL）
+    * 根据本组的容量会有不同的学习方式。（但是，本页没有其他分组的信息（没有整个ArrayList只有单个RVG）
+    * 因而无法轻易地获取额外数据，因而对碎片分组暂时简单的按照“只提示，不启动”处理）
+    * */
+    public void learnThisGroupGel(View view){
+        Toast.makeText(this, "准备弹确认对话框", Toast.LENGTH_SHORT).show();
+
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        Fragment prev_2 = getFragmentManager().findFragmentByTag("READY_TO_LEARN_GEL");
+
+        if (prev_2 != null) {
+            transaction.remove(prev_2);
+        }
+
+        if(rvGroup.getTotalItemsNum()<5){
+            //4个（含）以内的，触发合并式学习；但无法轻易获取其他碎片组信息，决定只进行提示，不予开始。
+            //可以弹出DFG，告知请从分组列表页点击本组，执行合并学习，询问是否跳转到分组列表页
+            DialogFragment dfg = LessAndQuitDiaFragment.newInstance(rvGroup.getId());
+            dfg.show(transaction, "LESS_IN_GD_DIA");
+        }else {
+            //正常容量正常学习。此时只需传递正常的分组id即可
+            //【但是本activity接下来需要实现与该dfg的交互接口】
+            DialogFragment dfg = LearningGelDiaFragment.newInstance(rvGroup);
+            dfg.show(transaction, "READY_TO_LEARN_GEL");
+
+        }
+    }
+
+    @Override
+    public void onLearningConfirmDfgInteraction(int dfgType, Bundle data) {
+        if(dfgType == JUMP_TO_GROUP_LIST_THIS_FRAG) {
+            Intent intentToGroupListActivity = new Intent(this, GroupsAndMissionDetailActivity.class);
+
+            intentToGroupListActivity.putExtra("GROUP_ID_TO_JUMP",data.getInt("GROUP_ID_TO_JUMP") );
+            this.startActivity(intentToGroupListActivity);
+        }
+    }
+
     private class SortByTime implements Comparator {
         public int compare(Object o1, Object o2) {
             SingleLearningLog s1 = (SingleLearningLog) o1;
@@ -141,5 +183,7 @@ public class GroupDetailActivity extends Activity {
             return (int)(s1.getTimeInLong() - s2.getTimeInLong());
         }
     }
+
+
 
 }

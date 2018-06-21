@@ -144,7 +144,7 @@ public class LearningLessDiaFragment extends DialogFragment implements View.OnCl
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.btn_confirm_learningAddRandom://创建新分组
+            case R.id.btn_confirm_learningLess://创建新分组
                 //从rv中取数据，存入Bundle，最终交到学习页。
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("IDS_GROUPS_READY_TO_MERGE",((CkbsChoseGroupsRvAdapter)mRv.getAdapter()).getIdsList());
@@ -152,7 +152,7 @@ public class LearningLessDiaFragment extends DialogFragment implements View.OnCl
                 mListener.onLearningConfirmDfgInteraction(OnLearningConfirmDfgInteraction.LEARNING_AND_MERGE,bundle);
                 break;
 
-            case R.id.btn_cancel_learningAddRandom:
+            case R.id.btn_cancel_learningLess:
 
                 this.dismiss();
                 break;

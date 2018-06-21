@@ -11,10 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.vkyoungcn.smartdevices.yomemory.R;
+import com.vkyoungcn.smartdevices.yomemory.adapters.Ckbs2ChoseGroupsRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.adapters.CkbsChoseGroupsRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.adapters.FragGroupCategoryRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
@@ -28,27 +28,26 @@ public class LearningMergeDiaFragment extends DialogFragment implements View.OnC
     private OnLearningConfirmDfgInteraction mListener;
 
     private ArrayList<FragGroupForMerge>[][] groupsInTwoDimensionArray;//在本DFG的设计方案下，需要这样一个结构来装载数据。
-//    private ArrayList<FragGroupForMerge> groups = new ArrayList<>();//所有符合条件的待选组（从上一页传来）
     //【最终回传给GofM页面（然后从该页面发起向学习页的跳转）的数据其实是ArrayList<Integer>】
 
     private TextView tvCancel;
     private TextView tvConfirm;
+    private TextView tvSelect_4;
+    private TextView getTvSelect_8;
+    private int select_4or8 =4;//与上两个按钮配合，记录选择的值，以便rv区安排合理数据。默认4。
 
     private TextView tvTotalNum;//显示当前已经选中的组共有多少项items。
-//    private int triggerGroupNum = 0;//此外还需要保持原始数量（或者保持触发组整组信息？）
     private int totalChoseNum = 0;//此外还需要保持原始数量（或者保持触发组整组信息？）
 
-//    private TextView tvTriggerGroupid;//首行不放入Rv，因为其ckb不需监听器，rv中逻辑处理比较麻烦。
-//    private TextView tvTriggerGroupNum;//首行
-
     private CheckBox ckbAllCheck;//作为RV中各项的“全选”开关，放置在DFG中。
-    boolean isCkbChangedByApp = false;//与ckbAll配合使用，平常置否，程序调用的setChecked中先置真，setChecked设置后再置否。
-        //在rv中采用了isPressed判断。
+    boolean isCkbChangedByApp = false;
+    //与ckbAll配合使用，平常置否，程序调用的setChecked中先置真，setChecked设置后再置否。也可采用isPressed判断。
 
-    private RecyclerView mRvCategory;//上方的RV显示girdView形式的“类别选择：4/8,MS的组合”
-    private RecyclerView mRvGroups;//根据上方rv的选择，动态加载下方的列表。
-    RecyclerView.Adapter adapterUpper;//需要在多个方法中操作，全局化。
-    RecyclerView.Adapter adapterDowner;
+    private RecyclerView mRvUpper;//上方的RV显示girdView形式的“类别选择：4/8,MS的组合”
+    private RecyclerView mRvDowner;//根据上方rv的选择，动态加载下方的列表。【发现还是用“上、下”比用类别内容更易区分】
+    FragGroupCategoryRvAdapter adapterUpper;//需要在多个方法中操作，全局化。
+    Ckbs2ChoseGroupsRvAdapter adapterDowner;
+    ArrayList<FragGroupForMerge> singleArrayList;//下方RV的数据源，未初始化。
 
     public LearningMergeDiaFragment() {
         // Required empty public constructor
@@ -101,20 +100,24 @@ public class LearningMergeDiaFragment extends DialogFragment implements View.OnC
                              Bundle savedInstanceState) {
         View rootView =  inflater.inflate(R.layout.dfg_learning_merge, container, false);
 
-        mRvCategory = (RecyclerView) rootView.findViewById(R.id.rv_category_chose_DfgLearningMerge);
-        mRvGroups =  (RecyclerView) rootView.findViewById(R.id.rv_group_chose_DfgLearningMerge);
+        mRvUpper = (RecyclerView) rootView.findViewById(R.id.rv_category_chose_DfgLearningMerge);
+        mRvDowner =  (RecyclerView) rootView.findViewById(R.id.rv_group_chose_DfgLearningMerge);
         tvTotalNum = (TextView) rootView.findViewById(R.id.tv_total_items_DfgLearningMerge);
 
         tvCancel = (TextView) rootView.findViewById(R.id.btn_cancel_dfgLearningMerge);
         tvConfirm = (TextView) rootView.findViewById(R.id.btn_confirm_dfgLearningMerge);
+        tvSelect_4 = (TextView) rootView.findViewById(R.id.select_4_DfgLearningMerge);
+        getTvSelect_8 = (TextView) rootView.findViewById(R.id.select_8_DfgLearningMerge);
         tvConfirm.setOnClickListener(this);
         tvCancel.setOnClickListener(this);
+        tvSelect_4.setOnClickListener(this);
+        getTvSelect_8.setOnClickListener(this);
 
         ckbAllCheck = (CheckBox) rootView.findViewById(R.id.ckb_all_DfgLearningMerge);
         ckbAllCheck.setOnCheckedChangeListener(this);
 
 
-        mRvCategory.setLayoutManager(new GridLayoutManager(getActivity(),3));
+        mRvUpper.setLayoutManager(new GridLayoutManager(getActivity(),3));
 
         //从传来的初始数据中整理本adp所需的数据
         ArrayList<ModelForGRv> tempListForGird_4 = new ArrayList<>();//4、8分开
@@ -131,19 +134,22 @@ public class LearningMergeDiaFragment extends DialogFragment implements View.OnC
             tempListForGird_8.add(new ModelForGRv(index_8, alf.size()));
         }
 
-        FragGroupCategoryRvAdapter categoryAdapter = new FragGroupCategoryRvAdapter(tempListForGird_4,getActivity(),this);
-        mRvCategory.setAdapter(categoryAdapter);
+        adapterUpper = new FragGroupCategoryRvAdapter(tempListForGird_4,this);
+        mRvUpper.setAdapter(adapterUpper);
 
 
 
-        mRvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
-        adapter= new CkbsChoseGroupsRvAdapter(groups,getActivity(),this);
-        mRv.setAdapter(adapter);
-
+        mRvDowner.setLayoutManager(new LinearLayoutManager(getActivity()));
+        singleArrayList = new ArrayList<>();//完成实例化，但暂无数据。
+        adapterDowner= new Ckbs2ChoseGroupsRvAdapter(singleArrayList,this);
+        mRvDowner.setAdapter(adapterDowner);//但是这时应是不显示的，没有数据。在点击上方Grv区后下方才有实际数据确定好。
 
         return rootView;
     }
 
+    /*
+    * 用于上方Grv区的临时数据模型
+    * */
     public class ModelForGRv{
         int Ms = 0;
         int howManyGroups = 0;
@@ -169,7 +175,6 @@ public class LearningMergeDiaFragment extends DialogFragment implements View.OnC
             this.howManyGroups = howManyGroups;
         }
     }
-
 
 
     @Override
@@ -213,16 +218,21 @@ public class LearningMergeDiaFragment extends DialogFragment implements View.OnC
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.btn_confirm_learningAddRandom://创建新分组
-                //从rv中取数据，存入Bundle，最终交到学习页。
+            case R.id.select_4_DfgLearningMerge://将4/8选择变量记4
+                select_4or8 = 4;
+                break;
+            case R.id.select_8_DfgLearningMerge:
+                select_4or8 = 8;
+                break;
+
+            case R.id.btn_confirm_dfgLearningMerge:
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("IDS_GROUPS_READY_TO_MERGE",((CkbsChoseGroupsRvAdapter)mRv.getAdapter()).getIdsList());
+                bundle.putSerializable("IDS_GROUPS_READY_TO_MERGE",((Ckbs2ChoseGroupsRvAdapter)mRvDowner.getAdapter()).getIdsList());
 
                 mListener.onLearningConfirmDfgInteraction(OnLearningConfirmDfgInteraction.LEARNING_AND_MERGE,bundle);
                 break;
 
-            case R.id.btn_cancel_learningAddRandom:
-
+            case R.id.btn_cancel_dfgLearningMerge:
                 this.dismiss();
                 break;
         }
@@ -242,34 +252,40 @@ public class LearningMergeDiaFragment extends DialogFragment implements View.OnC
             if(isChecked){
                 //通知Rv，将所有项目的ckb置真
 
-                int totalNum = triggerGroupNum;
-                for (FragGroupForMerge f :groups) {
-                    f.setChecked(true);//其中各项设为选中（此时该数据集已经没有首项了，都是Rv的数据）
+                int totalNum = 0;//准备计数
+                for (FragGroupForMerge f :singleArrayList) {
+                    f.setChecked(true);//其中各项设为选中
                      totalNum = totalNum + f.getTotalItemsNum();//计算数量
                 }
                 totalChoseNum = totalNum;//要保持数据和选择一致。
-                adapter.notifyDataSetChanged();//通过改变数据集的方式使Rv中的显示改变（可能是最省力的方式）
+                adapterDowner.notifyDataSetChanged();//通过改变数据集的方式使Rv中的显示改变（可能是最省力的方式）
                 //下方文本设为新的总量值
                 tvTotalNum.setText("已选总量："+String.valueOf(totalNum));
 
             }else {
                 //手动取消所有ckbs的选中。通知Rv,将所有项目的ckb置否
-                for (FragGroupForMerge f :groups) {
+                for (FragGroupForMerge f :singleArrayList) {
                     f.setChecked(false);
                 }
-                totalChoseNum = triggerGroupNum;//要保持数据和选择一致。
+                totalChoseNum = 0;//要保持数据和选择一致（以备其他方法使用时数值正确）。
 
-                adapter.notifyDataSetChanged();
-                tvTotalNum.setText("已选总量："+String.valueOf(triggerGroupNum));
+                adapterDowner.notifyDataSetChanged();
+                tvTotalNum.setText("已选总量："+0);
 
             }
         }
     }
 
+
     /*
     * 当上方Grid区域单项点击后，下方mRV要改变数据
     * */
     public void choseCategory(int memoryStage){
+        int firstIndex = select_4or8/4-1;
+
+        //在上方点击后，根据选定的MS、当前4/8值，确定（用于下方mRv的）新数据集。
+         singleArrayList = groupsInTwoDimensionArray[firstIndex][memoryStage];
+         adapterDowner.notifyDataSetChanged();//通知改变
 
     }
 

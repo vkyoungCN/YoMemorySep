@@ -17,7 +17,6 @@
     <string name="mission_description_extra">任务描述文字（文本足够长，内容足够多；文本足够长，内容足够多。）</string>
     <string name="add_group">新建分组</string>
     <string name="presaved_button">预留按键</string>
-
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="num_36">36</string>
     <string name="num_54">54</string>
@@ -159,13 +158,18 @@
     <string name="explanations_learningLess">本组容量过小\n将以合并方式开始复习\n\n请在右侧选择来源分组\n\n没有其他碎片组时\n不进行合并</string>
     <string name="str_total_items">已选总量：xx</string>
     <string name="choose_less_group">选择源分组</string>
-    <string name="arrows"><![CDATA[-->]]></string>
+    <string name="arrows"><![CDATA[—>]]></string>
     <string name="title_dfg_choseSourceFrags">合并来源选择</string>
     <string name="str_choseCategory_dfgLearningMerge">←选择类别</string>
     <string name="str_choseGroup_dfgLearningMerge">←选择分组</string>
-    <string name="str_explanation_merge2">数字：特定MS值下存在的满足特定条件（容量<4或<8）的分组的数量\n\n</string>
+    <string name="str_explanation_merge2"><![CDATA[数字：特定MS值下存在的满足特定条件（容量<4或<8）的分组的数量\n\n]]></string>
     <string name="str_explanation_merge3">完成的分组会被删除，部分完成的被拆分，未完成的会保留\n\n</string>
     <string name="str_filter_1">筛选</string>
     <string name="str_size4"><![CDATA[容量<4]]></string>
     <string name="str_size8"><![CDATA[容量<8]]></string>
+    <string name="explanations_learningGel">将对该分组进行识记</string>
+    <string name="group_info_learningGel">分组信息：xxxx</string>
+    <string name="explanations_learningGD">本组容量过小，\n应采取合并式学习</string>
+    <string name="str_jumpToGroupListAct">点击确认后转到分组列表\n点击取消返回分组详情</string>
+    <string name="str_clickAndQuitDfg">可返回分组列表页，直接在列表中点击相应分组</string>
 </resources>

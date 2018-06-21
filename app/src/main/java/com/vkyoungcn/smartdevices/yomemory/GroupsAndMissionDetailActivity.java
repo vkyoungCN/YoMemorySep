@@ -36,8 +36,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.vkyoungcn.smartdevices.yomemory.ItemLearningActivity.RESULT_EXTRA_LEARNING_SUCCEEDED;
-import static com.vkyoungcn.smartdevices.yomemory.ItemLearningActivity.RESULT_EXTRA_LEARNING_SUCCEEDED_UNDER24H;
 
 /*
  * 单个Mission及其所属分组的详情页；
@@ -110,7 +108,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
             tableItemSuffix = missionFromIntent.getTableItem_suffix();
         }
 
-        memoryDbHelper = YoMemoryDbHelper.getInstance(getApplicationContext());
+       memoryDbHelper = YoMemoryDbHelper.getInstance(getApplicationContext());
 
         new Thread(new PrepareForGroupsAndMissionRunnable()).start();         // start thread
     }
@@ -446,7 +444,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 
         //数据已组织好，接下来是传递，以及DFG中的接收显示。
 
-        DialogFragment dfg = LearningMergeDiaFragment.newInstance();
+        DialogFragment dfg = LearningMergeDiaFragment.newInstance(groupsInTwoDimensionArray);
         dfg.show(transaction, "READY_TO_LEARN_MERGE");
     }
 
@@ -508,7 +506,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
     }
 
 
-    @Override
+    /*@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode){
@@ -547,7 +545,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 
         }
     }
-
+*/
 
 }
 
