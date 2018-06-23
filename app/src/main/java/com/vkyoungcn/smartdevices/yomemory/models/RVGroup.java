@@ -83,7 +83,7 @@ public class RVGroup implements Parcelable{
 
 
     /*
-    * 衰减到某个指定的M值之前还剩多长时间
+    * （在指定MS下）衰减到某个指定的M值之前还剩多长时间
     * 在该时间内复习可以提升记忆等级MS，否则只是刷新记忆总量而已。
     * 该指定的M值，取决于当前所处的MS。
     * （由于设计中原realNum是对应复习，后来将学习和复习统一化，则m应从0其，初学次对应的m是0，对应的MS
@@ -98,26 +98,44 @@ public class RVGroup implements Parcelable{
         switch (memoryStage){
             case 0:
             case 1:
-            case 2:
                 target_RM =10;
                 break;
+            case 2:
+                target_RM =12;
+                break;
             case 3:
+                target_RM =16;
+                break;
             case 4:
-                target_RM=12;
+                target_RM=25;
                 break;
             case 5:
-                target_RM=24;
+                target_RM=39;
                 break;
             case 6:
-                target_RM=36;
+                target_RM=59;
+                break;
+            case 7:
+                target_RM=78;
+                break;
+            case 8:
+                target_RM=89;
+                break;
+            case 9:
+                target_RM=95;
+                break;
+            case 10:
+                target_RM=98;
                 break;
             default:
-                target_RM = 50;
+                target_RM = 99;
+
         }
 
         double block_1 = (Math.pow((1+alpha),fakeNum))*(Math.pow((1+beta),memoryStage));
         return (int)((100*block_1)/target_RM+1-block_1);
     }
+
 
 
     /*

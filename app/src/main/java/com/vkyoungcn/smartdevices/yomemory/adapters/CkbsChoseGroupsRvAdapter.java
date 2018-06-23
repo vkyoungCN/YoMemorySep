@@ -18,6 +18,11 @@ import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+* 用于在分组列表中，“点击学习后，若判断该组容量小于5，则触发合并式学习”时弹出的同级碎片分组选择DFG下的Rv。
+* 与另一个用于碎片选择的dfg相比，本dfg的初始分组是既定的（但是该分组直接在dfg中显示，不传入本rv）；
+* 区别在于总量计算等……【待】。
+* */
 public class CkbsChoseGroupsRvAdapter extends RecyclerView.Adapter<CkbsChoseGroupsRvAdapter.ViewHolder> {
 
     //    private static final String TAG = "CkbsChoseGroupsRvAdapter";

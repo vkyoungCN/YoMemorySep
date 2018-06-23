@@ -17,10 +17,14 @@ import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+*
+*
+* */
 public class Ckbs2ChoseGroupsRvAdapter extends RecyclerView.Adapter<Ckbs2ChoseGroupsRvAdapter.ViewHolder> {
 
     //    private static final String TAG = "Ckbs2ChoseGroupsRvAdapter";
-    private List<FragGroupForMerge> groups;//穿进来的数据
+    private List<FragGroupForMerge> groups;//传进来的数据
     private LearningMergeDiaFragment dfg;//保持一个引用，以便改变dfg的UI（由DFG提供改变UI的公共方法）
     private int howManyGroupsChecke = 0;//（除已移除的触发组外，已选中了多少个分组）用于判断是否是全选
     private ArrayList<Integer> idsList = new ArrayList<>();//最终外传/回传的数据

@@ -18,6 +18,11 @@ import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+* 用于点击“合并学习”后弹出的dfg中（该dfg有两个RV），其中上方rv用于选择碎片类型；
+* 下方rv用于既定类型条件下的碎片分组列表。
+* 本rvAdapter是用于上方Rv的。
+* */
 public class FragGroupCategoryRvAdapter extends RecyclerView.Adapter<FragGroupCategoryRvAdapter.ViewHolder> {
 
     //    private static final String TAG = "FragGroupCategoryRvAdapter";
