@@ -55,6 +55,7 @@
     <string name="unit_min">分</string>
     <string name="onItsWay">做好准备！马上开始！</string>
     <string name="confirm">确定</string>
+    <string name="accomplishedAndConfirm">学习结束，点击完成</string>
     <string name="ready_to_learn">确认开始学习…</string>
     <string name="hold_on_a_moment">正在加载分组信息，请稍等……</string>
     <string name="bar_x2_default">--</string>
@@ -62,8 +63,7 @@
     <string name="zero_2">00</string>
     <string name="slash1">/</string>
     <string name="num_one">1</string>
-    <string name="time_up1">真遗憾，时间用光了！</string>
-    <string name="should_prolong_question_mark">可以续15分钟（只有一次机会），意下如何？</string>
+    <string name="time_up1">很遗憾，时间到！</string>
     <string name="go_prolong">那就续吧！</string>
     <string name="give_up">不了，谢谢</string>
     <string name="time_past_words2_1">请在</string>
@@ -172,4 +172,20 @@
     <string name="explanations_learningGD">本组容量过小，\n应采取合并式学习</string>
     <string name="str_jumpToGroupListAct">点击确认后转到分组列表\n点击取消返回分组详情</string>
     <string name="str_clickAndQuitDfg">可返回分组列表页，直接在列表中点击相应分组</string>
+    <string name="str_or">或者→</string>
+    <string name="another_choice">点击放弃本次记录，就当什么都没发生过。</string>
+    <string name="glad_as_you">您的实际记忆水准可能会高于程序的推断值。\n程序没有意见，您开心就好！</string>
+    <string name="status_1">学习情况</string>
+    <string name="youCan">您可以→</string>
+    <string name="str_nothingHappend">就当没学过（放弃记录）</string>
+    <string name="confirm_andSetErrs">不拆分\n（记错误项的出错次数+1）</string>
+    <string name="confirm_andDevide">按正误拆分本组</string>
+    <string name="status_timeUpDfg">学习情况：共有%1$d个单词，正确%2$d个。</string>
+    <string name="still_has_wrong_item">仍有%1$d个未填写正确，请检查。（点击可强行结束）</string>
+    <string name="learn_and_repick">学而时习之……</string>
+    <string name="str_infoArea">（信息区域）</string>
+    <string name="save_area_1">预留区域1</string>
+    <string name="save_area_2">预留区域2</string>
+    <string name="preparing_data_start_soon">正在准备数据，马上开始……</string>
+    <string name="num_59">59</string>
 </resources>

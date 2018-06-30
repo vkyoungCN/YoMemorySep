@@ -3,18 +3,12 @@ package com.vkyoungcn.smartdevices.yomemory.fragments;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.vkyoungcn.smartdevices.yomemory.R;
-import com.vkyoungcn.smartdevices.yomemory.adapters.CkbsChoseGroupsRvAdapter;
-import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 
 import java.text.SimpleDateFormat;
@@ -23,7 +17,7 @@ import java.util.Date;
 @SuppressWarnings("all")
 public class LearningGelDiaFragment extends DialogFragment implements View.OnClickListener {
     private static final String TAG = "LearningGelDiaFragment";
-    private OnLearningConfirmDfgInteraction mListener;
+    private OnGeneralDfgInteraction mListener;
 
     private RVGroup rvGroup;
     private TextView tvCancel;
@@ -82,11 +76,11 @@ public class LearningGelDiaFragment extends DialogFragment implements View.OnCli
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnLearningConfirmDfgInteraction) {
-            mListener = (OnLearningConfirmDfgInteraction) context;
+        if (context instanceof OnGeneralDfgInteraction) {
+            mListener = (OnGeneralDfgInteraction) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnLearningConfirmDfgInteraction");
+                    + " must implement OnGeneralDfgInteraction");
         }
     }
 
@@ -104,7 +98,7 @@ public class LearningGelDiaFragment extends DialogFragment implements View.OnCli
                 Bundle bundle = new Bundle();
                 bundle.putInt("GROUP_ID_TO_LEARN",rvGroup.getId());
 
-                mListener.onLearningConfirmDfgInteraction(OnLearningConfirmDfgInteraction.LEARNING_GENERAL,bundle);
+                mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_GENERAL,bundle);
                 break;
 
             case R.id.btn_cancel_learningAddRandom:

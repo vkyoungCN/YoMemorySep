@@ -89,7 +89,7 @@ public class RVGroup implements Parcelable{
     * （由于设计中原realNum是对应复习，后来将学习和复习统一化，则m应从0其，初学次对应的m是0，对应的MS
     * 记忆等级也是0）
     * */
-    public static int minutesRemainTillThreshold( byte memoryStage){
+    public static int minutesTillFarThreshold(byte memoryStage){
         float alpha = 2.5f;
         float beta =2.05f;
         int fakeNum = 3;
@@ -136,6 +136,11 @@ public class RVGroup implements Parcelable{
         return (int)((100*block_1)/target_RM+1-block_1);
     }
 
+
+    public static int minutesBeforeShortThreshold(byte memoryStage){
+        return minutesTillFarThreshold(memoryStage)/5;//暂定为上限的1/5。
+        //具体时间当然还需要结合上次有效的记录时间和本值进行计算……
+    }
 
 
     /*

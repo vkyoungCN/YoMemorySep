@@ -23,13 +23,11 @@ import com.vkyoungcn.smartdevices.yomemory.fragments.CreateGroupDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningAddInOrderDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningAddRandomDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningMergeDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.OnLearningConfirmDfgInteraction;
+import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMission;
-import com.vkyoungcn.smartdevices.yomemory.spiralCore.GroupState;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
-import com.vkyoungcn.smartdevices.yomemory.spiralCore.GroupStateManager;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 
 import java.lang.ref.WeakReference;
@@ -48,7 +46,7 @@ import java.util.List;
  * 失败则产生一条消息【待实现】。
  * */
 public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
-        CreateGroupDiaFragment.onCreateGroupDFgConfirmListner,OnLearningConfirmDfgInteraction{
+        CreateGroupDiaFragment.onCreateGroupDFgConfirmListner,OnGeneralDfgInteraction {
     private static final String TAG = "MissionDetailActivity";
 
     public static final int EFFECTIVE_PICKING = 316;//先判断好是否仍在有效时期内，然后直接传递给后续页面。（学习完成需要将新Log存入DB，Log需要此信息。）
@@ -472,33 +470,34 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onLearningConfirmDfgInteraction(int dfgType, Bundle data) {
-        Intent intentToLA = new Intent(this,LearningActivity.class);
+    public void onButtonClickingDfgInteraction(int dfgType, Bundle data) {
+        Intent intentToLPA = new Intent(this,PrepareForLearningActivity.class);
+        intentToLPA.putExtra("TABLE_SUFFIX",tableItemSuffix);
+        intentToLPA.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
         switch (dfgType){
             case LEARNING_GENERAL:
-                intentToLA.putExtra("LEARNING_TYPE",LEARNING_GENERAL);
-                this.startActivity(intentToLA);
+                intentToLPA.putExtra("LEARNING_TYPE",LEARNING_GENERAL);
+                intentToLPA.putExtra("BUNDLE_FOR_GENERAL",data);
+                this.startActivity(intentToLPA);
                 break;
 
             case LEARNING_AND_CREATE_ORDER:
-
                 //需要传递标记
-                intentToLA.putExtra("LEARNING_TYPE",LEARNING_AND_CREATE_ORDER);
-                this.startActivity(intentToLA);
+                intentToLPA.putExtra("LEARNING_TYPE",LEARNING_AND_CREATE_ORDER);
+                this.startActivity(intentToLPA);
                 break;
 
             case LEARNING_AND_CREATE_RANDOM:
-                intentToLA.putExtra("LEARNING_TYPE",LEARNING_AND_CREATE_RANDOM);
-                this.startActivity(intentToLA);
+                intentToLPA.putExtra("LEARNING_TYPE",LEARNING_AND_CREATE_RANDOM);
+                this.startActivity(intentToLPA);
                 break;
 
             case LEARNING_AND_MERGE:
-                intentToLA.putExtra("LEARNING_TYPE",LEARNING_AND_MERGE);
-                intentToLA.putExtra("BUNDLE_FOR_MERGE",data);//这里传递的是从DFG（及其选择Rv）传来的，
+                intentToLPA.putExtra("LEARNING_TYPE",LEARNING_AND_MERGE);
+                intentToLPA.putExtra("BUNDLE_FOR_MERGE",data);//这里传递的是从DFG（及其选择Rv）传来的，
                 // 作为合并学习的来源碎片分组的分组id（构成的bundle，内部的key：IDS_GROUPS_READY_TO_MERGE）
-
-                this.startActivity(intentToLA);
+                this.startActivity(intentToLPA);
                 break;
 
 
@@ -506,13 +505,13 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
     }
 
 
-    /*@Override
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode){
             case REQUEST_CODE_LEARNING:
                 switch (resultCode){
-                    case ItemLearningActivity.RESULT_LEARNING_SUCCEEDED:
+                    case LearningActivity.RESULT_LEARNING_SUCCEEDED:
                         if(data == null) return;
                         String newLogsStr = data.getStringExtra("newLogsStr");
                         if(newLogsStr.isEmpty()) return;//根据当前设计，60分钟内的复习不计入Log且返回空串，【灰色状态下的额外复习亦然】
@@ -528,24 +527,14 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
                         rvGroups.set(clickPosition,groupWithNewLog);
                         adapter.notifyItemChanged(clickPosition);
                         break;
-                    case ItemLearningActivity.RESULT_LEARNING_FAILED:
-                        if(data == null) return;
-                        String failedStartTimeMillis = data.getStringExtra("startingTimeMills");
-                        Toast.makeText(self, "Learning starting at ("+failedStartTimeMillis+") has been failed because of TimeUp.", Toast.LENGTH_SHORT).show();
-                        //【下面应该生成一条失败的消息】
-                    case RESULT_EXTRA_LEARNING_SUCCEEDED_UNDER24H:
-                        if(data == null) return;
-                        adapter.notifyItemChanged(clickPosition);//【直接从当初离开的点击事件取位置？】
+                    case LearningActivity.RESULT_LEARNING_FAILED:
+                        Toast.makeText(this, "大失忆术！嘘，什么都没有发生。", Toast.LENGTH_SHORT).show();
 
-                    case RESULT_EXTRA_LEARNING_SUCCEEDED:
-
-                        Toast.makeText(this, "额外学习1次，完成！", Toast.LENGTH_SHORT).show();
 
                 }
 
         }
     }
-*/
 
 }
 

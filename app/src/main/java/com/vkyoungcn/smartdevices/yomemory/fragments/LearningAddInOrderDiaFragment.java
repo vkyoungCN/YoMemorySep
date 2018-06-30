@@ -6,24 +6,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.R;
-import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
-import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 
 @SuppressWarnings("all")
 public class LearningAddInOrderDiaFragment extends DialogFragment implements View.OnClickListener {
     private static final String TAG = "LearningAddInOrderDiaFragment";
 
-    private OnLearningConfirmDfgInteraction mListener;
+    private OnGeneralDfgInteraction mListener;
 
     private TextView tvCancel;
     private TextView tvConfirm;
@@ -64,11 +55,11 @@ public class LearningAddInOrderDiaFragment extends DialogFragment implements Vie
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnLearningConfirmDfgInteraction) {
-            mListener = (OnLearningConfirmDfgInteraction) context;
+        if (context instanceof OnGeneralDfgInteraction) {
+            mListener = (OnGeneralDfgInteraction) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnLearningConfirmDfgInteraction");
+                    + " must implement OnGeneralDfgInteraction");
         }
     }
 
@@ -83,7 +74,7 @@ public class LearningAddInOrderDiaFragment extends DialogFragment implements Vie
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btn_confirm_learningAddInOrder://创建新分组
-                mListener.onLearningConfirmDfgInteraction(OnLearningConfirmDfgInteraction.LEARNING_AND_CREATE_ORDER,null);
+                mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_AND_CREATE_ORDER,null);
                 break;
             case R.id.btn_cancel_learningAddInOrder:
 

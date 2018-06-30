@@ -22,7 +22,7 @@ import java.util.ArrayList;
 public class LearningLessDiaFragment extends DialogFragment implements View.OnClickListener,CompoundButton.OnCheckedChangeListener {
     private static final String TAG = "LearningLessDiaFragment";
 
-    private OnLearningConfirmDfgInteraction mListener;
+    private OnGeneralDfgInteraction mListener;
 
     private ArrayList<FragGroupForMerge> groups = new ArrayList<>();//所有符合条件的待选组（从上一页传来）
 
@@ -107,11 +107,11 @@ public class LearningLessDiaFragment extends DialogFragment implements View.OnCl
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnLearningConfirmDfgInteraction) {
-            mListener = (OnLearningConfirmDfgInteraction) context;
+        if (context instanceof OnGeneralDfgInteraction) {
+            mListener = (OnGeneralDfgInteraction) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnLearningConfirmDfgInteraction");
+                    + " must implement OnGeneralDfgInteraction");
         }
     }
 
@@ -149,7 +149,7 @@ public class LearningLessDiaFragment extends DialogFragment implements View.OnCl
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("IDS_GROUPS_READY_TO_MERGE",((CkbsChoseGroupsRvAdapter)mRv.getAdapter()).getIdsList());
 
-                mListener.onLearningConfirmDfgInteraction(OnLearningConfirmDfgInteraction.LEARNING_AND_MERGE,bundle);
+                mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_AND_MERGE,bundle);
                 break;
 
             case R.id.btn_cancel_learningLess:

@@ -58,7 +58,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + YoMemoryContract.LearningLogs.TABLE_NAME + " (" +
                     YoMemoryContract.LearningLogs._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG + " INTEGER, "+
-                    YoMemoryContract.LearningLogs.COLUMN_IS_EFFECTIVE + " BOOLEAN, "+
+                    YoMemoryContract.LearningLogs.COLUMN_IS_MS_EFFECTIVE + " BOOLEAN, "+
                     YoMemoryContract.LearningLogs.COLUMN_GROUP_ID + " INTEGER REFERENCES "+
                     YoMemoryContract.Group.TABLE_NAME+"("+ YoMemoryContract.Group._ID+") " +
                     "ON DELETE CASCADE)"; //外键采用级联删除
@@ -502,17 +502,52 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         return groups;
     }
 
+
+    /*
+    * 本方法所获取的时间记录，用于计算RMA、也可用于时间区间上限。
+    * 但是时间区间下限的记录则需要使用有效复习中的最大时间记录。
+    * */
     private long getLastLearningTimeInLong(int groupId){
         Log.i(TAG, "getLastLearningTimeInLong: be.");
         String selectLastTimeQuery = "SELECT "+YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG+
                 " FROM "+YoMemoryContract.LearningLogs.TABLE_NAME+" WHERE "+
-                YoMemoryContract.LearningLogs.COLUMN_GROUP_ID+" = "+groupId;
+                YoMemoryContract.LearningLogs.COLUMN_GROUP_ID+" = "+groupId+" ORDER BY "+
+                YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG+ " DESC";
         getWritableDatabaseIfClosedOrNull();//因为相关联的前一个方法之前已经打开了WDB，这里使用getW。
 
         Cursor cursor = mSQLiteDatabase.rawQuery(selectLastTimeQuery,null);
 
         long resultLong = 0;
-        if(cursor.moveToFirst()){
+        if(cursor.moveToFirst()){//降序之下只取第一行即可。不使用LIMIT。
+            resultLong = cursor.getLong(0);//毕竟只有1列的结果。【但是不知道是否从0起】
+        }
+
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //不能关DB，因为事务尚未完成。
+        return resultLong;
+    }
+
+    /*
+    * 本方法用于取出有效学习（使得MS等级提升的学习）记录的时间，在计算“MS可提升时间区间”的下限时，
+    * 需要使用本时间记录。（不区分MS有效性的学习记录中的最大值，对于RMA和时间区间上限的计算有效）
+    * */
+    private long getLastEffectiveLearningTimeInLong(int groupId){
+        Log.i(TAG, "getLastEffectiveLearningTimeInLong: be.");
+        String selectLastTimeQuery = "SELECT "+YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG+
+                " FROM "+YoMemoryContract.LearningLogs.TABLE_NAME+" WHERE "+
+                YoMemoryContract.LearningLogs.COLUMN_GROUP_ID+" = "+groupId+
+                " AND "+YoMemoryContract.LearningLogs.COLUMN_IS_MS_EFFECTIVE+" = 1 ORDER BY "+
+                YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG+ " DESC";
+        getWritableDatabaseIfClosedOrNull();//因为相关联的前一个方法之前已经打开了WDB，这里使用getW。
+
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectLastTimeQuery,null);
+
+        long resultLong = 0;
+        if(cursor.moveToFirst()){//降序之下只取第一行即可。不使用LIMIT。
             resultLong = cursor.getLong(0);//毕竟只有1列的结果。【但是不知道是否从0起】
         }
 
@@ -529,7 +564,8 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         Log.i(TAG, "getEffectiveLearningTime: be");
         String selectCountEffectiveQuery = "SELECT COUNT(*) "+" FROM "+
                 YoMemoryContract.LearningLogs.TABLE_NAME+" WHERE "+
-                YoMemoryContract.LearningLogs.COLUMN_GROUP_ID+" = "+groupId;
+                YoMemoryContract.LearningLogs.COLUMN_GROUP_ID+" = "+groupId+
+                " AND "+YoMemoryContract.LearningLogs.COLUMN_IS_MS_EFFECTIVE+" = 1";
 
         getWritableDatabaseIfClosedOrNull();//同一事务的前一方法中尚有打开的wdb。
         Cursor cursor = mSQLiteDatabase.rawQuery(selectCountEffectiveQuery,null);
@@ -652,7 +688,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(YoMemoryContract.LearningLogs.COLUMN_GROUP_ID,newLog.getGroupId());
-        values.put(YoMemoryContract.LearningLogs.COLUMN_IS_EFFECTIVE,newLog.isEffective());
+        values.put(YoMemoryContract.LearningLogs.COLUMN_IS_MS_EFFECTIVE,newLog.isEffective());
         values.put(YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG,newLog.getTimeInLong());
 
         lines = mSQLiteDatabase.insert(YoMemoryContract.LearningLogs.TABLE_NAME, null, values);
@@ -681,7 +717,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
                 singleLog.setGroupId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.LearningLogs.COLUMN_GROUP_ID)));
                 singleLog.setTimeInLong(cursor.getLong(cursor.getColumnIndex(YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG)));
-                singleLog.setEffective(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.LearningLogs.COLUMN_IS_EFFECTIVE))==1);
+                singleLog.setEffective(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.LearningLogs.COLUMN_IS_MS_EFFECTIVE))==1);
 
                 learningLogs.add(singleLog);
             }while (cursor.moveToNext());
@@ -827,6 +863,58 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
 
     /*
+     * 按顺序选取Item中前n项记录,为边学边建准备数据。
+     * 要求从尚未抽取的items中选取。
+     * 相应记录暂不该为“已抽取”，真正创建Group时再处理）
+     * 未能选到任何结果时，返回null；
+     * */
+    public ArrayList<SingleItem> getCertainAmountItemsOrderly(int amount, String tableNameSuffix){
+        ArrayList<SingleItem> items = new ArrayList<>();
+
+        String selectQueryOuter = "SELECT * FROM "+ YoMemoryContract.ItemBasic.TABLE_NAME+tableNameSuffix
+                +" WHERE "+  YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE +" =  0  OR "
+                + YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE +" IS NULL LIMIT "+amount;
+
+
+        getReadableDatabaseIfClosedOrNull();
+//        mSQLiteDatabase.beginTransaction();
+
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectQueryOuter, null);
+
+        if(cursor.moveToFirst()){
+            do{
+                SingleItem item = new SingleItem();
+                item.setId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.ItemBasic._ID)));
+                item.setName(cursor.getString(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_NAME)));
+                item.setPhonetic(cursor.getString(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_PHONETIC)));
+                item.setTranslations(cursor.getString(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_TRANSLATIONS)));
+
+                item.setChose(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE))==1);//【待测试。getString .equals(false)可用】
+                item.setLearned(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_IS_LEARNED))==1);//【待测试。getString .equals(false)可用】
+                item.setGroupId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_GROUP_ID)));
+                item.setPriority(cursor.getShort(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_PRIORITY)));
+                item.setFailedSpelling_times(cursor.getShort(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_FAILED_SPELLING_TIMES)));
+
+                items.add(item);
+            }while (cursor.moveToNext());
+
+        }//【即使无结果也不能返回null；返回长为0的list即可】
+
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        closeDB();
+
+        return items;
+    }
+
+
+
+
+
+    /*
      * 随机选取Item中前n项记录（的id），提供给任务组的生成。item置为已抽取的操作在建组时进行。
      * 未能选到任何结果时，返回null；
      * 【待】我怎么记得涉及到SQLite的ID的项目都需用long啊？！
@@ -860,6 +948,156 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         return ids;
     }
 
+    /*
+     * 随机选取n项Items,为边学边建准备数据。
+     * 要求从尚未抽取的items中选取。
+     * 相应记录暂不该为“已抽取”，真正创建Group时再处理）
+     * 未能选到任何结果时，返回null；
+     * */
+    public ArrayList<SingleItem> getCertainAmountItemsRandomly(int amount, String tableNameSuffix){
+        ArrayList<SingleItem> items = new ArrayList<>();
+
+        String selectQueryOuter = "SELECT * FROM "+ YoMemoryContract.ItemBasic.TABLE_NAME+tableNameSuffix
+                +" WHERE "+ YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE +" =  0  OR "
+                + YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE +" IS NULL"
+                + " ORDER BY RANDOM() LIMIT "+amount;
+
+        getReadableDatabaseIfClosedOrNull();
+//        mSQLiteDatabase.beginTransaction();
+
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectQueryOuter, null);
+
+        if(cursor.moveToFirst()){
+            do{
+                SingleItem item = new SingleItem();
+                item.setId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.ItemBasic._ID)));
+                item.setName(cursor.getString(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_NAME)));
+                item.setPhonetic(cursor.getString(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_PHONETIC)));
+                item.setTranslations(cursor.getString(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_TRANSLATIONS)));
+
+                item.setChose(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE))==1);//【待测试。getString .equals(false)可用】
+                item.setLearned(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_IS_LEARNED))==1);//【待测试。getString .equals(false)可用】
+                item.setGroupId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_GROUP_ID)));
+                item.setPriority(cursor.getShort(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_PRIORITY)));
+                item.setFailedSpelling_times(cursor.getShort(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_FAILED_SPELLING_TIMES)));
+
+                items.add(item);
+            }while (cursor.moveToNext());
+
+        }//【即使无结果也不能返回null；返回长为0的list即可】
+
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        closeDB();
+
+        return items;
+    }
+
+    /*
+     * 根据ItemId列表来获取Items。
+     * */
+    public ArrayList<SingleItem> getItemsWithList(ArrayList<Integer> idList,String tableNameSuffix){
+        Log.i(TAG, "getItemsWithList: before any.");
+        ArrayList<SingleItem> items = new ArrayList<>();
+
+        StringBuilder sbd = new StringBuilder();
+        for (Integer i: idList) {
+            sbd.append(i);
+            sbd.append(", ");
+        }
+        sbd.deleteCharAt(sbd.length()-2);//去掉末尾多余的逗号。
+
+        String selectQuery = "SELECT * FROM "+ YoMemoryContract.ItemBasic.TABLE_NAME+tableNameSuffix
+                +" WHERE "+ YoMemoryContract.ItemBasic._ID +" IN ( "+sbd.toString()+")";
+
+        getReadableDatabaseIfClosedOrNull();
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectQuery,null);
+
+        if(cursor.moveToFirst()){
+            do {
+                SingleItem item = new SingleItem();
+                item.setId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.ItemBasic._ID)));
+                item.setName(cursor.getString(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_NAME)));
+                item.setPhonetic(cursor.getString(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_PHONETIC)));
+                item.setTranslations(cursor.getString(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_TRANSLATIONS)));
+
+                item.setChose(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE))==1);//【待测试。getString .equals(false)可用】
+                item.setLearned(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_IS_LEARNED))==1);//【待测试。getString .equals(false)可用】
+                item.setGroupId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_GROUP_ID)));
+                item.setPriority(cursor.getShort(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_PRIORITY)));
+                item.setFailedSpelling_times(cursor.getShort(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_FAILED_SPELLING_TIMES)));
+
+                items.add(item);
+            }while (cursor.moveToNext());
+            Log.i(TAG, "getItemsWithList: cursor ok.");
+        }else{
+            return null;
+        }
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        closeDB();
+
+        return items;
+    }
+
+
+    /*
+     * 根据gid列表来获取对应各组所含的Items。
+     * 获取的items按照所属Group的id进行分组，且按gid升序。
+     * */
+    public ArrayList<SingleItem> getItemsWithInGidList(ArrayList<Integer> gidList,String tableNameSuffix){
+        Log.i(TAG, "getItemsWithInGidList: before any.");
+        ArrayList<SingleItem> items = new ArrayList<>();
+
+        StringBuilder sbd = new StringBuilder();
+        for (Integer i: gidList) {
+            sbd.append(i);
+            sbd.append(", ");
+        }
+        sbd.deleteCharAt(sbd.length()-2);//去掉末尾多余的逗号。
+
+        String selectQuery = "SELECT * FROM "+ YoMemoryContract.ItemBasic.TABLE_NAME+tableNameSuffix
+                +" WHERE "+ YoMemoryContract.ItemBasic.COLUMN_GROUP_ID +" IN ( "+sbd.toString()+")"
+                +" ORDER BY "+YoMemoryContract.ItemBasic.COLUMN_GROUP_ID + "ASC";
+
+        getReadableDatabaseIfClosedOrNull();
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectQuery,null);
+
+        if(cursor.moveToFirst()){
+            do {
+                SingleItem item = new SingleItem();
+                item.setId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.ItemBasic._ID)));
+                item.setName(cursor.getString(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_NAME)));
+                item.setPhonetic(cursor.getString(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_PHONETIC)));
+                item.setTranslations(cursor.getString(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_TRANSLATIONS)));
+
+                item.setChose(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE))==1);//【待测试。getString .equals(false)可用】
+                item.setLearned(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_IS_LEARNED))==1);//【待测试。getString .equals(false)可用】
+                item.setGroupId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_GROUP_ID)));
+                item.setPriority(cursor.getShort(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_PRIORITY)));
+                item.setFailedSpelling_times(cursor.getShort(cursor.getColumnIndex(YoMemoryContract.ItemBasic.COLUMN_FAILED_SPELLING_TIMES)));
+
+                items.add(item);
+            }while (cursor.moveToNext());
+            Log.i(TAG, "getItemsWithList: cursor ok.");
+        }else{
+            return null;
+        }
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        closeDB();
+
+        return items;
+    }
 
     public String getSingleItemNameById(long itemId, String suffix){
         String itemName;

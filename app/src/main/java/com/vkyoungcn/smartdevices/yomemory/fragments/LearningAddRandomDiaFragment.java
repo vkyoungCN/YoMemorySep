@@ -14,7 +14,7 @@ import com.vkyoungcn.smartdevices.yomemory.R;
 public class LearningAddRandomDiaFragment extends DialogFragment implements View.OnClickListener {
     private static final String TAG = "LearningAddRandomDiaFragment";
 
-    private OnLearningConfirmDfgInteraction mListener;
+    private OnGeneralDfgInteraction mListener;
 
     private TextView tvCancel;
     private TextView tvConfirm;
@@ -55,11 +55,11 @@ public class LearningAddRandomDiaFragment extends DialogFragment implements View
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnLearningConfirmDfgInteraction) {
-            mListener = (OnLearningConfirmDfgInteraction) context;
+        if (context instanceof OnGeneralDfgInteraction) {
+            mListener = (OnGeneralDfgInteraction) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnLearningConfirmDfgInteraction");
+                    + " must implement OnGeneralDfgInteraction");
         }
     }
 
@@ -74,7 +74,7 @@ public class LearningAddRandomDiaFragment extends DialogFragment implements View
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btn_confirm_learningAddRandom://创建新分组
-                mListener.onLearningConfirmDfgInteraction(OnLearningConfirmDfgInteraction.LEARNING_AND_CREATE_RANDOM,null);
+                mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_AND_CREATE_RANDOM,null);
                 break;
             case R.id.btn_cancel_learningAddRandom:
 

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.SingleItemLearningFragment">
+
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_view"
+        android:layout_gravity="center"
+        android:layout_margin="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#33ffab00"
+        >
+
+        <LinearLayout
+            android:id="@+id/llt_positivePage_singleItemLearning_re"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:padding="8dp"
+            >
+            <TextView
+                android:id="@+id/tv_name_singleItemLearning_re"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:textSize="28sp"
+                android:gravity="center"
+                android:text="@string/sharp_x5_default" />
+            <TextView
+                android:id="@+id/tv_ext1_singleItemLearning_re"
+                android:layout_width="match_parent"
+                android:layout_height="28dp"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:text="@string/sharp_x3_default" />
+            <TextView
+                android:id="@+id/tv_ext2Pos_singleItemLearning_re"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:padding="4dp"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:text="@string/sharp_x24_default"
+                android:lines="2"
+                android:ellipsize="marquee"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="2dp"
+                android:textSize="12sp"
+                android:textColor="@color/bottomLine_nonCorrect_color"
+                android:gravity="center"
+                android:text="@string/tip_and_over"
+                android:lines="1"
+                android:ellipsize="end"
+                />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/rlt_negativePage_singleItemLearning_re"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:padding="4dp"
+            android:visibility="gone"
+            >
+            <TextView
+                android:id="@+id/tv_ext2_singleItemLearning_re"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:padding="4dp"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:text="@string/sharp_x24_default"
+                android:lines="2"
+                android:ellipsize="marquee"
+                />
+            <com.vkyoungcn.learningtools.validatingEditor.ValidatingEditor
+                android:id="@+id/validatingEditor_singleItemLearning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/tv_ext2_singleItemLearning_re"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="2dp"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:text="@string/fill_and_slide_over"
+                android:lines="1"
+                android:ellipsize="end"
+                android:layout_below="@id/validatingEditor_singleItemLearning"
+                />
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+
+
+</RelativeLayout>

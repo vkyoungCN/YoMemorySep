@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ValidatingEditor">
+        <attr name="bottomLine_color"
+            format="color"/>
+        <attr name="bottomLine_nonCorrect_color"
+            format="color"/>
+        <attr name="text_color"
+            format="color"/>
+        <attr name="text_nonCorrect_color"
+            format="color"/>
+        <attr name="target_text"
+            format="string"/>
+        <attr name="sectionAmount"
+            format="integer"/>
+    </declare-styleable>
+</resources>

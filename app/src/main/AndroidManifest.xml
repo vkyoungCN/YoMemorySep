@@ -18,9 +18,11 @@
         </activity>
         <activity android:name=".MainActivity" />
         <activity android:name=".GroupsAndMissionDetailActivity" />
-        <activity android:name=".ItemsAndMissionDetailActivity"/>
-        <activity android:name=".GroupDetailActivity"/>
-        <activity android:name=".LearningActivity"/>
+        <activity android:name=".ItemsAndMissionDetailActivity" />
+        <activity android:name=".GroupDetailActivity" />
+        <activity android:name=".LearningActivity" />
+        <activity android:name=".AccomplishActivity" />
+        <activity android:name=".PrepareForLearningActivity"></activity>
     </application>
 
 </manifest>

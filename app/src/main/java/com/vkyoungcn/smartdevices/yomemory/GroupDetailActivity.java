@@ -17,7 +17,7 @@ import com.vkyoungcn.smartdevices.yomemory.adapters.ItemsOfMissionRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningGelDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LessAndQuitDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LogsOfGroupDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.OnLearningConfirmDfgInteraction;
+import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 
-public class GroupDetailActivity extends Activity implements OnLearningConfirmDfgInteraction {
+public class GroupDetailActivity extends Activity implements OnGeneralDfgInteraction {
 //    private static final String TAG = "GroupDetailActivity";
     private RVGroup rvGroup;
     private YoMemoryDbHelper memoryDbHelper;
@@ -84,7 +84,7 @@ public class GroupDetailActivity extends Activity implements OnLearningConfirmDf
 
             lastLearnTime.setText(lastLearningTimeStr);
 
-            int remainingMinutes = RVGroup.minutesRemainTillThreshold(rvGroup.getMemoryStage());
+            int remainingMinutes = RVGroup.minutesTillFarThreshold(rvGroup.getMemoryStage());
             remainTime.setText(formatFromMinutes(remainingMinutes));
 
             moreLogsBtn.setOnClickListener(new View.OnClickListener() {
@@ -167,7 +167,7 @@ public class GroupDetailActivity extends Activity implements OnLearningConfirmDf
     }
 
     @Override
-    public void onLearningConfirmDfgInteraction(int dfgType, Bundle data) {
+    public void onButtonClickingDfgInteraction(int dfgType, Bundle data) {
         if(dfgType == JUMP_TO_GROUP_LIST_THIS_FRAG) {
             Intent intentToGroupListActivity = new Intent(this, GroupsAndMissionDetailActivity.class);
 

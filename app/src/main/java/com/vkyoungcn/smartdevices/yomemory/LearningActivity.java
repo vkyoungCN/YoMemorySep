@@ -4,90 +4,105 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.vkyoungcn.smartdevices.yomemory.adapter.LearningViewPrAdapter;
+import com.vkyoungcn.smartdevices.yomemory.adapters.LearningViewPrAdapter;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningTimeUpDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.OnSimpleDFgButtonClickListener;
+import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
-import com.vkyoungcn.smartdevices.yomemory.spiralCore.LogList;
-import com.vkyoungcn.smartdevices.yomemory.sqlite.YouMemoryDbHelper;
+import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 import com.vkyoungcn.smartdevices.yomemory.validatingEditor.ValidatingEditor;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
+import java.util.ArrayList;
 
 /*
-* 进入本Activity后，在启动的新线程中处理从DB取数据的业务，
-* 数据取好后，附加一条“ending伪数据”，作为结束页面；
-* 在结束页面还有其他特殊逻辑：①取消页脚的页数显示；②到达最后一页（伪数据页）后计时停止，生成要存入DB的Log数据；
-* ③增加完成学习的确认按钮，以及DB数据生成、存入逻辑；④允许向前滑动查看，但数据不再改变（以TextView说明这个情况）；
-* （同时，取消初始设计中以Dfg收尾的计划）
+* 进入本Activity之前，经过一个预准备数据用的专用Activity，从该页面传来的数据有：
+* ①tableSuffix；②learningType；③ArrayList<SingleItems>主体数据；以及：
+* ④（仅LG）gid；⑤(仅LMerge)gids列表List。
+* 数据的获取和完结分别在前、后页面完成。本页只负责学习逻辑（和最小限度的确保前后逻辑完整的业务）。
+* 【新版取消了伪数据尾页，注意逻辑修改】
+*
+*  本页要实现的主要逻辑有：
+*  ①时间控制——限定在60分钟内完成单次学习任务。
+*      学习可以暂停（离开本页）但计时继续。
+*      到时间后根据已学/未学进行拆分。
+*      全部完成后计时并不停止，也不自动跳转完结（可以手动完结；
+*      且会提示请及时保存，以免程序被系统强制退出后丢失学习数据），待计时结束按统一逻辑处理。
+*  ②各Item的学习情况控制——
+*      a.完成状态：正确（已填完整且正确）/错误（有错或未完成）/未填写
+*      b.正面、反面与点击提示（且限次数，超过则本次学习置“记忆失败”）
+*      c.允许手动改变单项Item的标记记录
+*  ③滑动逻辑——可以自由前后滑动；
+*       *最后一页为附加的伪完成页（滑到该页时，下方结束按钮变大且改为鲜艳颜色）
+*       点击后如果存在错误VE，会弹出DFG提示并确认；如全对则跳转结束页。
+*  ④CardView学习逻辑
+*       初始显示状态：CardView正面（名称+音标+释义；附加标记等）
+*       点击翻面：（VE+音标+释义；附加标记等）。点击提示按钮会给出名称提示（记录次数），点击VE时消失；
+*       *当提示记次>3时，不可再提示，且给该item记“记忆失败”错误+1；（每次学习最多加1）
+*       b.允许自由前后滑动（滑出时记录VE状态（含所填的内容），滑回时恢复）
+*
+* 对于学习是否“能使MS提升”，由学习结束后的专用结束Activity根据学习时间进行判断、处理；
+* 而本页本着“不能不让学”的原则，无论时间区间如何，都可以开始学习。
 * */
-public class LearningActivity extends AppCompatActivity implements OnSimpleDFgButtonClickListener, ValidatingEditor.codeCorrectAndReadyListener {
-    private static final String TAG = "ItemLearningActivity";
+public class LearningActivity extends AppCompatActivity implements OnGeneralDfgInteraction, ValidatingEditor.OnValidatingEditorInputListener {
+    private static final String TAG = "LearningActivity";
 
-    public static final int CREATE_IN_ORDER = 2041;
-    public static final int CREATE_RANDOM = 2042;
+    private int learningType;//Intent传入。
+    private String tableNameSuffix;//Intent传入。
+    private ArrayList<SingleItem> items;//Intent传入。数据源
 
+    private int groupId;//Intent传入。（仅LG模式下）
+    private ArrayList<Integer> gIdsForMerge;//Intent传来，仅在合并学习时有此数据。
 
-    private int groupId;//最后的结果页面需要获取分组信息
-    private int learningType;//在最后的操作中，蓝色、橙色的日志生成方式不同，无法统一做“复习类型”传递。
-    private String tableNameSuffix;//用来从DB获取本组所属的ITEMS
-    private String groupSubItemIdsStr;//用来从DB获取本组所属的ITEMS
-    private List<SingleItem> items;//数据源（未初始化）
-    private String newLogs="";//用于回传到调用act的字串，新log
+    private ArrayList<String> veFillings;//记录填写在VE内的信息，用于回滚时加载。【如果需要记录所填内容，似乎只能在Act记录。】
+    //【原方案还有一个布尔List用于记录各VE正误情况，今认为应少建高开销资源，直接在Activity中利用上一List对比。且实际状态有三，布尔不符】
+    private String veCacheString = "";//记录正在输入的VE的内容，在滑动卡片时存入list并置空。
+    // (该字串在回调监听中设置，设计为VE每增删一个有效字符本字串被改写一次，但上下限与VE同不会越界修改)
+
+//    private boolean autoSliding = true;//（在VE填写正确时）自动向后滑动的设置开关。
 
     private Thread timingThread;//采用全局变量便于到时间后终结之。【如果已滑动到ending页则直接停止计时，避免最后timeUp消息的产生】
-    private Boolean prolonged = false;//计时完成如果还没有完成复习，可以延长时间一次（暂定15分钟，暂定不影响log计时）
 
-    private int timeCount = 60;//【调试期间临时设置为1分钟】默认执行60次for循环（for循环包含60次1秒间隔的执行，完整执行一次for需要60秒）
-    private long startingTimeMillis;//用于非正常结束时回传调用方的信息项。
-    private int timePastInMinute = 0;//流逝分钟数
-    private int timeInSecond = 0;
+    private int timeCount = 59;//for循环控制变量。执行60次for循环，即1h。（for循环包含60次1秒间隔的执行，一次完整的for=1min）
+    private boolean isTimeUp = false;//计时线程的控制变量【旧版采用timeCount兼任。存在-1:59问题】
+    private long startingTimeMillis;//学习开始的时间。（需要在……时间内完成，否则拆分）【最后的时间区间计算可令开始时间大于下限，结束小于上限】
+//    private int timePastInMinute = 60;//流逝分钟数【借用timeCount即可】
+    private int timeInSecond =59;//以秒计算的总流逝时间
+    private boolean shouldChangeMinForFirstSec = true;//UI中开始是60:00，当第一秒走过后，应变为59:59.
 
-//    private Boolean prepared = false;
-    private Boolean learningFinished = false;//本组学习完成。完成后置true，计时线程要检测之，避免完成后重新计时（因为代码顺序靠后BUG)
+//    private boolean isTimeUp = false;//计时只在时间到或手动停止时停止。完成学习后并不停止计时（分属两项任务）。
+//    private boolean learningFinishedCorrectly = false;//本组学习完成。完成后置true，计时线程要检测之，避免完成后重新计时（因为代码顺序靠后BUG)
+//    private boolean learningFinishedWithWrong = false;
     private Handler handler = new LearningActivityHandler(this);
 
-    private int scrollablePage = 1;//目前可自由滑动的页数范围。只增不减。
+//    private int scrollablePage = 1;//目前可自由滑动的页数范围。只增不减。【现在无限制了】
 
-    private YouMemoryDbHelper memoryDbHelper;
+    private YoMemoryDbHelper memoryDbHelper;
 
-    private FrameLayout fltMask;
-    private TextView tv_mask;
-    private HalfScrollableViewPager viewPager;
-    private TextView timePastMin;
-    private TextView timePastScd;
+    private ViewPager viewPager;//原是自定义的HalfScrollableVP
+    private TextView tv_timeRestMin;
+    private TextView tv_timeRestScd;
     private TextView totalMinutes;//应在xx分钟内完成，的数字部分。
-
+    private TextView tv_rollLabel;//上方滚动标语栏
     private TextView tv_currentPageNum;
-    private int currentLearnedAmount;//用于最后判断是否完成，是只增不减的量。
     private TextView tv_totalPageNum;
-    private TextView confirmAndFinish;//额外复习完成后的返回按钮，初始隐藏。
+    private int maxLearnedAmount = 0;//用于判断已滑动过了多少词。当向回滑动时，此数字不减小。
 
     public static final int RESULT_LEARNING_SUCCEEDED = 3020;
-    public static final int RESULT_EXTRA_LEARNING_SUCCEEDED = 3021;
-    public static final int RESULT_EXTRA_LEARNING_SUCCEEDED_UNDER24H = 3022;
     public static final int RESULT_LEARNING_FAILED = 3030;
 
-    public static final int MESSAGE_DB_DATE_FETCHED =5101;
     public static final int MESSAGE_ONE_MINUTE_CHANGE =5102;
     public static final int MESSAGE_ONE_SECOND_CHANGE =5103;
     public static final int MESSAGE_TIME_UP = 5104;
-    public static final int MESSAGE_LOGS_SAVED = 5105;
-    public static final int MESSAGE_EXTRA_LEARNING_ACCOMPLISHED = 5106;
-    public static final int MESSAGE_EXTRA_LEARNING_UNDER_1H = 5107;
-    public static final int MESSAGE_EXTRA_LEARNING_1H_24H = 5108;
-
 
 
     @Override
@@ -96,90 +111,121 @@ public class LearningActivity extends AppCompatActivity implements OnSimpleDFgBu
         setContentView(R.layout.activity_item_learning);
 
         //从Intent获取参数
-        groupId = getIntent().getIntExtra("group_id",0);
-        tableNameSuffix = getIntent().getStringExtra("item_table_suffix");
-        groupSubItemIdsStr = getIntent().getStringExtra("group_sub_item_ids_str");
-        learningType = getIntent().getIntExtra("learning_type",0);
+        learningType = getIntent().getIntExtra("LEARNING_TYPE",0);
+        tableNameSuffix = getIntent().getStringExtra("TABLE_NAME_SUFFIX");//各种learningType都有TableSuffix
+        items = getIntent().getParcelableArrayListExtra("ITEMS_FOR_LEARNING");//都有，主数据。
 
-        fltMask = (FrameLayout) findViewById(R.id.flt_mask_learningPage);
-        tv_mask = (TextView)findViewById(R.id.tv_onItsWay_learningPage);
-        timePastMin = (TextView)findViewById(R.id.tv_time_past_numMinute_Learning);
-        timePastScd = (TextView)findViewById(R.id.tv_time_past_numSecond_Learning);
+//        groupId = getIntent().getBundleExtra("BUNDLE_GROUP_ID").getInt("GROUP_ID_TO_LEARN");【似乎用不到】，gids列表也用不到
+
+
+        //获取各控件
+        tv_timeRestMin = (TextView)findViewById(R.id.tv_time_past_numMinute_Learning);
+        tv_timeRestScd = (TextView)findViewById(R.id.tv_time_past_numSecond_Learning);
+        //给时间的分、秒数设置字体
+        Typeface typeFace = Typeface.createFromAsset(getAssets(),"fonts/digit.ttf");
+        tv_timeRestMin.setTypeface(typeFace);
+        tv_timeRestScd.setTypeface(typeFace);
+
         tv_currentPageNum = (TextView)findViewById(R.id.currentPageNum_learningActivity);
         tv_totalPageNum = (TextView)findViewById(R.id.totalPageNum_learningActivity);//总数字需要在数据加载完成后设置，在handleMessage中处理
-        totalMinutes = (TextView) findViewById(R.id.tv_num_itemLearningActivity);
-        confirmAndFinish = (TextView)findViewById(R.id.learningFinish) ;
 
-        viewPager = (HalfScrollableViewPager) findViewById(R.id.viewPager_ItemLearning);
-        if(learningType == R.color.colorGP_Newly) {
-            viewPager.setScrollable(true);//初学状态，vp可以直接滑动
-        }
+        tv_rollLabel = (TextView)findViewById(R.id.tv_rollLabel_learningActivity) ;
 
+
+        viewPager = (ViewPager) findViewById(R.id.viewPager_ItemLearning);
+        //给Vpr设置监听
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+            int oldPageNum = 0;//用于记录页面滑动操作的“起始页”
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+                oldPageNum = position;//获取滑动开始时的页面索引
+            }
+
+            /*
+            * 本方法中需要完成的任务：
+            * ①设置页脚数字
+            * ②判断并设置最大已滑动值
+            * ③给自定义进度条UI传递当前页面数【待】
+            * ④（由于刚进入新页）将VE缓存（对应上一页内容）存入String列表；并检测本页对应位置上是否有值，有则传入。
+            * ⑤理论上，每滑动一页，就应将上一页的正误情况存入记录列表。
+            *
+            * （注意反向滑动下的特殊逻辑）
+            * */
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
+                //据文档，本方法调用时，滑动已经完成。
 
-                //如果是复习，需要在滑动一页后重新设置为不可滑动，直至validatingEditor校验正确
-                //但是可以向前一页滑动（由Adapter负责实现）
-                //且在向前滑动后可以重新自由滑动到已阅读页
-
-                //跳转到下一页后的首要逻辑是将已阅读（可滑动）范围设为当前最大页（向后滑动才设新值）
-                if(scrollablePage < position) {
-                    scrollablePage = position;
-                }//end if, 向前滑动不设新值。
-
-                //非初学状态下，不能超越上限滑动
-                if((learningType == R.color.colorGP_AVAILABLE ||
-                        learningType == R.color.colorGP_Miss_ONCE ||
-                        learningType == R.color.colorGP_STILL_NOT )&& position>=scrollablePage) {
-                    viewPager.setScrollable(false);
-                }else {//页码未到（正处在向已学部分回览状态，或新学习模式，都可以自由翻页）
-                    viewPager.setScrollable(true);
-                }
+                //任务一：
                 //设置底端页码显示逻辑
                 //当页面滑动时为下方的textView设置当前页数，但是只在开始滑动后才有效果，初始进入时需要手动XML设为1
-                if(currentLearnedAmount<position+1){
-                    currentLearnedAmount = position+1;//只加不减
+                tv_currentPageNum.setText(String.valueOf(position + 1));//索引从0起需要加1
+                //【旧版中，因为有伪数据尾页，在滑到最后一页时需要各种特殊的逻辑和判断】
+
+                //任务二：
+                //记录已滑动的上限值（注意只增不减）【但上限不包括伪数据尾页，所以位于任务一的if内】
+                if(maxLearnedAmount <position+1){
+                    maxLearnedAmount = position+1;//只加不减
                 }
-                tv_currentPageNum.setText(String.valueOf(position+1));//索引从0起需要加1
-                //滑动到最后一页时
+
+/*
+* 任务三之UI的设计：考虑接收两个List参数（一个是正确的String列表，一个是实际VE字串列表）；通过对此两个
+* 列表的对比，得出各位置上的状态（正确、错误、未填写——三种之一），其中尺寸大小从正确列表的尺寸获取。
+* 当页面滑动时，对该UI进行通知/设置：改变其“当前位置”，并对上一个当前位置的状态进行重新计算。
+* 【只在页面滑动后才更新某位置上的显示；未滑动时对该页所做的修改不反应到该UI上】
+* 可以由该控件设计一个最终状态是否全对的回调，在学习结束时判断。
+* */
+
+
+                //任务四：
+                //将上一页的（用于记录输入信息的）临时字串存入List，临时字串清空备用
+                veFillings.set(oldPageNum, veCacheString);
+                veCacheString = "";
+                //本页VE缓存（如果有）设置给VE
+                if(veFillings.get(position)!=null){//若为空串""则是可以设置的。
+                    ValidatingEditor vdEt = ((LearningViewPrAdapter)viewPager.getAdapter()).currentFragment.getView().findViewById(R.id.validatingEditor_singleItemLearning);
+                    vdEt.setInitText(veFillings.get(position));
+                }
+
+
                 if(position==items.size()-1){
-                    //最后一张【Ending伪数据页】
-                    learningFinished = true;
-                    timingThread.interrupt();//先结束计时线程。
-                    // （不需要用户确认完成）向DB写数据；
-                    //能到这一页的，属于正常完成
-                    tv_currentPageNum.setText("--");//总不能显示比总数还+1.
-
-                    //显示信息：学习记录保存中，请稍等……同时执行向DB写log
-                    tv_mask.setText("学习记录保存中，请稍等");
-                    fltMask.setVisibility(View.VISIBLE);
-                    //在新线程处理log的DB保存操作。
-                    new Thread(new learningFinishedRunnable()).start();
-
+                    //最后一张
+                    //将结束按钮扩大。
 
                 }
             }
         });
 
-            //从db查询List<SingleItem>放在另一线程
-            new Thread(new PreparingRunnable()).start();         // start thread
+        /*
+        * 【在点击了结束按钮（手动强行结束）或时间到而结束后，判断是否全部完成。
+        * 1、如果全部完成且全部正确，直接进入结束页（且直接执行DB更新任务）
+        * 2、如果全部完成，但并非全对，弹出DFG，询问：A确认（则错误的记错误1次）or B.放弃本次复习。
+        * 3、未全部完成（可能是时间到所致），弹出DFG询问：A确认（则未完成的拆分，且错误的记错1）or B.放弃
+        */
 
         //后期增加：①items可选顺序随机；
-        // ②增加倒计时欢迎页面；
+
+
+        startingTimeMillis = System.currentTimeMillis();//记录学习开始的时间
+
+        //启动计时器（每分钟更改一次数字）
+        timingThread = new Thread(new TimingRunnable());
+        timingThread.start();
+
     }
 
     final static class LearningActivityHandler extends Handler {
-        private final WeakReference<ItemLearningActivity> activity;
+        private final WeakReference<LearningActivity> activity;
 
-        private LearningActivityHandler(ItemLearningActivity activity) {
-            this.activity = new WeakReference<ItemLearningActivity>(activity);
+        private LearningActivityHandler(LearningActivity activity) {
+            this.activity = new WeakReference<LearningActivity>(activity);
         }
 
         @Override
         public void handleMessage(Message msg) {
-            ItemLearningActivity itemLearningActivity = activity.get();
+            LearningActivity itemLearningActivity = activity.get();
             if(itemLearningActivity != null){
                 itemLearningActivity.handleMessage(msg);
             }
@@ -191,16 +237,19 @@ public class LearningActivity extends AppCompatActivity implements OnSimpleDFgBu
 
         @Override
         public void run() {
-            //从DB读取数据
-            memoryDbHelper = YouMemoryDbHelper.getInstance(getApplicationContext());
-            items = memoryDbHelper.getItemsByGroupSubItemIds(groupSubItemIdsStr,tableNameSuffix);
+            //从DB准备数据
 
-            //在数据原的最后附加一条“伪数据”，用于学习完成后显示学习信息，处理完成业务。
-            SingleItem endingItem = new SingleItem(0,"完成","","",true);
-            items.add(endingItem);
+            //将学习记录初始化（全否）；VE记录列表初始化。
+            itemsVeRightOrWrong = new ArrayList<>();
+            veFillings = new ArrayList<>();
+            for(int i =0;i<items.size();i++) {
+                itemsVeRightOrWrong.add(false);
+                veFillings.add("");
+            }
+
+
 
             Message message = new Message();
-            message.what = MESSAGE_DB_DATE_FETCHED;
 
             handler.sendMessage(message);
         }
@@ -211,89 +260,41 @@ public class LearningActivity extends AppCompatActivity implements OnSimpleDFgBu
 
         @Override
         public void run() {
-            //额外复习
-            if(learningType == R.color.colorGP_STILL_NOT){
-                //额外复习处理逻辑
-                String oldLogs = memoryDbHelper.getGroupById(groupId).getGroupLogs();
-                int minutesPast = LogList.getMinutesBetweenInitLearningAndNow(oldLogs);
-                if(minutesPast<60){
-                    //1小时内的额外复习
-                    //DB记录字段置true
-                    //返回调用方后更新UI
-                    int lines = memoryDbHelper.updateExtraLearningOneAsTrue(groupId);
-                    if(lines == -1 || lines ==0){
-                        //失败逻辑，待处理
-                        return;
-                    }
-                    Message message = new Message();
-                    message.what = MESSAGE_EXTRA_LEARNING_UNDER_1H ;
 
-                    handler.sendMessage(message);
-                }else if(minutesPast<24*60){
-                    //1~24h
-                    //DB相应字段值+1
-                    //返回调用方后通知更新UI
-                    int lines2 = memoryDbHelper.updateExtraLearning24HourAsAddOne(groupId);
-                    if(lines2 == -1 || lines2 ==0){
-                        //失败逻辑，待处理
-                        return;
-                    }
-                    Message message = new Message();
-                    message.what = MESSAGE_EXTRA_LEARNING_1H_24H ;
-
-                    handler.sendMessage(message);
-                }else {
-                    //超过24小时，没有特殊处理
-                    Message message = new Message();
-                    message.what = MESSAGE_EXTRA_LEARNING_ACCOMPLISHED ;
-
-                    handler.sendMessage(message);
-                }
-
-                //判断时间，在1h内的；在1h以上，24h内的；在24h以上的。
-                //增加DB列，额外学习的记录。也是要操作DB的。
-
-            }else {
-                //需要生成新Logs记录存入DB（覆盖旧Logs）
-                //注意，仍然需要传递learningType以区分蓝色、橙色生成几条记录。
-                newLogs = LogList.getUpdatedGroupLogs(ItemLearningActivity.this, groupId, System.currentTimeMillis(),learningType);
-                //向DB更新
-                if(newLogs==null||newLogs.isEmpty()){
-                    Toast.makeText(ItemLearningActivity.this, "学习记录生成失败，未知错误。", Toast.LENGTH_SHORT).show();
-                }
-                long lines = memoryDbHelper.updateLogOfGroupById(groupId,newLogs);
-
-                //完成后通知UI
-                Message message = new Message();
-                message.what = MESSAGE_LOGS_SAVED;
-//                message.obj = lines;//暂时用不到该数据
-
-                handler.sendMessage(message);
-            }
         }
     }
 
-    //用于计时并发送更新UI上时间值的消息
     public class TimingRunnable implements Runnable {
 //        private static final String TAG = "TimingRunnable";
 
         @Override
         public void run() {
-            while(!learningFinished && timeCount > 0){
+            while(!isTimeUp){//时间未到
                 try {
-                    for (int i = 0; i < 60&&!learningFinished; i++) {//这样才能在学习完成而分钟数未到的情况下终止计时。
-                        Thread.sleep(1000);     // sleep 1 秒；本循环执行完60次需60秒
+//                    for (int i = 0; i < 60&&!learningFinishedCorrectly; i++) {//这样才能在学习完成而分钟数未到的情况下终止计时。
+                    for (int i = 0; i < 60; i++) {
+                        Thread.sleep(1000);     // sleep 1 秒；
 
                         //消息发回UI，改变秒数1
                         Message message = new Message();
                         message.what = MESSAGE_ONE_SECOND_CHANGE;
                         handler.sendMessage(message);
 
+                        //这个似乎只能放在for内部【待】
+                        if(timeCount == 0 && i==0 ){
+                            //当减到-1时，其实秒数已经改为59了，所以需要在减到-1前就停止。
+                            //【旧版使用timeCount代替专用控制变量似乎难以避免-1:59的问题（其实也行）】
+                            Message messageTimeUp = new Message();
+                            messageTimeUp.what = MESSAGE_TIME_UP;
+                            handler.sendMessage(message);
+                            isTimeUp = true;
+                        }
                     }
+                    timeCount--;//所以一个count是1分钟
 
-                    timeCount--;
-                    if(!learningFinished) {
-                        //消息发回UI，改变分钟数1（只在未完成状态下才改变数字）
+                    //消息发回UI，改变分钟数1（只在未完成状态下才改变数字）
+                    if(timeCount!=-1) {
+                        //当最后减到-1时，就不再发送分钟改变的消息。
                         Message message = new Message();
                         message.what = MESSAGE_ONE_MINUTE_CHANGE;
                         handler.sendMessage(message);
@@ -303,70 +304,71 @@ public class LearningActivity extends AppCompatActivity implements OnSimpleDFgBu
                 }
             }
 
-            if(timeCount==0) {
-                //是由于时间耗尽而结束循环时，消息发回UI。
+            if(timeCount==-1) {
+                //时间耗尽，消息发回UI。
                 Message message = new Message();
                 message.what = MESSAGE_TIME_UP;
                 handler.sendMessage(message);
+                timeCount--;
             }
-
         }
     }
 
-    void handleMessage(Message msg){
-        switch (msg.what){
-            case MESSAGE_DB_DATE_FETCHED:
-                startingTimeMillis = System.currentTimeMillis();
-                fltMask.setVisibility(View.GONE);
+    void handleMessage(Message msg) {
+        switch (msg.what) {
 
-                int vpLearningType = LearningViewPrAdapter.TYPE_RE_PICKING;//默认复习
-                if(learningType == R.color.colorGP_Newly){
-                    vpLearningType = LearningViewPrAdapter.TYPE_INIT_LEARNING;
-                }//【纯复习采用何种标记目前暂未设计】
+                LearningViewPrAdapter learningVpAdapter = new LearningViewPrAdapter(getSupportFragmentManager(), items);
+                viewPager.setAdapter(learningVpAdapter);
 
-                //下方构造参数待修改
-                LearningViewPrAdapter lvAdp = new LearningViewPrAdapter(getSupportFragmentManager(),items,vpLearningType);
-                viewPager.setAdapter(lvAdp);
 
-                tv_totalPageNum.setText(String.valueOf(items.size()-1));//最后一页ending伪数据不能算页数。
-//                prepared = true;
-
-                //然后由启动计时器（每分钟更改一次数字）
-                timingThread =  new Thread(new TimingRunnable());
-                timingThread.start();
                 break;
 
+
             case MESSAGE_ONE_SECOND_CHANGE:
-                timeInSecond++;
-                timePastScd.setText(String.format("%02d",timeInSecond%60));
+                if(timeInSecond == 0){
+                    timeInSecond =60;//先判断，如果该值降低到0，则重置为60；
+                }
+                timeInSecond--;//【逻辑经推演基本是正确的】
+                tv_timeRestScd.setText(String.format("%02d", timeInSecond));
                 break;
 
             case MESSAGE_ONE_MINUTE_CHANGE:
-                timePastInMinute++;
-                timePastMin.setText(String.format("%02d",timePastInMinute));
+                tv_timeRestMin.setText(String.format("%02d", timeCount));
                 break;
 
             case MESSAGE_TIME_UP:
-                timingThread.interrupt();//先结束计时线程。
-                //安排时间到后的逻辑：②Dfg弹窗询问：
-                //a.是否续时；b.强制结束，执行收尾逻辑。【完成数量大于18个可以拆分为两组】或者强制结束不做任何记录。
-                if(!prolonged){
-                    //尚未延长过时间，此时可以延长一次。
-                    // 弹出dfg，其中要置prolonged为true。如果用户要延长时间，则将计时计数器回调到15分，继续执行线程。
-                    popUpTimeEndingDiaFragment();
-                }else {
-                    //【后期可增加“在分组部分完成时，拆分分组”的功能。】
-//                    finishWithUnAcomplishment();//无论是已无再次延时的机会，还是直接dismiss，都调用本方法。
-                    Toast.makeText(this, "未能完成，不记录本次学习。", Toast.LENGTH_SHORT).show();
+                timingThread.interrupt();//显式结束计时线程。
+                //如果此时已经完成学习（滑动到过最后一页，且VE全部正确），则自动跳转到结束页，并保存记录。
+                if((maxLearnedAmount == items.size()-1) &&(itemsVeRightOrWrong.indexOf(false)==-1)){
+                    Intent intentForAccomplishActivity = new Intent (this,AccomplishActivity.class);
+                    intentForAccomplishActivity.putExtra("GROUP_ID",groupId);
+                    //到达目标页后，需要根据本组的MS，lastTime等，结合本次学习的起止时间判断是否算作有效MS复习（是否令MS++）
+                    intentForAccomplishActivity.putExtra("START_TIME",startingTimeMillis);
+                    intentForAccomplishActivity.putExtra("FINISH_TIME",System.currentTimeMillis());
 
+                    intentForAccomplishActivity.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+                    startActivity(intentForAccomplishActivity);
+                }else {
+                    //否则常规模式：Dfg弹窗提示时间到——
+                    // 并给出正误情况。
+                    //按钮1：确认。拆分。
+                    //按钮2：（默认隐藏）“就当刚才没学过”（提示，这样您的实际记忆水平可能会高于本程序记录的水平哦，
+                    // 不过只要您开心，当然就可以这样做。）
+
+                    popUpTimeEndingDiaFragment();
+                }
+
+/*
                     //为返回调用方Activity准备数据,
                     Intent intentForFailedReturn = new Intent();
                     intentForFailedReturn.putExtra("startingTimeMills",startingTimeMillis);
                     setResult(RESULT_LEARNING_FAILED,intentForFailedReturn);
                     this.finish();
-                }
+*/
                 break;
 
+/*
             case MESSAGE_LOGS_SAVED:
 //                timingThread = null;//停止计时
                 // 滑动监听的设置代码早于timingThread实例化代码的位置，所以原先的终止方式无效。
@@ -380,29 +382,21 @@ public class LearningActivity extends AppCompatActivity implements OnSimpleDFgBu
                 setResult(RESULT_LEARNING_SUCCEEDED,intent);
                 this.finish();
                 break;
+*/
 
-            case MESSAGE_EXTRA_LEARNING_1H_24H:
-            case MESSAGE_EXTRA_LEARNING_UNDER_1H:
-                fltMask.setVisibility(View.GONE);//取消遮盖
-                //在原始activity上给出结束按钮。显示学习信息。
-
-                //可以为返回调用方activity而设置数据了
-                Intent intent2 = new Intent();
-//                intent2.putExtra("GroupId",groupId);
-                setResult(RESULT_EXTRA_LEARNING_SUCCEEDED_UNDER24H,intent2);
-                this.finish();
-                break;
-
-            case MESSAGE_EXTRA_LEARNING_ACCOMPLISHED:
-                fltMask.setVisibility(View.GONE);
-                confirmAndFinish.setVisibility(View.VISIBLE);
-                //其返回操作在设visible的控件点击事件完成
         }
     }
 
+    /*
+    * 时间到了之后，弹出DFG。
+    * ①未完成（未滑动到最后）就到时间了
+    * ②滑动到最后，但是没有全部正确。（虽然即使正确也不会停止计时，但在计时结束后，直接跳转了结束页，不会弹出DFG）
+    *  滑动到最后，又向前回滑，但并非全对——无影响，按②处理。
+    *【现在的是否完成，是以是否填对全部VE为标志的。】
+    * 其他情况
+    * ①滑动到最后，全部正确，但是又向回滑动——【暂定强行跳转结束页（可能不太友好）】
+    * */
     private void popUpTimeEndingDiaFragment(){
-        //先将延时标记置为true，代表已延时一次。
-        prolonged = true;
         FragmentTransaction transaction = (getFragmentManager().beginTransaction());
         Fragment prev = (getFragmentManager().findFragmentByTag("Time_up"));
 
@@ -411,7 +405,7 @@ public class LearningActivity extends AppCompatActivity implements OnSimpleDFgBu
             Toast.makeText(this, "Old Dfg still there, removing...", Toast.LENGTH_SHORT).show();
             transaction.remove(prev);
         }
-        DialogFragment dfg = LearningTimeUpDiaFragment.newInstance();
+        DialogFragment dfg = LearningTimeUpDiaFragment.newInstance(itemsVeRightOrWrong);
         dfg.show(transaction,"Time_up");
     }
 
@@ -419,45 +413,50 @@ public class LearningActivity extends AppCompatActivity implements OnSimpleDFgBu
         //根据完成的项目数量，小于12只有提示未能完成-确认。大于12可以拆分生成新分组，提示用户
         // （没必要询问是否拆分，如果不拆分就只能全部标记未完成，正常人不能这么干）
         // 此时如果遇到丢失焦点应默认将学习状态（时间、数量）保存，onStop直接存入DB（没有询问环节）。
-        if(currentLearnedAmount<12){
+        if(maxLearnedAmount<12){
 
         }
     }*/
 
     @Override
-    public void onDfgButtonClick(int viewId) {
-        switch (viewId){
-            case R.id.confirm_timeEndingDfg:
-                //在LearningTimeUpDiaFragment中点击了确认按键
-                // 延时15分钟
-                timeCount = 15;//【调试期间暂时设1】计时时间补充15分钟
-                totalMinutes.setText(getResources().getString(R.string.minutes_75));
-                timingThread.start();//再次启动计时
-                break;
-            case R.id.cancel_timeEndingDfg:
-                //在LearningTimeUpDiaFragment中点击了取消按键
-                // 学习未能完成，直接给出消息然后退出到分组列表Activity。
-                //【计划中】生成一条程序全局可见的消息（未完成……），存入未读消息列表。
-                Toast.makeText(this, "未能完成，不记录本次学习。", Toast.LENGTH_SHORT).show();
+    public void onButtonClickingDfgInteraction(int dfgType, Bundle data) {
+        switch (dfgType){
+            case TIME_UP_CONFIRM_DIVIDE:
+                //要拆分
 
-                //为返回调用方Activity准备数据,
+                break;
+            case TIME_UP_DISCARD:
                 Intent intentForTimeUpAndCancelReturn = new Intent();
-                intentForTimeUpAndCancelReturn.putExtra("startingTimeMills",startingTimeMillis);
                 setResult(RESULT_LEARNING_FAILED,intentForTimeUpAndCancelReturn);
                 this.finish();
+
                 break;
+
+
         }
     }
 
-    public void confirmAndFinish(View view){
-        Intent intent2 = new Intent();
-        setResult(RESULT_EXTRA_LEARNING_SUCCEEDED,intent2);
-        this.finish();
-    }
+
+
 
     @Override
     public void onCodeCorrectAndReady() {
-        //此时已填入正确单词，自动向下一页滑动。
-        viewPager.setCurrentItem(viewPager.getCurrentItem()+1,true);
+        //检测当前位置对应的词是否已经填对过，若未，则设为对。
+        int currentIndex = viewPager.getCurrentItem();
+        if(!itemsVeRightOrWrong.get(currentIndex)){
+            itemsVeRightOrWrong.set(currentIndex,true);//只改为真，不改为假
+            //这种首次改对/填对的情况，要给出提示。
+        }
+
+        //此时已填入正确单词，（如果允许自动滑动则）自动向下一页滑动。
+        if(autoSliding) {
+            viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
+        }
+    }
+
+    @Override
+    public void onCodeChanged(String str) {
+        //传出来的是当前完整的String
+        veCacheString = str;
     }
 }

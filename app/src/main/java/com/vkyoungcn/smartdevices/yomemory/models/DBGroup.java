@@ -20,6 +20,7 @@ public class DBGroup implements Parcelable{
     //以下两项由Logs表提供
     private long lastLearningTime = 0;//最新的学习记录（是否有效m皆可；RMA的计算不需要持有整个Logs列表）。
     private byte effectiveRePickingTimes = 0;//有效学习次数（*背后的设计原理：复习间隔过久时的新一次复习，只刷新记忆量，不抬升曲线，属“无效”复习，不增加有效次数）
+    //可直接对应为MS字段
 
     //以下字段由Items表提供
     //所含Items的数量，有两种方案①：因为只在显示时需要，考虑直接由RvGroup负责拉取。②出于职能清晰明确的考虑，由本类拉取。（暂定后者）

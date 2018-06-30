@@ -62,8 +62,12 @@ public final class YoMemoryContract {
         public static final String TABLE_NAME = "learning_logs";
         public static final String COLUMN_TIME_IN_LONG = "long";
         public static final String COLUMN_GROUP_ID = "group_id";
-        public static final String COLUMN_IS_EFFECTIVE = "is_effective";
-    }
+        public static final String COLUMN_IS_MS_EFFECTIVE = "is_effective";//时间下限的计算只依据MS有效的复习记录来计算。
+        //RMA、时间上限的计算只要求是最新的Log，不要Log的类型。
+    }//但是，仍然不需要使用专门的LOG类，在DB中将区分后的结果以long列表形式传出即可。
+
+
+
 
     /*
     * 外语词汇类资源的资源表模板，此类表结构一致，如下；

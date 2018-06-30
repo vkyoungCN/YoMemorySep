@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.adapters.Ckbs2ChoseGroupsRvAdapter;
-import com.vkyoungcn.smartdevices.yomemory.adapters.CkbsChoseGroupsRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.adapters.FragGroupCategoryRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
 
@@ -25,7 +24,7 @@ import java.util.ArrayList;
 public class LearningMergeDiaFragment extends DialogFragment implements View.OnClickListener,CompoundButton.OnCheckedChangeListener {
     private static final String TAG = "LearningMergeDiaFragment";
 
-    private OnLearningConfirmDfgInteraction mListener;
+    private OnGeneralDfgInteraction mListener;
 
     private ArrayList<FragGroupForMerge>[][] groupsInTwoDimensionArray;//在本DFG的设计方案下，需要这样一个结构来装载数据。
     //【最终回传给GofM页面（然后从该页面发起向学习页的跳转）的数据其实是ArrayList<Integer>】
@@ -180,12 +179,12 @@ public class LearningMergeDiaFragment extends DialogFragment implements View.OnC
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnLearningConfirmDfgInteraction) {
-            mListener = (OnLearningConfirmDfgInteraction) context;
+        if (context instanceof OnGeneralDfgInteraction) {
+            mListener = (OnGeneralDfgInteraction) context;
         } else {
 
             throw new RuntimeException(context.toString()
-                    + " must implement OnLearningConfirmDfgInteraction");
+                    + " must implement OnGeneralDfgInteraction");
         }
     }
 
@@ -229,7 +228,7 @@ public class LearningMergeDiaFragment extends DialogFragment implements View.OnC
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("IDS_GROUPS_READY_TO_MERGE",((Ckbs2ChoseGroupsRvAdapter)mRvDowner.getAdapter()).getIdsList());
 
-                mListener.onLearningConfirmDfgInteraction(OnLearningConfirmDfgInteraction.LEARNING_AND_MERGE,bundle);
+                mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_AND_MERGE,bundle);
                 break;
 
             case R.id.btn_cancel_dfgLearningMerge:
