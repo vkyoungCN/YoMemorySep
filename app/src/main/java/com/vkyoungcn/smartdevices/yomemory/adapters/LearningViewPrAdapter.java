@@ -5,9 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.ViewGroup;
 
-import com.vkyoungcn.smartdevices.yomemory.fragments.SingleItemInitLearningFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.SingleItemLearningFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.SingleItemRePickingFragment;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
 
 import java.util.List;

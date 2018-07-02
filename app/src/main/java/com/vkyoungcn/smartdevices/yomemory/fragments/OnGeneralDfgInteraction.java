@@ -10,9 +10,12 @@ public interface OnGeneralDfgInteraction {
 
     int JUMP_TO_GROUP_LIST_THIS_FRAG = 2027;
 
-    int TIME_UP_CONFIRM_DIVIDE = 2091;
-    int TIME_UP_CONFIRM_ADD_ERR = 2092;
-    int TIME_UP_DISCARD = 2093;
+    int LEARNING_FINISH_DFG_CONFIRM = 2101;
+    int LEARNING_FINISH_DFG_BACK = 2102;
+    int LEARNING_FINISH_DFG_GIVE_UP = 2103;
+
+    int LEARNING_TIME_UP_DFG_CONFIRM = 2111;
+    int LEARNING_TIME_UP_DFG_GIVE_UP = 2112;
 
 
     void onButtonClickingDfgInteraction(int dfgType, Bundle data);

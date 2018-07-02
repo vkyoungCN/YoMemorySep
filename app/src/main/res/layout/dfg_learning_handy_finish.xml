@@ -14,7 +14,7 @@
         android:layout_height="36dp"
         android:padding="4dp"
         android:gravity="center"
-        android:text="@string/confirm_end"
+        android:text="@string/confirm_question"
         android:textSize="16sp"
         android:background="#efefef"
         />
@@ -26,7 +26,7 @@
         android:orientation="vertical"
         >
         <TextView
-            android:id="@+id/tv_empty_dfgTimeUp"
+            android:id="@+id/tv_empty_dfgLHFinish"
             android:layout_width="match_parent"
             android:layout_height="42dp"
             android:gravity="center"
@@ -41,7 +41,7 @@
             android:background="#aaaaaa"
             />
         <TextView
-            android:id="@+id/tv_wrong_dfgTimeUp"
+            android:id="@+id/tv_wrong_dfgLHFinish"
             android:layout_width="match_parent"
             android:layout_height="42dp"
             android:paddingStart="24dp"
@@ -63,14 +63,13 @@
             android:paddingEnd="20dp"
             android:gravity="center"
             android:background="#efefef"
-            android:text="@string/time_up"
+            android:text="@string/rest_min_and_sec"
             />
-        
     </LinearLayout>
 
 
     <TextView
-        android:id="@+id/tvBtn_confirm_dfgTimeUp"
+        android:id="@+id/tvBtn_confirm_dfgLHFinish"
         android:layout_width="match_parent"
         android:layout_height="46dp"
         android:layout_marginTop="2dp"
@@ -79,9 +78,18 @@
         android:textSize="18sp"
         android:background="#8bc34a"
         />
+    <TextView
+        android:id="@+id/tvBtn_back_dfgLHFinish"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:text="@string/back_2"
+        android:background="#eeff41"
+        />
 
     <TextView
-        android:id="@+id/tvBtn_giveUp_dfgTimeUp"
+        android:id="@+id/tvBtn_giveUp_dfgLHFinish"
         android:layout_width="match_parent"
         android:layout_height="36dp"
         android:gravity="center"

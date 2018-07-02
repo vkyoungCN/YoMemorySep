@@ -180,7 +180,11 @@
     <string name="str_nothingHappend">就当没学过（放弃记录）</string>
     <string name="confirm_andSetErrs">不拆分\n（记错误项的出错次数+1）</string>
     <string name="confirm_andDevide">按正误拆分本组</string>
-    <string name="status_timeUpDfg">学习情况：共有%1$d个单词，正确%2$d个。</string>
+    <string name="wrong_info_all_correct">所有单词填写正确</string>
+    <string name="wrong_info_un_correct">%1$d个单词错误，确认则错误记录+1</string>
+    <string name="empty_info_all_correct">所有单词已填写</string>
+    <string name="empty_info_un_correct">%1$d个单词未填，确认将拆分分组</string>
+    <string name="rest_min_and_sec">还剩%1$d分%2$d秒，可以返回查看</string>
     <string name="still_has_wrong_item">仍有%1$d个未填写正确，请检查。（点击可强行结束）</string>
     <string name="learn_and_repick">学而时习之……</string>
     <string name="str_infoArea">（信息区域）</string>
@@ -188,4 +192,15 @@
     <string name="save_area_2">预留区域2</string>
     <string name="preparing_data_start_soon">正在准备数据，马上开始……</string>
     <string name="num_59">59</string>
+    <string name="click_and_over">点击结束→</string>
+    <string name="confirm_question">确认结束？</string>
+    <string name="back_2">返回查看</string>
+    <string name="give_up_2">放弃本次学习</string>
+    <string name="save_area_3">预留区域3</string>
+    <string name="time_up">时间已经用尽</string>
+    <string name="confirm_end">确认结束</string>
+    <string name="symbol_add">+</string>
+    <string name="symbol_minus">-</string>
+    <string name="str_phonetic">[音标]</string>
+    <string name="rest_chances">剩余提示次数：%1$d</string>
 </resources>

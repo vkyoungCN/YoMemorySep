@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.SingleItemLearningFragment">
+    tools:context=".fragments.SingleItemLearningFragment"
+    >
 
     <android.support.v7.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
@@ -12,33 +14,159 @@
         android:layout_margin="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#33ffab00"
+        card_view:cardCornerRadius="4dp"
         >
 
+        <!--cardView本身基于Flt，估计不利排版，改套一层llt-->
         <LinearLayout
-            android:id="@+id/llt_positivePage_singleItemLearning_re"
+            android:id="@+id/llt_singleItemLearningCDV"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:orientation="vertical"
             android:padding="8dp"
             >
-            <TextView
-                android:id="@+id/tv_name_singleItemLearning_re"
+
+            <!--第一行。在有段设置err次数、优先级次数及调节组件-->
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:textSize="28sp"
-                android:gravity="center"
-                android:text="@string/sharp_x5_default" />
+                android:layout_height="28dp">
+
+                <TextView
+                    android:id="@+id/tv_restChances_sIL_CDV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center_vertical"
+                    android:text="@string/rest_chances"
+                    android:textColor="#ff6e40"
+                    />
+
+                <!--优先级显示与调节组件-->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="49dp"
+                    >
+                    <TextView
+                        android:id="@+id/tv_priorityAdd_sIL_CDV"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:text="@string/symbol_add"
+                        android:gravity="center"
+                        android:background="#efefef"
+                        />
+                    <TextView
+                        android:id="@+id/tv_priorityNum_sIL_CDV"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:text="@string/sharp_x1_default"
+                        android:gravity="center"
+                        android:background="#e0e0e0"
+                        />
+                    <TextView
+                        android:id="@+id/tv_priorityMinus_sIL_CDV"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:text="@string/symbol_minus"
+                        android:gravity="center"
+                        android:background="#efefef"
+                        />
+
+                </LinearLayout>
+
+                <!--竖向小分割线，位于优先级组件和错误数之间-->
+                <TextView
+                    android:layout_width="1dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="46dp"
+                    android:background="#757575"
+                    />
+
+                <!--错误次数组件-->
+                <TextView
+                    android:id="@+id/tv_errNum_sIL_CDV"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:text="@string/sharp_x1_default"
+                    android:gravity="center"
+                    android:background="#e0e0e0"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="20dp"
+                    />
+
+
+            </FrameLayout>
+            <!--横分割线-->
             <TextView
-                android:id="@+id/tv_ext1_singleItemLearning_re"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#efefef"
+                />
+
+            <!--第二行，Name或VE。始末端各有一个点击控件：点击①切换到VE,点击②临时展示NAME；另有-->
+            <!--Surface①：Name面，含一个点击点+Name【系统提示使用带drawab属性的tv更高效】-->
+            <TextView
+                android:id="@+id/tv_surfaceName_sIL_CDV"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:textSize="24sp"
+                android:gravity="center"
+                android:text="@string/sharp_x5_default"
+                android:drawableStart=""
+                />
+
+            <!--第二行VE层面，本面就需要分设tv和imv了，因为imv三次点击后隐藏-->
+            <LinearLayout
+                android:id="@+id/llt_surfaceVe_sIL_CDV"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                >
+
+                <ImageView
+                    android:id="@+id/imv_showTip_sIL_CDV"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="start|center_vertical"
+                    />
+
+                <com.vkyoungcn.learningtools.validatingEditor.ValidatingEditor
+                    android:id="@+id/ve_singleItemLearning"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="4dp"
+                    />
+
+
+            </LinearLayout>
+
+            <!--横分割线-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="2dp"
+                android:background="#efefef"
+                />
+            <TextView
+                android:id="@+id/tv_phonetic_singleItemLearning"
                 android:layout_width="match_parent"
                 android:layout_height="28dp"
                 android:textSize="16sp"
                 android:gravity="center"
-                android:text="@string/sharp_x3_default" />
+                android:text="@string/str_phonetic" />
+            <!--横分割线-->
             <TextView
-                android:id="@+id/tv_ext2Pos_singleItemLearning_re"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="1dp"
+                android:background="#efefef"
+                />
+            <TextView
+                android:id="@+id/tv_translation_singleItemLearning"
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:padding="4dp"
@@ -46,60 +174,9 @@
                 android:gravity="center"
                 android:text="@string/sharp_x24_default"
                 android:lines="2"
-                android:ellipsize="marquee"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="2dp"
-                android:textSize="12sp"
-                android:textColor="@color/bottomLine_nonCorrect_color"
-                android:gravity="center"
-                android:text="@string/tip_and_over"
-                android:lines="1"
                 android:ellipsize="end"
                 />
         </LinearLayout>
-
-        <RelativeLayout
-            android:id="@+id/rlt_negativePage_singleItemLearning_re"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:padding="4dp"
-            android:visibility="gone"
-            >
-            <TextView
-                android:id="@+id/tv_ext2_singleItemLearning_re"
-                android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:padding="4dp"
-                android:textSize="18sp"
-                android:gravity="center"
-                android:text="@string/sharp_x24_default"
-                android:lines="2"
-                android:ellipsize="marquee"
-                />
-            <com.vkyoungcn.learningtools.validatingEditor.ValidatingEditor
-                android:id="@+id/validatingEditor_singleItemLearning"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_centerHorizontal="true"
-                android:layout_below="@id/tv_ext2_singleItemLearning_re"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="2dp"
-                android:textSize="12sp"
-                android:gravity="center"
-                android:text="@string/fill_and_slide_over"
-                android:lines="1"
-                android:ellipsize="end"
-                android:layout_below="@id/validatingEditor_singleItemLearning"
-                />
-        </RelativeLayout>
     </android.support.v7.widget.CardView>
 
 

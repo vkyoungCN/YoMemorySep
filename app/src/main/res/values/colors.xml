@@ -6,6 +6,15 @@
 
     <color name="bottomLine_default_color">#aeea00</color>
     <color name="bottomLine_nonCorrect_color">#eef44336</color>
+
+    <color name="singleStripe_color_correct">#aeea00</color>
+    <color name="singleStripe_color_nonCorrect">#ff6e40</color>
+    <color name="singleStripe_color_empty">#e0e0e0</color>
+    <color name="some_thing_wrong">#757575</color>
+    <color name="enclose_white">#ffffff</color>
+
+
+
     <color name="textColor">#1a237e</color>
     <color name="text_nonCorrect_Color">#eeff5252</color>
 

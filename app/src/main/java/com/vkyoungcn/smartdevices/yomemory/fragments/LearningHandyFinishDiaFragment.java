@@ -14,15 +14,16 @@ import java.util.ArrayList;
 
 
 /*
-* 本DFG对应的是“没有完全正确，但时间到了”的情形，有三种结束方式：
-* ①结束，拆分
-* ②结束，不正确的记错误一次，但不拆分；
-* ③就当我根本没学过；
+* 本DFG对应的是手动结束的情形，根据传入的列表产生不同处理逻辑：
+* （首先显示还剩余多少时间，可以返回查看）
+* ①有未完成的，提示会拆分；
+* ②有未正确的，提示将记录错误一次；
+* ③如果没有上述情况任一，则提示正确（？），也可返回查看。
 *
 * 确然后的跳转操作还是由Activity负责，所以不需要持有gid。
 * */
-public class LearningTimeUpDiaFragment extends DialogFragment implements View.OnClickListener {
-    private static final String TAG = "LearningTimeUpDiaFragme";
+public class LearningHandyFinishDiaFragment extends DialogFragment implements View.OnClickListener {
+    private static final String TAG = "LearningHandyFinishDiaFragment";
 
 
     private ArrayList<Byte> emptyCards;
@@ -31,18 +32,20 @@ public class LearningTimeUpDiaFragment extends DialogFragment implements View.On
 
     private TextView tvWrongInfo;
     private TextView tvEmptyInfo;
+    private TextView tvRestTimeInfo;
 
     private OnGeneralDfgInteraction mListener;
 
-    public LearningTimeUpDiaFragment() {
+    public LearningHandyFinishDiaFragment() {
         // Required empty public constructor
     }
 
-    public static LearningTimeUpDiaFragment newInstance(ArrayList<Byte> emptyCards,ArrayList<Byte> wrongCards) {
-        LearningTimeUpDiaFragment fragment = new LearningTimeUpDiaFragment();
+    public static LearningHandyFinishDiaFragment newInstance(ArrayList<Byte> emptyCards,ArrayList<Byte> wrongCards,int restSeconds) {
+        LearningHandyFinishDiaFragment fragment = new LearningHandyFinishDiaFragment();
         Bundle args = new Bundle();
         args.putSerializable("WRONG_CARD_INDEXES",wrongCards);
         args.putSerializable("EMPTY_CARD_INDEXES",emptyCards);
+        args.putInt("REST_SECONDS",restSeconds);
         fragment.setArguments(args);
         return fragment;
     }
@@ -53,6 +56,7 @@ public class LearningTimeUpDiaFragment extends DialogFragment implements View.On
         if (getArguments() != null) {
             this.wrongCards = (ArrayList<Byte>) getArguments().getSerializable("WRONG_CARD_INDEXES");
             this.emptyCards = (ArrayList<Byte>) getArguments().getSerializable("EMPTY_CARD_INDEXES");
+            this.restSeconds = getArguments().getInt("REST_SECONDS");
         }
     }
 
@@ -60,11 +64,13 @@ public class LearningTimeUpDiaFragment extends DialogFragment implements View.On
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.dfg_learning_time_up, container, false);
-        rootView.findViewById(R.id.tvBtn_confirm_dfgTimeUp).setOnClickListener(this);
-        rootView.findViewById(R.id.tvBtn_giveUp_dfgTimeUp).setOnClickListener(this);
-        tvWrongInfo = rootView.findViewById(R.id.tv_wrong_dfgTimeUp);
-        tvEmptyInfo = rootView.findViewById(R.id.tv_empty_dfgTimeUp);
+        View rootView = inflater.inflate(R.layout.dfg_learning_handy_finish, container, false);
+        rootView.findViewById(R.id.tvBtn_back_dfgLHFinish).setOnClickListener(this);
+        rootView.findViewById(R.id.tvBtn_confirm_dfgLHFinish).setOnClickListener(this);
+        rootView.findViewById(R.id.tvBtn_giveUp_dfgLHFinish).setOnClickListener(this);
+        tvWrongInfo = rootView.findViewById(R.id.tv_wrong_dfgLHFinish);
+        tvEmptyInfo = rootView.findViewById(R.id.tv_empty_dfgLHFinish);
+        tvRestTimeInfo = rootView.findViewById(R.id.tv_restTime_dfgLHFinish);
 
         int wrongNum = wrongCards.size();
         int emptyNum = emptyCards.size();
@@ -79,7 +85,11 @@ public class LearningTimeUpDiaFragment extends DialogFragment implements View.On
             tvEmptyInfo.setText(String.format(getResources().getString(R.string.empty_info_un_correct),emptyNum));
         }
 
+        tvRestTimeInfo.setText(String.format(getResources().getString(R.string.rest_min_and_sec),restSeconds/60,restSeconds%60));
+
         return rootView;
+
+
 
     }
 
@@ -88,29 +98,28 @@ public class LearningTimeUpDiaFragment extends DialogFragment implements View.On
         //不论点击的是确认还是取消或其他按键，直接调用Activity中实现的监听方法，
         // 将view的id传给调用方处理。
         switch (v.getId()){
-            case R.id.tvBtn_confirm_dfgTimeUp:
+            case R.id.tvBtn_confirm_dfgLHFinish:
                 // 由LearningActivity根据其持有的状态列表具体判断拆分等操作。在此不判断不传递。
-                mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_TIME_UP_DFG_CONFIRM,null);
+                mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_FINISH_DFG_CONFIRM,null);
+                dismiss();
+
+                break;
+            case R.id.tvBtn_back_dfgLHFinish:
+                //返回查看，继续计时
+                mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_FINISH_DFG_BACK,null);
                 dismiss();
 
                 break;
 
-            case R.id.tvBtn_giveUp_dfgTimeUp:
+            case R.id.tvBtn_giveUp_dfgLHFinish:
                 //放弃，就当什么都没发生。通知Act，直接返回分组的Rv列表页。
-                mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_TIME_UP_DFG_GIVE_UP,null);
+                mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_FINISH_DFG_GIVE_UP,null);
                 dismiss();
 
                 break;
 
         }
     }
-
-
-    /*public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }*/
 
     @Override
     public void onAttach(Context context) {

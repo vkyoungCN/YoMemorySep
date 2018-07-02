@@ -112,7 +112,7 @@ public class LearningCreateActivity extends AppCompatActivity implements OnGener
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_item_learning);
+        setContentView(R.layout.activity_learning);
 
         //从Intent获取参数
         groupId = getIntent().getBundleExtra("BUNDLE_GROUP_ID").getInt("GROUP_ID_TO_LEARN");

@@ -90,6 +90,36 @@
             android:layout_height="match_parent">
         </android.support.v4.view.ViewPager>
 
+
+        <!--手动结束的按钮，初始隐藏在达到一定条件时出现。-->
+        <!--理想的条件并不易得，暂定当maxReadNum达到items.size时出现；回滑不消失-->
+        <!--效果是弹出dfg-->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/finish_fab_learningActivity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabSize="normal"
+            android:layout_gravity="end|bottom"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="36dp"
+            android:src="@drawable/finish"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            android:onClick="handyFinish"
+            />
+        <TextView
+            android:id="@+id/finish_tv_learningActivity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/click_and_over"
+            android:layout_gravity="end|bottom"
+            android:layout_marginEnd="64dp"
+            android:visibility="gone"
+            android:layout_marginBottom="40dp"
+            />
+
+
+
         <!--页脚数字-->
         <LinearLayout
             android:id="@+id/footer_learningActivity"
@@ -127,11 +157,15 @@
         </LinearLayout>
 
         <!--页脚的自定义UI（进度条）-->
-
+        <com.vkyoungcn.learningtools.stripeProgessBar.StripeProgressBar
+            android:id="@+id/stripeProgressBar_LearningActivity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:elevation="1dp"
+            android:translationZ="1dp"
+            android:layout_marginBottom="4dp"
+            />
 
     </FrameLayout>
-
-
-
-
 </LinearLayout>
