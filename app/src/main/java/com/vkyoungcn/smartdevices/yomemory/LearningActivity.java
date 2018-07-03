@@ -79,6 +79,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
     private int timeCount = 59;//for循环控制变量。执行60次for循环，即1h。（for循环包含60次1秒间隔的执行，一次完整的for=1min）
     private boolean isTimeUp = false;//计时线程的控制变量【旧版采用timeCount兼任。存在-1:59问题】
     private long startingTimeMillis;//学习开始的时间。（需要在……时间内完成，否则拆分）【最后的时间区间计算可令开始时间大于下限，结束小于上限】
+    private long finishTimeMillis;//用于最后传递
 //    private int timePastInMinute = 60;//流逝分钟数【借用timeCount即可】
     private int timeInSecond =59;//以秒计算的总流逝时间
     private boolean shouldChangeMinForFirstSec = true;//UI中开始是60:00，当第一秒走过后，应变为59:59.
@@ -209,7 +210,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
                 veFillings.set(oldPagePosition, veCacheString);
                 //本页VE缓存（如果有）设置给VE
                 if(veFillings.get(position)!=null){//若为空串""则是可以设置的。
-                    ValidatingEditor vdEt = ((LearningViewPrAdapter)viewPager.getAdapter()).currentFragment.getView().findViewById(R.id.validatingEditor_singleItemLearning);
+                    ValidatingEditor vdEt = ((LearningViewPrAdapter)viewPager.getAdapter()).currentFragment.getView().findViewById(R.id.ve_singleItemLearning);
                     vdEt.setInitText(veFillings.get(position));
                     veCacheString = veFillings.get(position);//缓存要保持一致，否则（比如非空VE而cache置空的话）第三次滑到时内容就删除了。
 
@@ -221,11 +222,14 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
                 spb_bar.reFreshStripes(oldPagePosition,position);
 
 
-                if(position==items.size()-1 && !isFabShowing){
-                    //当滑到最后一张时将结束按钮显示出来。 【回滑不应隐藏】
-                    tv_finish.setVisibility(View.VISIBLE);
-                    fab_finish.setVisibility(View.VISIBLE);
-                    isFabShowing = true;
+                if(!isFabShowing){
+                    if(learningType!=LEARNING_GENERAL||position==items.size()-1) {
+                        // 普通模式下滑到最后一张时将结束按钮显示出来。 【回滑不应隐藏】
+                        //其他模式下，第二页开始显示结束按钮；
+                        tv_finish.setVisibility(View.VISIBLE);
+                        fab_finish.setVisibility(View.VISIBLE);
+                        isFabShowing = true;
+                    }
                 }
             }
         });
@@ -343,7 +347,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
                 case MESSAGE_TIME_UP:
                 timingThread.interrupt();//显式结束计时线程。
                     //调用进度条UI方法判断完成情况，然后弹出对应DFG
-
+                    finishTimeMillis = System.currentTimeMillis();
                     popUpTimeEndingDiaFragment();
 
                 break;
@@ -376,13 +380,34 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
 
     @Override
     public void onButtonClickingDfgInteraction(int dfgType, Bundle data) {
+
         switch (dfgType){
             case LEARNING_FINISH_DFG_CONFIRM:
             case LEARNING_TIME_UP_DFG_CONFIRM:
-                //将空、错的位置转换成id列表，传递给结束页进行结束操作。
-                spb_bar.getEmptyPositions();
+                //准备Intent，存入部分数据
+                Intent intentToAccomplishActivity = new Intent(this,AccomplishActivity.class);
+                intentToAccomplishActivity.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                intentToAccomplishActivity.putExtra("LEARNING_TYPE",learningType);
+                intentToAccomplishActivity.putExtra("TABLE_NAME_SUFFIX",tableNameSuffix);
+                if(learningType == LEARNING_GENERAL){
+                    intentToAccomplishActivity.putExtra("GROUP_ID",groupId);
+                }else if(learningType == LEARNING_AND_MERGE){
+                    intentToAccomplishActivity.putExtra("GROUP_ID_FOR_MERGE",gIdsForMerge);
+                }
 
-                【】
+                intentToAccomplishActivity.putExtra("START_TIME",startingTimeMillis);
+                intentToAccomplishActivity.putExtra("FINISH_TIME",finishTimeMillis);
+
+                //将空、错的位置转换成id列表，传递给结束页进行结束操作。
+                ArrayList<Integer> emptyPositions = spb_bar.getEmptyPositions();
+                ArrayList<Integer> errPositions = spb_bar.getWrongPositions();
+
+                intentToAccomplishActivity.putIntegerArrayListExtra("EMPTY_ITEMS_POSITIONS",emptyPositions);
+                intentToAccomplishActivity.putIntegerArrayListExtra("WRONG_ITEMS_POSITIONS",errPositions);
+                intentToAccomplishActivity.putParcelableArrayListExtra("ITEMS",items);
+
+                this.startActivity(intentToAccomplishActivity);
+
                 this.finish();
 
                 break;
@@ -448,6 +473,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
         // 用于校正当前页面已作出的改动】
 
         timingThread.interrupt();//先停止计时
+        finishTimeMillis = System.currentTimeMillis();
         //先将当前页的缓存字串存入缓存字串列表
         veFillings.set(currentPagePosition, veCacheString);
         //部分更新spb，并重绘

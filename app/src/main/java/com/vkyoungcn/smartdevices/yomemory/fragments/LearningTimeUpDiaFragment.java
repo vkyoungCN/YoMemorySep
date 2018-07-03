@@ -38,7 +38,7 @@ public class LearningTimeUpDiaFragment extends DialogFragment implements View.On
         // Required empty public constructor
     }
 
-    public static LearningTimeUpDiaFragment newInstance(ArrayList<Byte> emptyCards,ArrayList<Byte> wrongCards) {
+    public static LearningTimeUpDiaFragment newInstance(ArrayList<Integer> emptyCards,ArrayList<Integer> wrongCards) {
         LearningTimeUpDiaFragment fragment = new LearningTimeUpDiaFragment();
         Bundle args = new Bundle();
         args.putSerializable("WRONG_CARD_INDEXES",wrongCards);

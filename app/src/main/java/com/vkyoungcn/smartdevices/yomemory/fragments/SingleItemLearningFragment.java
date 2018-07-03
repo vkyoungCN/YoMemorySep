@@ -92,7 +92,7 @@ public class SingleItemLearningFragment extends Fragment implements View.OnClick
         llt_surfaceVe = (LinearLayout) rootView.findViewById(R.id.llt_surfaceVe_sIL_CDV);
         imv_surfaceVe = (ImageView)rootView.findViewById(R.id.imv_showTip_sIL_CDV);
 
-        ve_ValidatingEditor = (ValidatingEditor) rootView.findViewById(R.id.validatingEditor_singleItemLearning);
+        ve_ValidatingEditor = (ValidatingEditor) rootView.findViewById(R.id.ve_singleItemLearning);
 //        ve_ValidatingEditor.requestFocus();//因为发现焦点默认在cardView上。[改为点击后申请获取]
 
         tv_phonetic = (TextView) rootView.findViewById(R.id.tv_phonetic_singleItemLearning);

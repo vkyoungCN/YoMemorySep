@@ -21,8 +21,8 @@ public class StripeProgressBar extends View {
     
     private ArrayList<String> currentCode;
     private ArrayList<String> targetCode;
-    private ArrayList<Byte> emptyCards;//从0起,存的是卡片序列（字串列表序列）的索引。
-    private ArrayList<Byte> wrongCards;//从0起。
+    private ArrayList<Integer> emptyCards;//从0起,存的是卡片序列（字串列表序列）的索引。
+    private ArrayList<Integer> wrongCards;//从0起。
 
     private SingleStripe[] stripeSections;
     private Paint singleStripeCorrectPaint;
@@ -243,11 +243,11 @@ public class StripeProgressBar extends View {
 
 
 
-    public ArrayList<Byte> getEmptyPositions() {
+    public ArrayList<Integer> getEmptyPositions() {
         return emptyCards;
     }
 
-    public ArrayList<Byte> getWrongPositions() {
+    public ArrayList<Integer> getWrongPositions() {
         return wrongCards;
     }
 
@@ -284,12 +284,12 @@ public class StripeProgressBar extends View {
                 }else {
                     //值错误
                     stripeSections[i].setState(SingleStripe.SINGLE_STRIPE_UN_CORRECT);
-                    wrongCards.add((byte)i);
+                    wrongCards.add(i);
                 }
             }else {
                 //该项空或NULL，未填
                 stripeSections[i].setState(SingleStripe.SINGLE_STRIPE_EMPTY);
-                emptyCards.add((byte)i);
+                emptyCards.add(i);
             }
         }
         stripeSections[0].setState(SingleStripe.SINGLE_STRIPE_CURRENT);//初始时，开始位显然位于开始【如果有额外逻辑再修改】
@@ -326,12 +326,12 @@ public class StripeProgressBar extends View {
             }else {
                 //值错误
                 stripeSections[changingPosition].setState(SingleStripe.SINGLE_STRIPE_UN_CORRECT);
-                wrongCards.add((byte)changingPosition);
+                wrongCards.add(changingPosition);
             }
         }else {
             //该项空或NULL，未填
             stripeSections[changingPosition].setState(SingleStripe.SINGLE_STRIPE_EMPTY);
-            emptyCards.add((byte)changingPosition);
+            emptyCards.add(changingPosition);
         }
 
         stripeSections[currentPosition].setState(SingleStripe.SINGLE_STRIPE_CURRENT);

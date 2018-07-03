@@ -457,6 +457,77 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     }
 
     /*
+    * 建立一个容量为0的分组，用于拆分分组时先行一步生成临时分组
+    * */
+    public int createEmptyGroup(DBGroup dbGroup){
+        int gid = 0;
+        getWritableDatabaseIfClosedOrNull();
+
+        ContentValues values = new ContentValues();
+
+        values.put(YoMemoryContract.Group.COLUMN_DESCRIPTION, dbGroup.getDescription());
+        values.put(YoMemoryContract.Group.COLUMN_MISSION_ID, dbGroup.getMission_id());
+        values.put(YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG, dbGroup.getSettingUptimeInLong());
+
+        mSQLiteDatabase.insert(YoMemoryContract.Group.TABLE_NAME, null, values);
+
+        String queryNewGroupId = "SELECT "+YoMemoryContract.Group._ID+" FROM "
+                +YoMemoryContract.Group.TABLE_NAME+" WHERE "
+                +YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG +" = "
+                +dbGroup.getSettingUptimeInLong();
+        Cursor cursor = mSQLiteDatabase.rawQuery(queryNewGroupId,null);
+        if(cursor.moveToFirst()){
+            gid = cursor.getInt(0);
+        }
+
+        closeDB();
+        return gid;
+    }
+
+    /*
+     *
+     * */
+    public long createSingleLog(SingleLearningLog sLog){
+        long l;
+        getWritableDatabaseIfClosedOrNull();
+
+        ContentValues values = new ContentValues();
+
+        values.put(YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG, sLog.getTimeInLong());
+        values.put(YoMemoryContract.LearningLogs.COLUMN_GROUP_ID, sLog.getGroupId());
+        values.put(YoMemoryContract.LearningLogs.COLUMN_IS_MS_EFFECTIVE, sLog.isEffective());
+
+        l = mSQLiteDatabase.insert(YoMemoryContract.LearningLogs.TABLE_NAME, null, values);
+
+        closeDB();
+        return l;
+    }
+
+    /*
+    * 用于拆分组时，复制旧组log给新组
+    * */
+    public boolean createBatchLogsForGroup(ArrayList<SingleLearningLog> sLogs, int gid){
+        long l;
+        boolean correct = true;//标记是否都正确
+        getWritableDatabaseIfClosedOrNull();
+
+        for (SingleLearningLog s : sLogs) {
+            ContentValues values = new ContentValues();
+
+            values.put(YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG, s.getTimeInLong());
+            values.put(YoMemoryContract.LearningLogs.COLUMN_GROUP_ID, gid);
+            values.put(YoMemoryContract.LearningLogs.COLUMN_IS_MS_EFFECTIVE, s.isEffective());
+
+            l = mSQLiteDatabase.insert(YoMemoryContract.LearningLogs.TABLE_NAME, null, values);
+            if(l == -1){ correct = false; }
+        }
+
+        closeDB();
+        return correct;
+    }
+
+
+    /*
     * 需要读取两个表，group表获取4个字段、Logs表（经计算）获取两个字段
     * */
     public ArrayList<DBGroup> getAllGroupsByMissionId(int missionsId, String tableSuffix){
@@ -763,7 +834,50 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         closeDB();
     }*/
 
+    /*
+    * 修改一组items的其中三项内容（用于学习完成后需要拆分分组时）
+    * */
+    public int updateItemsTri(String tableSuffix, ArrayList<SingleItem> items){
+        int rowsAffected = 0;
+        getWritableDatabaseIfClosedOrNull();
 
+        for (SingleItem singleItem : items) {
+            ContentValues contentValues = new ContentValues();
+            //只有三项需要修改
+            contentValues.put(YoMemoryContract.ItemBasic.COLUMN_GROUP_ID,singleItem.getGroupId());
+            contentValues.put(YoMemoryContract.ItemBasic.COLUMN_PRIORITY,singleItem.getPriority());
+            contentValues.put(YoMemoryContract.ItemBasic.COLUMN_FAILED_SPELLING_TIMES,singleItem.getFailedSpelling_times());
+
+            rowsAffected = mSQLiteDatabase.update(YoMemoryContract.ItemBasic.TABLE_NAME+tableSuffix,contentValues,
+                    YoMemoryContract.ItemBasic._ID+" = ?",new String[]{String.valueOf(singleItem.getId())});
+        }
+
+        closeDB();
+        return rowsAffected;
+
+    }
+
+    /*
+     * 修改一组items的其中两项内容（用于学习完成后不需拆分分组时）
+     * */
+    public int updateItemsDual(String tableSuffix, ArrayList<SingleItem> items){
+        int rowsAffected = 0;
+        getWritableDatabaseIfClosedOrNull();
+
+        for (SingleItem singleItem : items) {
+            ContentValues contentValues = new ContentValues();
+            //只有三项需要修改
+            contentValues.put(YoMemoryContract.ItemBasic.COLUMN_PRIORITY,singleItem.getPriority());
+            contentValues.put(YoMemoryContract.ItemBasic.COLUMN_FAILED_SPELLING_TIMES,singleItem.getFailedSpelling_times());
+
+            rowsAffected = mSQLiteDatabase.update(YoMemoryContract.ItemBasic.TABLE_NAME+tableSuffix,contentValues,
+                    YoMemoryContract.ItemBasic._ID+" = ?",new String[]{String.valueOf(singleItem.getId())});
+        }
+
+        closeDB();
+        return rowsAffected;
+
+    }
 
     private void setItemsUnChose(String tableSuffix, ArrayList<Integer> itemIds){
         getWritableDatabaseIfClosedOrNull();

@@ -115,7 +115,6 @@
                 android:textSize="24sp"
                 android:gravity="center"
                 android:text="@string/sharp_x5_default"
-                android:drawableStart=""
                 />
 
             <!--第二行VE层面，本面就需要分设tv和imv了，因为imv三次点击后隐藏-->

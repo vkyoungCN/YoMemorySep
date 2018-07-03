@@ -105,6 +105,9 @@ public class SingleItem implements Parcelable {
     public void setFailedSpelling_times(short failedSpelling_times) {
         this.failedSpelling_times = failedSpelling_times;
     }
+    public void failSpellingSelfAddOne(){
+        this.failedSpelling_times++;
+    }
 
     /*
      * 以下是Parcelable要求的内容

@@ -40,7 +40,7 @@ public class LearningHandyFinishDiaFragment extends DialogFragment implements Vi
         // Required empty public constructor
     }
 
-    public static LearningHandyFinishDiaFragment newInstance(ArrayList<Byte> emptyCards,ArrayList<Byte> wrongCards,int restSeconds) {
+    public static LearningHandyFinishDiaFragment newInstance(ArrayList<Integer> emptyCards,ArrayList<Integer> wrongCards,int restSeconds) {
         LearningHandyFinishDiaFragment fragment = new LearningHandyFinishDiaFragment();
         Bundle args = new Bundle();
         args.putSerializable("WRONG_CARD_INDEXES",wrongCards);

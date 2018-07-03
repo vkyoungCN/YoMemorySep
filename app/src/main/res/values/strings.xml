@@ -203,4 +203,31 @@
     <string name="symbol_minus">-</string>
     <string name="str_phonetic">[音标]</string>
     <string name="rest_chances">剩余提示次数：%1$d</string>
+    <string name="reserving_position_1">预留位置1</string>
+    <string name="reserving_position_2">预留位置2</string>
+    <string name="reserving_position_3">预留位置3</string>
+    <string name="items_err_add_1">%1$d个单词的错误记录+1</string>
+    <string name="report_1">学习报告</string>
+    <string name="learning_stating_time">开始时间：%1$d-%2$d-%3$d %4$d:%5$d:%6$d</string>
+    <string name="learning_starting_time_str">开始时间：%1$s</string>
+    <string name="learning_finish_time_str">开始时间：%1$s</string>
+    <string name="learning_finish_time">结束时间：%1$d-%2$d-%3$d %4$d:%5$d:%6$d</string>
+    <string name="learning_usd_up_time">学习耗时：%1$d分%2$d秒</string>
+    <string name="group_change_info">分组改变情况</string>
+    <string name="common_merge_create">普通/合并/新建学习</string>
+    <string name="reserving_divide">保留——是否有拆分</string>
+    <string name="frags_change">合并·各组状态</string>
+    <string name="oldStatus">旧状态</string>
+    <string name="newStatus">新状态</string>
+    <string name="divide_2">%1$d个未完成，已拆分</string>
+    <string name="group_info_2">分组id:%1$d，数量%2$d</string>
+    <string name="str_MS_brk">(ms)</string>
+    <string name="str_RMA_brk">(rma)</string>
+    <string name="groupId_Num">组号%1$d，容量%2$d</string>
+    <string name="RMA_info">记\n忆\n存\n量</string>
+    <string name="MS_info">记\n忆\n等\n级</string>
+    <string name="divide">%1$d个单词未完成，分拆为新组</string>
+    <string name="learningType">学习类型：%1$s</string>
+    <string name="hold_on_a_moment_2">正在努力地处理数据，马上呈现…</string>
+
 </resources>
