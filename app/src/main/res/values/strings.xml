@@ -210,7 +210,7 @@
     <string name="report_1">学习报告</string>
     <string name="learning_stating_time">开始时间：%1$d-%2$d-%3$d %4$d:%5$d:%6$d</string>
     <string name="learning_starting_time_str">开始时间：%1$s</string>
-    <string name="learning_finish_time_str">开始时间：%1$s</string>
+    <string name="learning_finish_time_str">结束时间：%1$s</string>
     <string name="learning_finish_time">结束时间：%1$d-%2$d-%3$d %4$d:%5$d:%6$d</string>
     <string name="learning_usd_up_time">学习耗时：%1$d分%2$d秒</string>
     <string name="group_change_info">分组改变情况</string>
@@ -229,5 +229,9 @@
     <string name="divide">%1$d个单词未完成，分拆为新组</string>
     <string name="learningType">学习类型：%1$s</string>
     <string name="hold_on_a_moment_2">正在努力地处理数据，马上呈现…</string>
+    <string name="num_100">100</string>
+    <string name="no_dvd">全部完成，没有拆分</string>
+    <string name="strH_these_add_one">以下单词错误次数加一：%1$s</string>
+    <string name="did_dvd">未完成，产生了拆分</string>
 
 </resources>

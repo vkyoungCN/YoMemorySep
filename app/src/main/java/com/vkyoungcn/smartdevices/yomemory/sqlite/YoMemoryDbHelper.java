@@ -653,7 +653,9 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         return resultNumber;
     }
 
-
+    /*
+    * 用于内部
+    * */
     private short getTotalSubItemsNumOfGroup(int groupId, String tableSuffix){
         Log.i(TAG, "getTotalSubItemsNumOfGroup: be.");
         String selectNumSubItemsQuery = "SELECT COUNT(*) "+" FROM "+
@@ -674,6 +676,33 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
 
+        return resultNum;
+    }
+
+    /*
+    * 用于外部，带关DB。
+    * */
+    public int getSubItemsNumOfGroup(int groupId, String tableSuffix){
+        Log.i(TAG, "getSubItemsNumOfGroup: be.");
+        String selectNumSubItemsQuery = "SELECT COUNT(*) "+" FROM "+
+                YoMemoryContract.ItemBasic.TABLE_NAME+tableSuffix+" WHERE "+
+                YoMemoryContract.ItemBasic.COLUMN_GROUP_ID+" = "+groupId;
+
+        getWritableDatabaseIfClosedOrNull();
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectNumSubItemsQuery,null);
+
+        short resultNum = 0;
+        if(cursor.moveToFirst()){
+            resultNum = cursor.getShort(0);
+        }
+
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        mSQLiteDatabase.close();
         return resultNum;
     }
 
@@ -709,6 +738,54 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
         closeDB();
         return group;
+    }
+
+
+    /*
+    * 当仅需获取Group类中group表相关的字段时使用的方法。
+    * 此时获取的类只能用于修改group表单表的记录情形下临时使用，是不完整的。
+    * */
+    public DbTableGroup getTableGroupById(int groupId){
+        DbTableGroup group = new DbTableGroup();
+        String selectQuery = "SELECT * FROM "+ YoMemoryContract.Group.TABLE_NAME+
+                " WHERE "+ YoMemoryContract.Group._ID+" = "+groupId;
+
+        getReadableDatabaseIfClosedOrNull();
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectQuery, null);
+
+        if(cursor.moveToFirst()){
+            group.setId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Group._ID)));
+            group.setDescription(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_DESCRIPTION)));
+            group.setSettingUptimeInLong(cursor.getLong(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG)));
+            group.setMission_id(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_MISSION_ID)));
+        }
+
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        closeDB();
+        return group;
+    }
+
+
+    /*
+     * 仅修改group表的描述字段
+     * */
+    public int updateTableGroupDescriptionSingle(int groupId,String newDescription){
+        int affectedRows = 0;
+
+        getReadableDatabaseIfClosedOrNull();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(YoMemoryContract.Group.COLUMN_DESCRIPTION,newDescription);
+
+        affectedRows = mSQLiteDatabase.update(YoMemoryContract.Group.TABLE_NAME,contentValues,
+                YoMemoryContract.Group._ID+" = ? ",new String[]{String.valueOf(groupId)} );
+        closeDB();
+        return affectedRows;
     }
 
     //取指定第几行上的数据

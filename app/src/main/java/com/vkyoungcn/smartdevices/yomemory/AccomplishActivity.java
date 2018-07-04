@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
+import com.vkyoungcn.smartdevices.yomemory.models.DbTableGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleLearningLog;
@@ -28,6 +29,7 @@ public class AccomplishActivity extends AppCompatActivity {
 
     public static final int DB_DONE_LG_UN_DVD_ACA = 2801;
     public static final int DB_DONE_LG_DVD_ACA = 2802;
+    public static final int DB_DONE_LM_ACA = 2803;
 
     private FrameLayout flt_mask;
     private TextView tv_startTime;
@@ -68,6 +70,7 @@ public class AccomplishActivity extends AppCompatActivity {
 
     private YoMemoryDbHelper memoryDbHelper;
     private DBGroup group;
+    private DBGroup groupNew;//更新后，重新获得的group信息（持有新的日志记录，从而能计算得到新RMA/MS，如拆分，则有新items）
 
 
     @Override
@@ -123,10 +126,8 @@ public class AccomplishActivity extends AppCompatActivity {
             llt_oldStatus.setVisibility(View.VISIBLE);
             groupId = getIntent().getIntExtra("GROUP_ID",0);
 
-            new Thread(new GeneralAccomplishRunnable()).start();         // start thread
+            new Thread(new GeneralAccomplishRunnable()).start();         // 用于LG模式下的DB与计算线程
             //【以下对各Tv进行设置，要等待DB处理完成后才能执行】
-
-
 
         }else if(learningType == LEARNING_AND_MERGE){
             tempStr ="合并";
@@ -134,6 +135,10 @@ public class AccomplishActivity extends AppCompatActivity {
             llt_oldFrags.setVisibility(View.VISIBLE);
 
             gidsForMerge = getIntent().getIntegerArrayListExtra("GROUP_ID_FOR_MERGE");
+
+            new Thread(new MergedAccomplishRunnable()).start();         // 用于LM模式下的DB与计算线程
+            //【以下对各控件的设置，待DB完成后转到消息处理方法中进行】
+
 
             tv_newGroupInfo.setText(String.format(getResources().getString(R.string.),,));
             tv_newRma.setText();
@@ -201,7 +206,7 @@ public class AccomplishActivity extends AppCompatActivity {
         @Override
         public void run() {
             memoryDbHelper = YoMemoryDbHelper.getInstance(getApplicationContext());
-            group = memoryDbHelper.getGroupById(groupId,tableSuffix);
+            group = memoryDbHelper.getGroupById(groupId,tableSuffix);//取到的group信息对应于学习活动前的分组信息
 
             int minutesFarThreshold = RVGroup.minutesTillFarThreshold(group.getEffectiveRePickingTimes());
             int minutesShortThreshold = minutesFarThreshold/5;
@@ -240,17 +245,17 @@ public class AccomplishActivity extends AppCompatActivity {
                 //有未学习的数据，需拆分【此逻辑仅在LG模式下适用】
 
                 //以下是拆分逻辑
-                DBGroup newGroup = new DBGroup();//新组用于未学到的各item
+                DBGroup newGroupForSplitting = new DBGroup();//新组用于未学到的各item
 
                 //生成新组的描述字串【暂时只需三项字段。其余字段在group建立后再生成】
                 String strForDescription = "拆分产生，"
                         +items.get(emptyItemPositions.get(0)).getName()+"起，数量"+items.size();
-                newGroup.setDescription(strForDescription);
-                newGroup.setMission_id(group.getMission_id());
-                newGroup.setSettingUptimeInLong(finishTime);//以此次学习结束的时间为拆分（产生的）组的设立时间
+                newGroupForSplitting.setDescription(strForDescription);
+                newGroupForSplitting.setMission_id(group.getMission_id());
+                newGroupForSplitting.setSettingUptimeInLong(finishTime);//以此次学习结束的时间为拆分（产生的）组的设立时间
 
                 //提交到DB
-                int newGid = memoryDbHelper.createEmptyGroup(newGroup);
+                int newGid = memoryDbHelper.createEmptyGroup(newGroupForSplitting);
                 //判断DB返回的结果
                 if(newGid == 0){
                     Toast.makeText(AccomplishActivity.this, "生成临时拆分组异常", Toast.LENGTH_SHORT).show();
@@ -280,7 +285,6 @@ public class AccomplishActivity extends AppCompatActivity {
                     return;
                 }
                 //对已学的词，要更新其两项内容（优先级、错次两项）【但是上一方法中其实已学词的gid未变且一同提交，因而不需单独处理】
-
                 message.what = DB_DONE_LG_DVD_ACA;
 
             }else {
@@ -290,29 +294,146 @@ public class AccomplishActivity extends AppCompatActivity {
                 message.what = DB_DONE_LG_UN_DVD_ACA;
             }
 
+            message.arg1 = group.getEffectiveRePickingTimes();//旧分组的有效MS次数。
+            message.arg2 = group.getEffectiveRePickingTimes()+(singleLearningLog.isEffective()?1:0);//新的有效MS次数
 
+            Bundle bundleForMsg = new Bundle();//用于传递其他信息（预置位只有arg1、2，不够）
+
+            //准备分组的新信息，准备传递到UI线程
+            groupNew = memoryDbHelper.getGroupById(groupId,tableSuffix);//虽是同一个gid，但此时其log、items(拆分时)均已得到更新；
+            RVGroup groupRvNew = new RVGroup(groupNew);
+
+            //准备旧RMA数据
+            RVGroup rvGroup = new RVGroup(group);//相应group类持有的lastLearningTime仍然是复习之前的数据
+
+            bundleForMsg.putFloat("NEW_RMA",groupRvNew.getRM_Amount());//【这里其实应该就是100吧？】
+            bundleForMsg.putFloat("OLD_RMA",rvGroup.getRM_Amount()); //所以计算出的rma仍然是旧组数据。【所有的计算放在此线程进行，虽然是全局变量】
+
+            //准备错次+1的词的列表
+            if(errItemPositions.size() == 0){
+                bundleForMsg.putString("STR_ERR_LIST","(无)");
+            }else {
+                StringBuilder sbdForErrSrtList = new StringBuilder();
+                for (int i :
+                        errItemPositions) {
+                    sbdForErrSrtList.append(items.get(i).getName());
+                    sbdForErrSrtList.append(", ");
+                }
+                sbdForErrSrtList.deleteCharAt(sbdForErrSrtList.lastIndexOf(","));
+                bundleForMsg.putString("STR_ERR_LIST", sbdForErrSrtList.toString());
+            }
+            message.setData(bundleForMsg);//旧rma旧只能借助bundle传了。
 
             handler.sendMessage(message);
 
         }
     }
 
+    public class MergedAccomplishRunnable implements Runnable{
+        @Override
+        public void run() {
+            //本方法要执行的任务
+            // ①组的学习的日志记录处理（MS不增加，记无效时间）【以gidFM列表的首个为主组，因为items表也设计为按此序排列的】
+            // ②获取各旧组的id、容量、处理情况的List，传递给rv-adp显示【④要在②前，否则无法获取容量】。
+            // 组的合并处理（主组扩容、被完全吞噬组删组、被部分吞噬组拆分、未吞噬组无操作）
+            // 获取新主组信息，传递显示；
+            memoryDbHelper = YoMemoryDbHelper.getInstance(getApplicationContext());
+            SingleLearningLog singleLLForMerged = new SingleLearningLog(startTime,gidsForMerge.get(0),false);
+            //新Log记录提交到DB
+            long lineForLogs = memoryDbHelper.createSingleLog(singleLLForMerged);
+            //判断DB返回的值，操作是否正确。
+            if(lineForLogs == -1){
+                Toast.makeText(AccomplishActivity.this, "DB Error，Log表新增记录异常", Toast.LENGTH_SHORT).show();
+            }
+
+            ArrayList<Integer> oldFragsSizes = new ArrayList<>();
+            for (int i : gidsForMerge) {
+                oldFragsSizes.add(memoryDbHelper.getSubItemsNumOfGroup(i,tableSuffix));
+            }
+
+            if(emptyItemPositions.size() == 0){
+                //全部合并，没有剩余
+
+            }else {
+                //有剩余。判断哪些分组完全吞噬
+                int tempSizeNum = 0;
+                int swallowedSize = emptyItemPositions.get(0);//首个为空的位置前面都是被吞噬的，位置从0起，故被吞噬量恰好等于首空索引数。
+                int tempIndex = 0;
+                ArrayList<Integer> toDeleteFragIds = new ArrayList<>();//用于保存即将被删除的碎片id(被合并，且又不是第一个（主组）)
+                //【关于主组是否位于第一个的问题，还要重新检查。尤其考察在手动选定合并源的场景下】
+                for (int size : oldFragsSizes) {
+                    if(tempSizeNum+size<=swallowedSize){
+                        //吞噬分界点在本组之后，本组被合并
+                        //如果是等号，则界限在本组末端，本组恰好本吞噬完
+                        if(tempIndex!=0){
+                            //第一个是主组，不删。
+                            toDeleteFragIds.add(gidsForMerge.get(tempIndex));//其余碎片加入待删列表
+                        }
+
+                    }else if((tempSizeNum + size)>swallowedSize && tempSizeNum<swallowedSize){
+                        //界限在本组内，本碎片组被拆分（本组不删，但更新其部分信息。）
+
+                        //更新被拆分分组的描述字段（提交到DB）（对Group表的处理）
+                        memoryDbHelper.updateTableGroupDescriptionSingle(gidsForMerge.get(tempIndex),"碎片拆分");
+                        //对Log表不需处理；对items表的处理由其他逻辑统一完成，此处不需额外设计。
+
+                    }else if(tempSizeNum >swallowedSize){
+                        //本组位于吞噬点之后，未合并，保留
+                        //不需处理
+                    }
+                    tempSizeNum+=size;
+                    tempIndex++;
+
+                }
+                //其余分组
+
+            }
+
+
+            Message messageForMergeDone = new Message();
+            messageForMergeDone.what = DB_DONE_LM_ACA;
+
+            handler.sendMessage(messageForMergeDone);
+
+        }
+    }
+
+
+
+
     void handleMessage(Message msg) {
         switch (msg.what){
             case DB_DONE_LG_UN_DVD_ACA:
                 //确定是在LG模式下才会到达此处(且是未拆分)
-                tv_newGroupInfo.setText(String.format(getResources().getString(R.string.groupId_Num),groupId,group.getTotalItemNum()));
+                flt_mask.setVisibility(View.GONE);//取消遮罩
+
+                tv_newGroupInfo.setText(String.format(getResources().getString(R.string.groupId_Num),groupNew.getId(),groupNew.getTotalItemNum()));
                 tv_oldGroupInfo.setText(String.format(getResources().getString(R.string.groupId_Num),groupId,group.getTotalItemNum()));//此时新旧其实一致
-                tv_newRma.setText();
-                tv_newMs.setText();
-                tv_oldRma.setText();
-                tv_oldMs.setText();
 
-                tv_dvdInfo.setText(String.format(getResources().getString(R.string.),);//设置为“xx个未完成，拆分”【其他模式下则是另外的srt】
-                tv_errInfo.setText(String.format(getResources().getString(R.string.),);
+                tv_newRma.setText(String.valueOf(msg.getData().getFloat("NEW_RMA")));//或者直接设为100？【待】
+                tv_newMs.setText(msg.arg2);
+                tv_oldRma.setText(String.valueOf(msg.getData().getFloat("OLD_RMA")));
+                tv_oldMs.setText(msg.arg1);
+
+                tv_dvdInfo.setText(getResources().getString(R.string.no_dvd));//设置为“全部完成，没有拆分”
+                tv_errInfo.setText(String.format(getResources().getString(R.string.strH_these_add_one),msg.getData().getString("STR_ERR_LIST")));
+                //设置为“以下单词的错误次数+1：……”
                 break;
-            case DB_DONE_LG_DVD_ACA:
 
+            case DB_DONE_LG_DVD_ACA:
+                //是LG模式下，且产生了拆分的场景
+                flt_mask.setVisibility(View.GONE);//取消遮罩
+                tv_newGroupInfo.setText(String.format(getResources().getString(R.string.groupId_Num),groupNew.getId(),groupNew.getTotalItemNum()));
+                tv_oldGroupInfo.setText(String.format(getResources().getString(R.string.groupId_Num),groupId,group.getTotalItemNum()));
+
+                tv_newRma.setText(String.valueOf(msg.getData().getFloat("NEW_RMA")));//暂时直接设为100。（复习后直接刷新到100；本UI没有二次刷新功能，因而只显示完成时点的值）
+                tv_newMs.setText(msg.arg2);
+                tv_oldRma.setText(String.valueOf(msg.getData().getFloat("OLD_RMA")));
+                tv_oldMs.setText(msg.arg1);
+
+                tv_dvdInfo.setText(getResources().getString(R.string.did_dvd));//设置为“未完成，产生了拆分”【其实拆分与否只有本句不同啊！？代码待合并修改】
+                tv_errInfo.setText(String.format(getResources().getString(R.string.strH_these_add_one),msg.getData().getString("STR_ERR_LIST")));
+                //设置为“以下单词的错误次数+1：……”
                 break;
 
         }

@@ -275,6 +275,7 @@ public class StripeProgressBar extends View {
         stripeSections = new SingleStripe[totalSize];
 
         //确定各节的状态——正确、错误、未填写、当前。(最后对当前项进行二次赋值以便覆盖)
+        //另有reInit方法用于卡片滑动后改写进度条。
         for (int i = 0; i < totalSize; i++) {
             if(currentCode.get(i)!=null && !currentCode.get(i).isEmpty()){
                 //该项非NULL、非空，则可进行比较
