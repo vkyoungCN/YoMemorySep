@@ -9,13 +9,12 @@
 
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="80dp"
-        android:text="@string/YouMemoryEn"
-        android:textSize="26sp"
-        android:textColor="#006064"
+        android:layout_height="60dp"
         android:layout_gravity="center"
         android:gravity="center_horizontal|bottom"
-        />
+        android:text="@string/YouMemoryEn"
+        android:textColor="#006064"
+        android:textSize="28sp" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -35,28 +34,123 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="30dp" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/current_missions"
-        android:textSize="20sp"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="4dp"
-        />
+        android:layout_height="24dp" />
+
     <!--横向全屏分割线-->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#ff666666"
+        android:background="#e0e0e0"
         />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/all_missions_rv"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        />
+        android:orientation="horizontal"
+        >
+
+        <!--左列纵向按键栏-->
+        <LinearLayout
+            android:layout_width="82dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingTop="1dp"
+            android:paddingBottom="1dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="1dp"
+            >
+            <!--左列·第一个按键-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:background="#efefef"
+                android:text="@string/category"
+                android:padding="8dp"
+                android:textSize="18sp"
+                android:gravity="center|start"
+                />
+
+            <!--小横分割线-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#cccccc"/>
+
+
+            <!--左列·第2个按键-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:background="#efefef"
+                android:text="@string/str_default"
+                android:padding="8dp"
+                android:textSize="18sp"
+                android:gravity="center|start"
+                />
+
+            <!--小横分割线-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#cccccc"/>
+
+            <!--左列·第3个按键-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:background="#efefef"
+                android:padding="8dp"
+                android:textSize="18sp"
+                android:text="@string/plus"
+                android:gravity="center"
+                android:onClick="createMission"
+                />
+
+            <!--小横分割线-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#cccccc"/>
+
+        </LinearLayout>
+        <!--竖向长分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefef"
+            />
+
+
+        <!--右列：标题、Rv区-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:text="@string/missions_list"
+                android:textSize="18sp"
+                android:gravity="center"
+                />
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/slash_bars_red"
+                />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/all_missions_rv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
 
 </LinearLayout>

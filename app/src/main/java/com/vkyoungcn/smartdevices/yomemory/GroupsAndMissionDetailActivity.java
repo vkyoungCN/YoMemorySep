@@ -53,7 +53,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 //    public static final int PICKING_TYPE_INIT = 311;//新版的逻辑中，只需要区分是新学还是复习两组情况。不再需要传递具体状态，因再需要据此生成特殊Logs。
 //    public static final int PICKING_TYPE_RE_PICK =312;
 
-    public static final int MESSAGE_PRE_DB_FETCHED =5011;
+    public static final int MESSAGE_PRE_DB_FETCHED = 5011;
     public static final int MESSAGE_RE_FETCH_DONE = 5012;
     public static final int MESSAGE_RV_SCHEDULE_REFRESHING = 5013;
 
@@ -80,8 +80,8 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 
     private Activity self;//为了后方Timer配合runOnUiThread.
     private Handler handler = new GroupOfMissionHandler(this);//涉及弱引用，通过其发送消息。
-    private Boolean fetched =false;//是否已执行完成过从DB获取分组数据的任务；如完成，则onResume中可以重启UI-Timer
-    private Boolean needForScheduleRefreshing =true;//分组列表数据定时更新线程的控制变量。当刷新分组列表时暂停该更新；（？退出到Pause状态时，是否需要手动停止？）
+    private Boolean fetched = false;//是否已执行完成过从DB获取分组数据的任务；如完成，则onResume中可以重启UI-Timer
+    private Boolean needForScheduleRefreshing = true;//分组列表数据定时更新线程的控制变量。当刷新分组列表时暂停该更新；（？退出到Pause状态时，是否需要手动停止？）
     private Boolean isHandyRefreshing = false;//点击刷新列表的按键后，会重新执行加载数据的线程，为与首次的自动运行相区分，此标志变量会设true。
 
     @Override
@@ -92,8 +92,8 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 
         TextView missionDetailName = (TextView) findViewById(R.id.tv_mission_detail_name_GMDA);
         TextView missionDetailDescription = (TextView) findViewById(R.id.tv_mission_detail_description_GMDA);
-        maskFrameLayout = (FrameLayout)findViewById(R.id.maskOverRv_MissionDetail_GMDA);
-        rltFabPanel = (RelativeLayout)findViewById(R.id.rlt_fabFlat_GMDA);
+        maskFrameLayout = (FrameLayout) findViewById(R.id.maskOverRv_MissionDetail_GMDA);
+        rltFabPanel = (RelativeLayout) findViewById(R.id.rlt_fabFlat_GMDA);
 
         missionFromIntent = getIntent().getParcelableExtra("Mission");
         if (missionFromIntent == null) {
@@ -106,7 +106,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
             tableItemSuffix = missionFromIntent.getTableItem_suffix();
         }
 
-       memoryDbHelper = YoMemoryDbHelper.getInstance(getApplicationContext());
+        memoryDbHelper = YoMemoryDbHelper.getInstance(getApplicationContext());
 
         new Thread(new PrepareForGroupsAndMissionRunnable()).start();         // start thread
     }
@@ -116,10 +116,10 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        if(fetched){
+        if (fetched) {
             //如果已执行了DB数据的加载（也即本次onResume是onPause后发生的；不是Activity的首次LC环节）
             //（而Activity的首次LC期间，取决于运行的耗时情况，数据线程可能尚未完成，数据可能尚未准备好。）
-            needForScheduleRefreshing =true;
+            needForScheduleRefreshing = true;
             //【实践验证，只设true，线程不会自动重启。】
             new Thread(new RMAReCalculateRunnable()).start();         // 启动更新线程
         }
@@ -128,12 +128,11 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        needForScheduleRefreshing =false;
+        needForScheduleRefreshing = false;
     }
 
 
-
-    final static class GroupOfMissionHandler extends Handler{
+    final static class GroupOfMissionHandler extends Handler {
         private final WeakReference<GroupsAndMissionDetailActivity> activityWeakReference;
 
         private GroupOfMissionHandler(GroupsAndMissionDetailActivity activity) {
@@ -143,7 +142,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         @Override
         public void handleMessage(Message msg) {
             GroupsAndMissionDetailActivity missionDetailActivity = activityWeakReference.get();
-            if(missionDetailActivity!=null){
+            if (missionDetailActivity != null) {
                 missionDetailActivity.handleMessage(msg);
             }
         }
@@ -153,11 +152,11 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
      * 获取各分组原始数据，并进行排序、转换成RVGroup，然后返回给UI。
      * 提供两种排序方式：①衰减率最高的在前；②记忆存量最低的在前；
      */
-    public class PrepareForGroupsAndMissionRunnable implements Runnable{
+    public class PrepareForGroupsAndMissionRunnable implements Runnable {
         @Override
         public void run() {
             //获取各分组原始数据
-            ArrayList<DBGroup> dbGroupsOrigin = memoryDbHelper.getAllGroupsByMissionId(missionFromIntent.getId(),tableItemSuffix);
+            ArrayList<DBGroup> dbGroupsOrigin = memoryDbHelper.getAllGroupsByMissionId(missionFromIntent.getId(), tableItemSuffix);
             //将各分组原始数据转换为UI所需数据，比较耗时。相关数据直接设置给Activity的成员。
 
             ArrayList<RVGroup> tempRVGroups = new ArrayList<>();
@@ -170,14 +169,15 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 
             rvGroups = ascOrderByMemoryStage(tempRVGroups);
 
-            Message message =new Message();
+            Message message = new Message();
             message.what = MESSAGE_PRE_DB_FETCHED;
             //数据通过全局变量直接传递。
 
             handler.sendMessage(message);
         }
     }
-    public static ArrayList<RVGroup> ascOrderByMemoryStage(ArrayList<RVGroup> RVGroups){
+
+    public static ArrayList<RVGroup> ascOrderByMemoryStage(ArrayList<RVGroup> RVGroups) {
         ArrayList<RVGroup> resultRVGroups = new ArrayList<>();
 
         //此排序属何种算法【？】
@@ -188,7 +188,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
                 //从第二项开始，和指针项比较，如果小于指针项，则令指针指向当前项。（所以循环一次后，是将指针指向了当前列中的最小项）
                 //因为都是引用类型，无法换值，只能移动指针。
 
-                if(RVGroups.get(j).getMemoryStage()< minRVGroup.getMemoryStage()){
+                if (RVGroups.get(j).getMemoryStage() < minRVGroup.getMemoryStage()) {
                     minRVGroup = RVGroups.get(j);//指针指向较小者
                 }
             }
@@ -206,11 +206,11 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         return resultRVGroups;
     }
 
-    public class ReFetchForGroupsAndMissionRunnable implements Runnable{
+    public class ReFetchForGroupsAndMissionRunnable implements Runnable {
         @Override
         public void run() {
             //获取各分组原始数据
-            ArrayList<DBGroup> dbGroupsOrigin = memoryDbHelper.getAllGroupsByMissionId(missionFromIntent.getId(),tableItemSuffix);
+            ArrayList<DBGroup> dbGroupsOrigin = memoryDbHelper.getAllGroupsByMissionId(missionFromIntent.getId(), tableItemSuffix);
             //将各分组原始数据转换为UI所需数据，比较耗时。相关数据直接设置给Activity的成员。
 
             ArrayList<RVGroup> tempRVGroups = new ArrayList<>();
@@ -223,7 +223,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 
             rvGroups = ascOrderByMemoryStage(tempRVGroups);
 
-            Message message =new Message();
+            Message message = new Message();
             message.what = MESSAGE_RE_FETCH_DONE;
             //数据通过全局变量直接传递。
 
@@ -241,11 +241,11 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
      * 按列表所载部分更新即可（可减轻符合）。现版本暂时不予区分，后期可考虑按M_Stage，较高级别的缓速更新。
      *
      * */
-    public class RMAReCalculateRunnable implements Runnable{
+    public class RMAReCalculateRunnable implements Runnable {
         @Override
         public void run() {
-            int n=0;
-            while (needForScheduleRefreshing){
+            int n = 0;
+            while (needForScheduleRefreshing) {
                 n++;//每分加一【如果改到最后++，这样线程第一轮即可更新一次，适用于onResume；】
                 //更新频率1分钟一次即可，因为RMA函数的计算单位就是分钟。
 
@@ -257,7 +257,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
                 // 而实际的UI更新方面只更新少量的条目）
 
                 try {
-                    Thread.sleep(1000*60);//休息1分钟【新版1min更新，负荷已大降】
+                    Thread.sleep(1000 * 60);//休息1分钟【新版1min更新，负荷已大降】
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -265,7 +265,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
                 //【待】总觉得这里存在问题——学习结束后，分组的信息是更新了的、而此Schedule更新也是更新，
                 // 可能存在两个操作对一个资源的污染问题。——并不，进入onPause()后会将标记置否吧。
                 for (RVGroup singleRVGroup : rvGroups) {
-                    if(singleRVGroup.refreshRMA()){
+                    if (singleRVGroup.refreshRMA()) {
                         //新旧值不同，需要更新。（对于不需要更新的不再加以处理）
                         refreshingNeededPositionsList.add(rvGroups.indexOf(singleRVGroup));
                     }
@@ -280,7 +280,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         }
     }
 
-    void handyRefresh(){
+    void handyRefresh() {
         //手动触发刷新时（是一个底层的彻底的更新，从DB重新获取数据，然后重新计算）
         //①先停止计时更新（控制变量重设false）；
         //②清空旧Adapter数据
@@ -296,8 +296,8 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
     }
 
 
-    void handleMessage(Message message){
-        switch (message.what){
+    void handleMessage(Message message) {
+        switch (message.what) {
             case MESSAGE_PRE_DB_FETCHED://此时是从DB获取各分组数据并转换成合适的数据源完成
                 fetched = true;//用于onResume中的判断（如果在LC的首次流程中，数据线程可能尚未完成，此即为false，不会开启刷新线程）。
                 //取消上方遮罩
@@ -321,11 +321,12 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
                 break;
 
             case MESSAGE_RV_SCHEDULE_REFRESHING:
-                ArrayList<Integer> positionsNeedForUpdate = (ArrayList)(message.obj);
+                ArrayList<Integer> positionsNeedForUpdate = (ArrayList) (message.obj);
 
                 //所有的批量notify方法都只能用于连续项目，所以只能…
-                if(positionsNeedForUpdate==null||positionsNeedForUpdate.size()==0) return;//判空
-                for (int i :positionsNeedForUpdate) {
+                if (positionsNeedForUpdate == null || positionsNeedForUpdate.size() == 0)
+                    return;//判空
+                for (int i : positionsNeedForUpdate) {
                     adapter.notifyItemChanged(i);//【旧版似乎是传递的id，但是id和位置不对应啊。】
                 }
 
@@ -333,29 +334,29 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
     }
 
     /*
-    * 当Fab按键系统的主按钮点击时调用
-    *
-    * ①根据标志变量判定Fab组是否处于展开状态（再做展开或收缩处理）
-    * ②展开：变量置反；组Rlt取消隐藏；（加载动画）
-    * ③回缩：变量置反；组Rlt隐藏；（动画）
-    * */
-    public void fabMainClick(View view){
-        if(!isFabPanelExtracted){//未展开，要做展开操作
+     * 当Fab按键系统的主按钮点击时调用
+     *
+     * ①根据标志变量判定Fab组是否处于展开状态（再做展开或收缩处理）
+     * ②展开：变量置反；组Rlt取消隐藏；（加载动画）
+     * ③回缩：变量置反；组Rlt隐藏；（动画）
+     * */
+    public void fabMainClick(View view) {
+        if (!isFabPanelExtracted) {//未展开，要做展开操作
 
             //标志变量取反
             isFabPanelExtracted = true;
             //展开（取消隐藏）
             rltFabPanel.setVisibility(View.VISIBLE);
 
-        }else {
+        } else {
             isFabPanelExtracted = false;
             rltFabPanel.setVisibility(View.GONE);
         }
     }
 
     /*
-    * 各控件的点击事件方法
-    * */
+     * 各控件的点击事件方法
+     * */
     public void createGroup(View view) {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         Fragment prev = getFragmentManager().findFragmentByTag("CREATE_GROUP");
@@ -368,12 +369,12 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         dfg.show(transaction, "CREATE_GROUP");
     }
 
-    public void findGroup(View view){
+    public void findGroup(View view) {
         //查询指定分组（查询的方式和条件还没想好）
         Toast.makeText(self, "施工中，查询分组的方法。", Toast.LENGTH_SHORT).show();
     }
 
-    public void learnAndAddInOrder(View view){
+    public void learnAndAddInOrder(View view) {
         //启动DFG，在dfg中点击了确认后，再交互到本Activity下的onLDfgInteraction方法，然后再生成Intent跳转。
         // 启动“边学边建”，按顺序建组
         // 传递“顺序/随机”二选一；其余不传递
@@ -394,7 +395,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 
     }
 
-    public void learnAndAddRandom(View view){
+    public void learnAndAddRandom(View view) {
         //启动“边学边建”，随机顺序。
         Toast.makeText(self, "施工中，边学边建。", Toast.LENGTH_SHORT).show();
 
@@ -409,7 +410,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         dfg.show(transaction, "LEARNING_ADD_RANDOM");
     }
 
-    public void learnAndMerge(View view){
+    public void learnAndMerge(View view) {
         //原则上只从数量小于4个的分组中抽取资源，（可以选择，可扩大到8个）
         //①圈定可抽取的范围，②抽取资源（简单传递一批ItemId，以及GroupID以备最后删组），③记录所学的词条范围；
         //④时间到/数量到/手动点击结束（三种结束方式）后，将所学词条记录到一个新分组（按新的MS统一计算）；
@@ -431,11 +432,11 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         //本页有全部分组的信息，应在本页准备好数据（容量<4、<8）
         // 后续页面只能直接从DB取数据，而SQL复杂不宜用。
         for (RVGroup rvg : rvGroups) {
-            if(rvg.getTotalItemsNum()<4){
+            if (rvg.getTotalItemsNum() < 4) {
                 //一维上[0][x]是小于4的，x对应其不同MS；各元素本身就是一个ArrayList哦。
                 groupsInTwoDimensionArray[0][rvg.getMemoryStage()].add(new FragGroupForMerge(rvg));
-               //替代了switch，简洁。
-            }else if(rvg.getTotalItemsNum()<8){
+                //替代了switch，简洁。
+            } else if (rvg.getTotalItemsNum() < 8) {
                 groupsInTwoDimensionArray[1][rvg.getMemoryStage()].add(new FragGroupForMerge(rvg));
             }
         }
@@ -447,23 +448,22 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
     }
 
 
-
     /*
-    * 各DialogFragment交互方法
-    * */
+     * 各DialogFragment交互方法
+     * */
     @Override
     public void onCreateGroupDFgConfirm(long lines) {
         Log.i(TAG, "onCreateGroupDFgConfirm: +1");
         //如果新增操作成功，通知adp变更。
         if (lines != -1) {
             //新增操作只影响一行
-            DBGroup dGroup = memoryDbHelper.getGroupByLine(lines,tableItemSuffix);
+            DBGroup dGroup = memoryDbHelper.getGroupByLine(lines, tableItemSuffix);
             RVGroup newRVGroup = new RVGroup(dGroup);
 
-            rvGroups.add(0,newRVGroup);//新增分组放在最前【逻辑便于处理】
+            rvGroups.add(0, newRVGroup);//新增分组放在最前【逻辑便于处理】
             adapter.notifyItemInserted(0);//（仍是0起算，但是加到最后时似乎比较奇怪）
             mRv.scrollToPosition(0);//设置增加后滚动到新增位置。【已查，从0起算】
-        }else {
+        } else {
             Toast.makeText(self, "操作未能成功，DB：-1.", Toast.LENGTH_SHORT).show();
         }
 
@@ -471,33 +471,33 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 
     @Override
     public void onButtonClickingDfgInteraction(int dfgType, Bundle data) {
-        Intent intentToLPA = new Intent(this,PrepareForLearningActivity.class);
-        intentToLPA.putExtra("TABLE_SUFFIX",tableItemSuffix);
+        Intent intentToLPA = new Intent(this, PrepareForLearningActivity.class);
+        intentToLPA.putExtra("TABLE_SUFFIX", tableItemSuffix);
         intentToLPA.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
-        switch (dfgType){
+        switch (dfgType) {
             case LEARNING_GENERAL:
-                intentToLPA.putExtra("LEARNING_TYPE",LEARNING_GENERAL);
-                intentToLPA.putExtra("BUNDLE_FOR_GENERAL",data);
+                intentToLPA.putExtra("LEARNING_TYPE", LEARNING_GENERAL);
+                intentToLPA.putExtra("BUNDLE_FOR_GENERAL", data);
                 this.startActivity(intentToLPA);
                 break;
 
             case LEARNING_AND_CREATE_ORDER:
                 //需要传递标记
-                intentToLPA.putExtra("LEARNING_TYPE",LEARNING_AND_CREATE_ORDER);
-                intentToLPA.putExtra("MISSION_ID",missionFromIntent.getId());//在最后完成页生成新组时需要本字段信息。
+                intentToLPA.putExtra("LEARNING_TYPE", LEARNING_AND_CREATE_ORDER);
+                intentToLPA.putExtra("MISSION_ID", missionFromIntent.getId());//在最后完成页生成新组时需要本字段信息。
                 this.startActivity(intentToLPA);
                 break;
 
             case LEARNING_AND_CREATE_RANDOM:
-                intentToLPA.putExtra("LEARNING_TYPE",LEARNING_AND_CREATE_RANDOM);
-                intentToLPA.putExtra("MISSION_ID",missionFromIntent.getId());//在最后完成页生成新组时需要本字段信息。
+                intentToLPA.putExtra("LEARNING_TYPE", LEARNING_AND_CREATE_RANDOM);
+                intentToLPA.putExtra("MISSION_ID", missionFromIntent.getId());//在最后完成页生成新组时需要本字段信息。
                 this.startActivity(intentToLPA);
                 break;
 
             case LEARNING_AND_MERGE:
-                intentToLPA.putExtra("LEARNING_TYPE",LEARNING_AND_MERGE);
-                intentToLPA.putExtra("BUNDLE_FOR_MERGE",data);//这里传递的是从DFG（及其选择Rv）传来的，
+                intentToLPA.putExtra("LEARNING_TYPE", LEARNING_AND_MERGE);
+                intentToLPA.putExtra("BUNDLE_FOR_MERGE", data);//这里传递的是从DFG（及其选择Rv）传来的，
                 // 作为合并学习的来源碎片分组的分组id（构成的bundle，内部的key：IDS_GROUPS_READY_TO_MERGE）
                 this.startActivity(intentToLPA);
                 break;
@@ -505,40 +505,9 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 
         }
     }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode){
-            case REQUEST_CODE_LEARNING:
-                switch (resultCode){
-                    case LearningActivity.RESULT_LEARNING_SUCCEEDED:
-                        if(data == null) return;
-                        String newLogsStr = data.getStringExtra("newLogsStr");
-                        if(newLogsStr.isEmpty()) return;//根据当前设计，60分钟内的复习不计入Log且返回空串，【灰色状态下的额外复习亦然】
-                        // 所以最终接受到空串后，应直接返回，UI仍按原方式记录即可。
-
-                        //通知adp变更显示
-                        RVGroup groupWithNewLog = rvGroups.get(clickPosition);
-                        GroupState newGS = new GroupState(newLogsStr);
-                        groupWithNewLog.setStateText(GroupStateManager.getCurrentStateTimeAmountStringFromUIGroup(newGS));
-                        groupWithNewLog.setStateColorResId(newGS.getColorResId());
-                        groupWithNewLog.setStrGroupLogs(newLogsStr);//UI的定时更新线程需要该字段做计算。否则本条无法按时更新。
-
-                        rvGroups.set(clickPosition,groupWithNewLog);
-                        adapter.notifyItemChanged(clickPosition);
-                        break;
-                    case LearningActivity.RESULT_LEARNING_FAILED:
-                        Toast.makeText(this, "大失忆术！嘘，什么都没有发生。", Toast.LENGTH_SHORT).show();
-
-
-                }
-
-        }
-    }
-
 }
+
+
 
 /*旧片段
 * groupsStateTimer = new Timer(); 25 28 30

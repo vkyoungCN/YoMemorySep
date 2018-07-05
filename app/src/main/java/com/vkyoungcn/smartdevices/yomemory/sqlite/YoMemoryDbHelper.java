@@ -215,7 +215,6 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     }
 
     /*CRUD部分需要时再写*/
-/*
     public long createMission(Mission mission){
         long l;
 
@@ -225,13 +224,13 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         values.put(YoMemoryContract.Mission.COLUMN_NAME, mission.getName());
         values.put(YoMemoryContract.Mission.COLUMN_DESCRIPTION, mission.getDescription());
         values.put(YoMemoryContract.Mission.COLUMN_TABLE_ITEM_SUFFIX, mission.getTableItem_suffix());
+        values.put(YoMemoryContract.Mission.COLUMN_STAR,mission.getStarType());
 
         l = mSQLiteDatabase.insert(YoMemoryContract.Mission.TABLE_NAME, null, values);
         closeDB();
 
         return l;
     }
-*/
 
 
     /*
@@ -246,6 +245,26 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
         db.insert(YoMemoryContract.Mission.TABLE_NAME, null, values);
         closeDB();
+    }
+
+    /*
+    * 修改Mission的星标
+    * 因为在页面中能获取的（修改后数据）是Rv版的，所以在此使用ArrayList<RvMission>。
+     * */
+    public int updateMissionStartInBatches(ArrayList<RvMission> missions,ArrayList<Integer> positions){
+        int affectedRows = 0;
+        getReadableDatabaseIfClosedOrNull();
+
+        for (int i : positions) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(YoMemoryContract.Mission.COLUMN_STAR,missions.get(i).getStarType());
+
+            affectedRows = mSQLiteDatabase.update(YoMemoryContract.Mission.TABLE_NAME,contentValues,
+                    YoMemoryContract.Mission._ID+" = ? ",new String[]{String.valueOf(missions.get(i).getId())} );
+        }
+
+        closeDB();
+        return affectedRows;
     }
 
     /*public Mission getMissionById(long mission_id){
@@ -455,32 +474,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         closeDB();
         return l;
     }
-    /*
-     * 用于LC模式下，最后根据已学的范围创建分组
-     * */
-    public long createGroupForLC(DBGroup dbGroup,SingleLearningLog sLog, ArrayList<SingleItem> subItems, String tableSuffix){
-        long l;
-        getWritableDatabaseIfClosedOrNull();
 
-        mSQLiteDatabase.beginTransaction();
-
-        //先修改group表（新建）
-        ContentValues values = new ContentValues();
-
-        values.put(YoMemoryContract.Group.COLUMN_DESCRIPTION, dbGroup.getDescription());
-        values.put(YoMemoryContract.Group.COLUMN_MISSION_ID, dbGroup.getMission_id());
-        values.put(YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG, dbGroup.getSettingUptimeInLong());
-
-        l = mSQLiteDatabase.insert(YoMemoryContract.Group.TABLE_NAME, null, values);
-
-        createSingleLogLeaveDbOpen(sLog);//添加Logs记录。
-        setItemsChose(tableSuffix, subItemIds);
-        mSQLiteDatabase.setTransactionSuccessful();
-        mSQLiteDatabase.endTransaction();
-
-        closeDB();
-        return l;
-    }
     /*
     * 建立一个容量为0的分组，用于拆分分组时先行一步生成临时分组
     * 也用在LC最后生成时先产生分组记录（从而获取可用的gid）
@@ -807,35 +801,6 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     }
 
 
-
-    /*
-    * 当仅需获取Group类中group表相关的字段时使用的方法。
-    * 此时获取的类只能用于修改group表单表的记录情形下临时使用，是不完整的。
-    * */
-    public DbTableGroup getTableGroupById(int groupId){
-        DbTableGroup group = new DbTableGroup();
-        String selectQuery = "SELECT * FROM "+ YoMemoryContract.Group.TABLE_NAME+
-                " WHERE "+ YoMemoryContract.Group._ID+" = "+groupId;
-
-        getReadableDatabaseIfClosedOrNull();
-        Cursor cursor = mSQLiteDatabase.rawQuery(selectQuery, null);
-
-        if(cursor.moveToFirst()){
-            group.setId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Group._ID)));
-            group.setDescription(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_DESCRIPTION)));
-            group.setSettingUptimeInLong(cursor.getLong(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG)));
-            group.setMission_id(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_MISSION_ID)));
-        }
-
-        try {
-            cursor.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        closeDB();
-        return group;
-    }
 
 
     /*

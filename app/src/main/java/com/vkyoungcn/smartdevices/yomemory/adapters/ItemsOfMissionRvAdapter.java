@@ -10,7 +10,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.R;
-import com.vkyoungcn.smartdevices.yomemory.models.RvSingleItem;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
 
 import java.util.ArrayList;

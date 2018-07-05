@@ -8,8 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.adapters.AllMissionRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.models.Mission;
@@ -26,10 +25,14 @@ import java.util.ArrayList;
  * */
 public class MainActivity extends AppCompatActivity implements AllMissionRvAdapter.ChangeStar{
     private static final String TAG = "MainActivity";
-    public static final int MESSAGE_DB_MISSION_FETCHED = 5101;
-    private android.os.Handler handler = new MainActivity.MainActivityHandler(this);//通过其发送消息。
+    public static final int MESSAGE_DB_MISSION_FETCHED = 5001;
+    private YoMemoryDbHelper memoryDbHelper;
+    private ArrayList<Integer> starClickedPositions = new ArrayList<>();
+    private ArrayList<RvMission> rvMissions;//应为要跨方法使用，最后需要存入DB。所以全局。
+    ;
+    private Handler handler = new MainActivity.MainActivityHandler(this);//通过其发送消息。
 
-    private ArrayList<RvMission> missions = new ArrayList<>();
+//    private ArrayList<RvMission> missions = new ArrayList<>();
     private RecyclerView allMissionRecyclerView;
 
     private AllMissionRvAdapter allMissionRvAdapter;//便于更新UI时调用，注意检查非空
@@ -41,31 +44,25 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
 
         //从数据库获取数据源Missions，本页其实只需要显示名称字段；但是按钮需要其所属碎片信息。
         new Thread(new FetchMissionsFromDBRunnable()).start();
-//        YoMemoryDbHelper memoryDbHelper = YoMemoryDbHelper.getInstance(getApplicationContext());
 
         allMissionRecyclerView = (RecyclerView) findViewById(R.id.all_missions_rv);
-//        ArrayList<Mission> allMissions = getIntent().getParcelableArrayListExtra("All_Missions");
-        /*if(allMissions == null){
-            Toast.makeText(this, "没有任务信息", Toast.LENGTH_SHORT).show();
-            allMissions = new ArrayList<>();
-        }*/
-
 
     }
 
     public class FetchMissionsFromDBRunnable implements Runnable{
         @Override
         public void run() {
-            YoMemoryDbHelper memoryDbHelper = YoMemoryDbHelper.getInstance(getApplicationContext());
+            memoryDbHelper = YoMemoryDbHelper.getInstance(getApplicationContext());
             ArrayList<Mission> missions = (ArrayList<Mission>) memoryDbHelper.getAllMissions();
-            ArrayList<RvMission> rvMissions = new ArrayList<>();
+
+            //转换成适合于Rv显示的RvMission类。
+            rvMissions = new ArrayList<>();
             for (Mission m :missions) {
                 rvMissions.add(new RvMission(m));
             }
 
             Message message = new Message();
             message.what = MESSAGE_DB_MISSION_FETCHED;
-            message.obj = rvMissions;
 
             handler.sendMessage(message);
         }
@@ -90,24 +87,36 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
     void handleMessage(Message message){
         switch (message.what) {
             case MESSAGE_DB_MISSION_FETCHED:
-                missions = (ArrayList<RvMission>) message.obj;
 
                 //取到数据后，应更新UI的显示
-                allMissionRecyclerView.setHasFixedSize(true);//暂时只有固定数量的任务，可以设fix。
+//                allMissionRecyclerView.setHasFixedSize(true);//暂时只有固定数量的任务，可以设fix。
                 allMissionRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-                allMissionRvAdapter = new AllMissionRvAdapter(missions,this);
+                allMissionRvAdapter = new AllMissionRvAdapter(rvMissions,this);//只要是从本消息到达，则rvMs一定有数据。
                 allMissionRecyclerView.setAdapter(allMissionRvAdapter);
 
                 break;
         }
     }
 
+    //当RV-Adp中点击了星标后，会调用此回调方法，通知新的星标类型。
+    //在本页退出时，应当存入DB。
     @Override
-    public void changeRvStar(int position) {
-        if(allMissionRvAdapter==null){
-            return;
-        }else {
+    public void changeRvStar(int position,int newStartType) {
             allMissionRvAdapter.notifyItemChanged(position);
+            starClickedPositions.add(position);//这些位置上发生过点击，应该提交到DB更新
+        // （其新值应已在adapter中设置好了，毕竟是引用类型）
+        //点击最后不一定改变了值，但是判断逻辑估计较复杂，从略、只要点击了就全存。
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        //如果星标位置上发生过点击，则最终会产生向DB的提交（但不一定真的有改变，毕竟星标是循环设置的）
+        if(starClickedPositions!=null && !starClickedPositions.isEmpty()) {//【实测在此若不检测null则崩溃】
+            int affectRows = memoryDbHelper.updateMissionStartInBatches(rvMissions, starClickedPositions);
+            if (affectRows == 0) {
+                Toast.makeText(this, "星标有点击，但DB没改变。", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -124,4 +133,18 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
         return super.onKeyDown(keyCode, event);//继续执行父类其他点击事件
     }
 
+    //临时点击方法，仅用于增加显示任务
+    public void createMission(View view){
+        long line;
+        Mission mission = new Mission("演示任务"+System.currentTimeMillis()%10000,"","",1);
+
+        line = memoryDbHelper.createMission(mission);
+        if(line == -1){
+            Toast.makeText(this, "something goes wrong!", Toast.LENGTH_SHORT).show();
+        }else {
+            rvMissions.add(new RvMission(mission));
+            allMissionRvAdapter.notifyDataSetChanged();
+        }
+
+    }
 }

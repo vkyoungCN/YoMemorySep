@@ -188,11 +188,6 @@ public class SingleItemLearningFragment extends Fragment implements View.OnClick
                     }
 
                     break;
-                case R.id.ve_singleItemLearning:
-                    //点击后申请焦点
-                    ve_ValidatingEditor.requestFocus();
-                    break;
-
 
                 case R.id.card_view:
                     if(isNameSurfaceOn) {
@@ -207,7 +202,7 @@ public class SingleItemLearningFragment extends Fragment implements View.OnClick
                         llt_surfaceVe.setVisibility(View.GONE);
                     }
                     break;
-                case R.id.validatingEditor_singleItemLearning:
+                case R.id.ve_singleItemLearning:
                     ve_ValidatingEditor.requestFocus();
                     manager.showSoftInput(ve_ValidatingEditor, InputMethodManager.RESULT_UNCHANGED_SHOWN);
             }

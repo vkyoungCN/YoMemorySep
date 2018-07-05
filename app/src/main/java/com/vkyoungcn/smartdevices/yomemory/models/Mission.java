@@ -13,7 +13,7 @@ public class Mission implements Parcelable {
     private String name="";
     private String description="";
     private String tableItem_suffix="";
-    private int starType = 1;//星标类型，默认1（对应蓝色？）。
+    private int starType = 1;//星标类型，默认1（对应蓝色？）。【目前没什么意义，考虑后期改成任务“标签类型”】
 
     //空构造器
     public Mission() {

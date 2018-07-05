@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -14,9 +13,7 @@ import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.adapters.ItemsOfMissionRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMission;
-import com.vkyoungcn.smartdevices.yomemory.models.RvSingleItem;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
-import com.vkyoungcn.smartdevices.yomemory.models.Mission;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 
 import java.lang.ref.WeakReference;
@@ -107,13 +104,8 @@ public class ItemsAndMissionDetailActivity extends AppCompatActivity {
     public class PrepareForMissionItemsDetailRunnable implements Runnable{
         @Override
         public void run() {
-            //获取各分组原始数据
-            ArrayList<SingleItem> itemsPreFetched = (ArrayList<SingleItem>) memoryDbHelper.getAllItemsOfMission(tableItemSuffix);
-            ArrayList<RvSingleItem> items = new ArrayList<>();
-
-            for (SingleItem s: itemsPreFetched) {
-                items.add(new RvSingleItem(s));
-            }
+            //获取原始数据
+            ArrayList<SingleItem> items = (ArrayList<SingleItem>) memoryDbHelper.getAllItemsOfMission(tableItemSuffix);
             float percentage = memoryDbHelper.getLearnedPercentageOfMission(tableItemSuffix);
             int percentageTimes100 = (int)(percentage*100);
             Message message =new Message();

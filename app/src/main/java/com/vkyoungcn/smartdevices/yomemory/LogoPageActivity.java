@@ -19,9 +19,8 @@ import java.lang.ref.WeakReference;
 
 /*
 * 本页面是程序第一个页面
-* 职能：①欢迎页（Logo动画）；②首次运行时向DB填充数据。
-* 本页一旦离开不能退回（需在下一页特别实现）
-* （*原计划在此页从DB预加载Missions数据，但各页职能应清晰化且Missions数据量较小，取消。）
+* 职能：①欢迎（Logo动画）；②首次运行时向DB填充数据；③获取Mission信息向后传递（本项取消）
+* 本页一旦离开不能退回（在下一页特别实现）
 * */
 public class LogoPageActivity extends AppCompatActivity {
     
@@ -44,8 +43,7 @@ public class LogoPageActivity extends AppCompatActivity {
         boolean isFirstLaunch=sharedPreferences.getBoolean("IS_FIRST_LAUNCH", true);
         SharedPreferences.Editor editor=sharedPreferences.edit();
         if(isFirstLaunch){
-            //第一次
-            //开启新线程执行DB填充操作然，同时提示。
+            //第一次运行：开启新线程执行DB填充操作然，同时提示。
             //完成后跳转下一页
             Toast.makeText(this, "首次运行，正在填充数据，请稍等……", Toast.LENGTH_LONG).show();
             new Thread(new PopTheDatabaseRunnable()).start();
@@ -98,13 +96,12 @@ public class LogoPageActivity extends AppCompatActivity {
                 Intent intent= new Intent(this,MainActivity.class);
                 startActivity(intent);
                 break;
-
         }
     }
 
 
     private void startAnimator(){
-         ValueAnimator CenterLogoAnimator = ValueAnimator.ofFloat(80,100,100,0);
+         ValueAnimator CenterLogoAnimator = ValueAnimator.ofFloat(0,80,90,100);
                 CenterLogoAnimator.setDuration(1200);
                 CenterLogoAnimator.addUpdateListener(new LogoDisAnimatorListener());
                 CenterLogoAnimator.setInterpolator(new LinearInterpolator());

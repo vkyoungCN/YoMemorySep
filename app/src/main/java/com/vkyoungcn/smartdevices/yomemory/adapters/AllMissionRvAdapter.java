@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +29,7 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
     //    private static final String TAG = "AllMissionRvAdapter";
     private List<RvMission> missions;//本页暂时只显示titles，但后续页面需要suffix，点击事件需要相应id
     private Context context;//用于点击事件的启动新Activity
+    private boolean is4BtnsShowing = false;
 
 
 
@@ -35,28 +37,34 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
         private final TextView title;
         private final ImageView star;
 
+        private final LinearLayout llt_4Btns;
         private final ImageView fgStart;//开始碎片学习（自动新建分组）
         private final ImageView fgRe;//碎片快速复习
         private final ImageView groupsOfThis;//跳到任务详情与所属分组页
         private final ImageView itemsOfThis;//跳到任务详情与所属资源页
 
+
+
         int tempStarType = 1;//用于临时改变（存入DB前的）星标状态记录。
 
         private ViewHolder(View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.title);
+            title = itemView.findViewById(R.id.title_rvAllMission);
 //            fgsList = itemView.findViewById(R.id.fragmentGroupsList);
             fgStart = itemView.findViewById(R.id.fragmentGroupStart);
             fgRe = itemView.findViewById(R.id.fragmentGroupRe);
             groupsOfThis = itemView.findViewById(R.id.groupsOfThisMission);
             itemsOfThis = itemView.findViewById(R.id.itemsOfThisMission);
             star = itemView.findViewById(R.id.starAtStart);
+            llt_4Btns = itemView.findViewById(R.id.llt_4Btn_rvAllMission);
 
+            title.setOnClickListener(this);//点击名称区域后，下方llt展开显示
             fgStart.setOnClickListener(this);
             fgRe.setOnClickListener(this);
             groupsOfThis.setOnClickListener(this);
             itemsOfThis.setOnClickListener(this);
             star.setOnClickListener(this);
+
         }
 
         public TextView getTitle() {
@@ -74,24 +82,30 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
                 switch (view.getId()){
                     case R.id.fragmentGroupStart:
                         //跳转到学习页，边学边建方式建立碎片分组。
-                        Toast.makeText(context, "碎片学习点击", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "预留按键1，施工未完成", Toast.LENGTH_SHORT).show();
                         break;
+
                     case R.id.fragmentGroupRe:
                         //开始分组复习（按某种顺序自动选取第一组？）；复习页给出类似“播放列表”的复习列表？
-                        Toast.makeText(context, "碎片复习点击", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "预留按键2，施工未完成", Toast.LENGTH_SHORT).show();
                         break;
+
                     case R.id.groupsOfThisMission:
                         //跳转到任务详情页。
+                        if(position!=0){return;}//测试期间由于只有第一项任务是有效数据，临时禁止其他项目的跳转
                         Intent intentToGroups = new Intent(context, GroupsAndMissionDetailActivity.class);
                         intentToGroups.putExtra("Mission",missions.get(position));
-                            context.startActivity(intentToGroups);
-                            break;
+                        context.startActivity(intentToGroups);
+                        break;
+
                     case R.id.itemsOfThisMission:
-                        //跳转到任务详情页。
+                        //跳转到任务资源详情页。
+                        if(position!=0){return;}//测试期间由于只有第一项任务是有效数据，临时禁止其他项目的跳转
                         Intent intentToItems = new Intent(context, ItemsAndMissionDetailActivity.class);
                         intentToItems.putExtra("Mission",missions.get(position));
                         context.startActivity(intentToItems);
                         break;
+
                     case R.id.starAtStart:
                         //切换星标图片（并且在退出时保存到DB）
                         tempStarType = missions.get(getAdapterPosition()).getStarType();//数据源中的类型值
@@ -112,7 +126,16 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
                                 missions.get(position).setStartResourceId(R.drawable.star_red);
                                 break;
                         }
-                        ((MainActivity)context).changeRvStar(position);
+                        ((MainActivity)context).changeRvStar(position,tempStarType%3);
+
+                    case R.id.title_rvAllMission:
+                        if(is4BtnsShowing){
+                            llt_4Btns.setVisibility(View.GONE);
+                            is4BtnsShowing = false;
+                        }else {
+                            llt_4Btns.setVisibility(View.VISIBLE);
+                            is4BtnsShowing = true;
+                        }
                 }
 
             }
@@ -121,7 +144,7 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
     }
 
     public interface ChangeStar{
-        void changeRvStar(int position);
+        void changeRvStar(int position,int newStartType);
     }
 
 
