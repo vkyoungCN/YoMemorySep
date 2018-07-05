@@ -12,7 +12,6 @@ import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -27,6 +26,7 @@ public class PrepareForLearningActivity extends AppCompatActivity {
     private String tableNameSuffix;
     private int groupId;//Intent传来，仅边建边学没有此数据。
     private ArrayList<Integer> gIdsForMerge;//Intent传来，仅在合并学习时有此数据。
+    private int missionId;//仅在LC两种模式下使用。传递到最后页，生成新组时使用。
 
     private Handler handler = new PrepareLearningDataHandler(this);
     private YoMemoryDbHelper memoryDbHelper;
@@ -64,13 +64,15 @@ public class PrepareForLearningActivity extends AppCompatActivity {
                 }
                 break;
             case LEARNING_AND_CREATE_ORDER:
-                //边学边建模式下不传入额外数据
+                //边学边建模式下传入的额外数据
+                missionId = getIntent().getIntExtra("MISSION_ID",0);
                 //下面为创建模式准备数据List<Item>。
                 new Thread(new PrepareDataForLcOrderRunnable()).start();         // start thread
 
                 break;
             case LEARNING_AND_CREATE_RANDOM:
-                //边学边建模式下不传入额外数据
+                //边学边建模式下传入的额外数据
+                missionId = getIntent().getIntExtra("MISSION_ID",0);
                 //下面为创建模式准备数据List<Item>。
                 new Thread(new PrepareDataForLcRandomRunnable()).start();         // start thread
                 break;
@@ -83,7 +85,7 @@ public class PrepareForLearningActivity extends AppCompatActivity {
                     //合并模式下额外传入的数据是一个ArrayList。
                 }
                 //下面为合并模式准备数据List<Item>。
-                new Thread(new PrepareDataForLcMergeRunnable()).start();         // start thread
+                new Thread(new PrepareDataForLMergeRunnable()).start();         // start thread
 
 
                 break;
@@ -136,6 +138,7 @@ public class PrepareForLearningActivity extends AppCompatActivity {
                 Intent intentToLearningActivity_LCO = new Intent(this,LearningActivity.class);
                 intentToLearningActivity_LCO.putExtra("LEARNING_TYPE",LEARNING_AND_CREATE_ORDER);
                 intentToLearningActivity_LCO.putExtra("TABLE_NAME_SUFFIX",tableNameSuffix);
+                intentToLearningActivity_LCO.putExtra("MISSION_ID",missionId);
                 intentToLearningActivity_LCO.putParcelableArrayListExtra("ITEMS_FOR_LEARNING",items);
 
                 intentToLearningActivity_LCO.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);//要求不记录
@@ -147,6 +150,7 @@ public class PrepareForLearningActivity extends AppCompatActivity {
                 Intent intentToLearningActivity_LCR = new Intent(this,LearningActivity.class);
                 intentToLearningActivity_LCR.putExtra("LEARNING_TYPE",LEARNING_AND_CREATE_ORDER);
                 intentToLearningActivity_LCR.putExtra("TABLE_NAME_SUFFIX",tableNameSuffix);
+                intentToLearningActivity_LCR.putExtra("MISSION_ID",missionId);
                 intentToLearningActivity_LCR.putParcelableArrayListExtra("ITEMS_FOR_LEARNING",items);
 
                 intentToLearningActivity_LCR.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);//要求不记录
@@ -197,9 +201,6 @@ public class PrepareForLearningActivity extends AppCompatActivity {
         public void run() {
             //从DB准备数据
             items = memoryDbHelper.getCertainAmountItemsOrderly(36,tableNameSuffix);
-            //在Items列表数据的最后附加一条“伪数据”，用于伪完成页显示。【仍然附加！】
-            SingleItem endingItem = new SingleItem(0,"完成","","",true,0,true,(short) 0,(short) 0);
-            items.add(endingItem);
 
             Message message = new Message();
             message.what = MESSAGE_LCO_DB_DATA_FETCHED;
@@ -228,8 +229,8 @@ public class PrepareForLearningActivity extends AppCompatActivity {
 
 
 
-    public class PrepareDataForLcMergeRunnable implements Runnable {
-//        private static final String TAG = "PrepareDataForLcMergeRunnable";
+    public class PrepareDataForLMergeRunnable implements Runnable {
+//        private static final String TAG = "PrepareDataForLMergeRunnable";
 
         @Override
         public void run() {

@@ -485,11 +485,13 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
             case LEARNING_AND_CREATE_ORDER:
                 //需要传递标记
                 intentToLPA.putExtra("LEARNING_TYPE",LEARNING_AND_CREATE_ORDER);
+                intentToLPA.putExtra("MISSION_ID",missionFromIntent.getId());//在最后完成页生成新组时需要本字段信息。
                 this.startActivity(intentToLPA);
                 break;
 
             case LEARNING_AND_CREATE_RANDOM:
                 intentToLPA.putExtra("LEARNING_TYPE",LEARNING_AND_CREATE_RANDOM);
+                intentToLPA.putExtra("MISSION_ID",missionFromIntent.getId());//在最后完成页生成新组时需要本字段信息。
                 this.startActivity(intentToLPA);
                 break;
 

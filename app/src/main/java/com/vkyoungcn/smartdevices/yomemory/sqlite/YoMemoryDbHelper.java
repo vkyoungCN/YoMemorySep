@@ -455,9 +455,35 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         closeDB();
         return l;
     }
+    /*
+     * 用于LC模式下，最后根据已学的范围创建分组
+     * */
+    public long createGroupForLC(DBGroup dbGroup,SingleLearningLog sLog, ArrayList<SingleItem> subItems, String tableSuffix){
+        long l;
+        getWritableDatabaseIfClosedOrNull();
 
+        mSQLiteDatabase.beginTransaction();
+
+        //先修改group表（新建）
+        ContentValues values = new ContentValues();
+
+        values.put(YoMemoryContract.Group.COLUMN_DESCRIPTION, dbGroup.getDescription());
+        values.put(YoMemoryContract.Group.COLUMN_MISSION_ID, dbGroup.getMission_id());
+        values.put(YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG, dbGroup.getSettingUptimeInLong());
+
+        l = mSQLiteDatabase.insert(YoMemoryContract.Group.TABLE_NAME, null, values);
+
+        createSingleLogLeaveDbOpen(sLog);//添加Logs记录。
+        setItemsChose(tableSuffix, subItemIds);
+        mSQLiteDatabase.setTransactionSuccessful();
+        mSQLiteDatabase.endTransaction();
+
+        closeDB();
+        return l;
+    }
     /*
     * 建立一个容量为0的分组，用于拆分分组时先行一步生成临时分组
+    * 也用在LC最后生成时先产生分组记录（从而获取可用的gid）
     * */
     public int createEmptyGroup(DBGroup dbGroup){
         int gid = 0;
@@ -500,6 +526,25 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         l = mSQLiteDatabase.insert(YoMemoryContract.LearningLogs.TABLE_NAME, null, values);
 
         closeDB();
+        return l;
+    }
+
+
+    /*
+     * 用于内部调用，位于事务内，不关DB。
+     * */
+    private long createSingleLogLeaveDbOpen(SingleLearningLog sLog){
+        long l;
+        getWritableDatabaseIfClosedOrNull();
+
+        ContentValues values = new ContentValues();
+
+        values.put(YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG, sLog.getTimeInLong());
+        values.put(YoMemoryContract.LearningLogs.COLUMN_GROUP_ID, sLog.getGroupId());
+        values.put(YoMemoryContract.LearningLogs.COLUMN_IS_MS_EFFECTIVE, sLog.isEffective());
+
+        l = mSQLiteDatabase.insert(YoMemoryContract.LearningLogs.TABLE_NAME, null, values);
+
         return l;
     }
 
@@ -706,6 +751,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         return resultNum;
     }
 
+
     public DBGroup getGroupById(int groupId,String tableSuffix){
         DBGroup group = new DBGroup();
         String selectQuery = "SELECT * FROM "+ YoMemoryContract.Group.TABLE_NAME+
@@ -739,6 +785,27 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         closeDB();
         return group;
     }
+
+
+    /*
+    * 本方法不负责对所含有的items的处理；应由调用方根据实际情况安排具体处理逻辑。
+    * 批量删除group表中的几条记录
+    * 因为Logs表的gid字段按级联删除模式建立到group的外键，因而DB会自动删除之
+    * 而Items表与group表之间的外键没有特殊约束，因而需要手动处理所属items的归属。
+    * 本方法主要适用于合并式学习之后对“被吞噬”分组的删除；其余普通的删除应使用……方法。
+    * */
+    public void deleteGroupsAndLogs(ArrayList<Integer> groupIds){
+        getWritableDatabaseIfClosedOrNull();
+        for (int i : groupIds) {
+            String deleteSingleGroupSql = "DELETE FROM "+ YoMemoryContract.Group.TABLE_NAME+" WHERE "+
+                    YoMemoryContract.Group._ID+" = "+i;
+            mSQLiteDatabase.execSQL(deleteSingleGroupSql);
+
+        }
+        closeDB();
+
+    }
+
 
 
     /*
@@ -937,13 +1004,41 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     /*
      * 修改一组items的其中两项内容（用于学习完成后不需拆分分组时）
      * */
-    public int updateItemsDual(String tableSuffix, ArrayList<SingleItem> items){
+    public int updateItemsPrtAndErr(String tableSuffix, ArrayList<SingleItem> items){
         int rowsAffected = 0;
         getWritableDatabaseIfClosedOrNull();
 
         for (SingleItem singleItem : items) {
             ContentValues contentValues = new ContentValues();
             //只有三项需要修改
+            contentValues.put(YoMemoryContract.ItemBasic.COLUMN_PRIORITY,singleItem.getPriority());
+            contentValues.put(YoMemoryContract.ItemBasic.COLUMN_FAILED_SPELLING_TIMES,singleItem.getFailedSpelling_times());
+
+            rowsAffected = mSQLiteDatabase.update(YoMemoryContract.ItemBasic.TABLE_NAME+tableSuffix,contentValues,
+                    YoMemoryContract.ItemBasic._ID+" = ?",new String[]{String.valueOf(singleItem.getId())});
+        }
+
+        closeDB();
+        return rowsAffected;
+
+    }
+
+
+    /*
+     * 修改一组items的后五项内容（用于LC学习模式完成后更新所属items）
+     * 修改的内容是：已抽取、已学习、gid、优先级、错次。
+     * 其中将两个布尔值直接置true。
+     * */
+    public int updateItemsPdnWithDoubleTrue(String tableSuffix, ArrayList<SingleItem> items){
+        int rowsAffected = 0;
+        getWritableDatabaseIfClosedOrNull();
+
+        for (SingleItem singleItem : items) {
+            ContentValues contentValues = new ContentValues();
+            //五项需要修改
+            contentValues.put(YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE,true);
+            contentValues.put(YoMemoryContract.ItemBasic.COLUMN_IS_LEARNED,true);
+            contentValues.put(YoMemoryContract.ItemBasic.COLUMN_GROUP_ID,singleItem.getGroupId());
             contentValues.put(YoMemoryContract.ItemBasic.COLUMN_PRIORITY,singleItem.getPriority());
             contentValues.put(YoMemoryContract.ItemBasic.COLUMN_FAILED_SPELLING_TIMES,singleItem.getFailedSpelling_times());
 

@@ -65,6 +65,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
     private ArrayList<String> targetCodes;//用于条纹进度条。
 
     private int groupId;//Intent传入。（仅LG模式下）
+    private int missionId;//Intent传入。（仅LCO/LCR模式下）仅在最后（完成页）创建新组时使用
     private ArrayList<Integer> gIdsForMerge;//Intent传来，仅在合并学习时有此数据。
 
     private ArrayList<String> veFillings;//记录填写在VE内的信息，用于回滚时加载；以及条纹进度条当前状态的生成。
@@ -136,6 +137,9 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
             groupId = getIntent().getIntExtra("GROUP_ID",0);
         }else if(learningType == LEARNING_AND_MERGE){
             gIdsForMerge = getIntent().getIntegerArrayListExtra("GIDS_FOR_MERGE");
+        }else{
+            //在剩余两种模式是LCO/LCR时有效。如果增加了其他新模式，则本逻辑必须修改。
+            missionId = getIntent().getIntExtra("MISSION_ID",0);
         }
 
 
@@ -393,6 +397,9 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
                     intentToAccomplishActivity.putExtra("GROUP_ID",groupId);
                 }else if(learningType == LEARNING_AND_MERGE){
                     intentToAccomplishActivity.putExtra("GROUP_ID_FOR_MERGE",gIdsForMerge);
+                }else {
+                    //在剩余两种模式是LCO/LCR时有效。如果增加了其他新模式，则本逻辑必须修改。
+                    intentToAccomplishActivity.putExtra("MISSION_ID",missionId);
                 }
 
                 intentToAccomplishActivity.putExtra("START_TIME",startingTimeMillis);

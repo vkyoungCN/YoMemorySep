@@ -233,5 +233,8 @@
     <string name="no_dvd">全部完成，没有拆分</string>
     <string name="strH_these_add_one">以下单词错误次数加一：%1$s</string>
     <string name="did_dvd">未完成，产生了拆分</string>
+    <string name="sizeChanged">容量改变：%1$d → %2$d</string>
+    <string name="create_order">创建了新组（顺序）</string>
+    <string name="create_random">创建了新组（随机）</string>
 
 </resources>
