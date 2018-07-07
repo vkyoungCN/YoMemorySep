@@ -239,5 +239,9 @@
     <string name="category">类别</string>
     <string name="str_default">默认</string>
     <string name="plus">+</string>
+    <string name="reserved_btn">预留按键</string>
+    <string name="res_belongs">所属资源</string>
+    <string name="groups_belongs">所属分组</string>
+    <string name="to_details">查看详情</string>
 
 </resources>

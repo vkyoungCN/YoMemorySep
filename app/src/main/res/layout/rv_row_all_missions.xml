@@ -2,132 +2,109 @@
 <!--两层结构构成的行UI-->
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="5dp"
-    android:layout_margin="4dp">
+    android:layout_margin="2dp"
+    android:orientation="vertical"
+    app:cardCornerRadius="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
+
+        <!--第一行-->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:orientation="horizontal"
-            >
+            android:layout_height="56dp"
+            android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/starAtStart"
                 android:layout_width="48dp"
-                android:layout_height="match_parent"
+                android:layout_height="48dp"
+                android:layout_gravity="center|start"
                 android:padding="5dp"
-                android:src="@drawable/star_blue"
-                />
-            <!--竖线2-->
-            <TextView
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="#efefef"
-                />
-
+                android:src="@drawable/star_blue" />
 
             <!--任务名称-->
             <TextView
                 android:id="@+id/title_rvAllMission"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:textSize="18sp"
-                android:background="#fffde7"
+                android:gravity="center|start"
+                android:paddingEnd="24dp"
+                android:paddingStart="24dp"
                 android:text="@string/sharp_x5_default"
-                />
+                android:textSize="18sp" />
 
         </LinearLayout>
-
-        <!--下方是四个按钮-->
-        <LinearLayout
-            android:id="@+id/llt_4Btn_rvAllMission"
+        <!--横分割线-->
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="42dp"
-            android:orientation="horizontal"
-            android:background="#e0e0e0"
-            android:visibility="gone"
-            android:paddingTop="4dp"
-            android:paddingBottom="3dp"
-            android:paddingStart="4dp"
-            android:paddingEnd="4dp"
+            android:layout_height="1dp"
+            android:background="#efefef" />
 
-            >
+        <!--第二行-->
+        <!--任务名称-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:gravity="center"
+            android:text="@string/sharp_x24_default" />
 
-            <!--碎片复习-->
-            <ImageView
-                android:id="@+id/fragmentGroupRe"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#77b2ff59"
-                android:gravity="center"
-                android:paddingBottom="2dp"
-                android:src="@drawable/reserve_btn" />
+        <!--横分割线-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#efefef" />
 
-            <!--按键组的分割条-->
-            <TextView
-                android:layout_width="3dp"
-                android:layout_height="match_parent"
-                android:gravity="center" />
-            <!--碎片学习-->
-            <ImageView
-                android:id="@+id/fragmentGroupStart"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#7700e676"
-                android:gravity="center"
-                android:paddingBottom="2dp"
-                android:src="@drawable/reserve_btn" />
-
-            <!--按键组的分割条-->
-            <TextView
-                android:layout_width="3dp"
-                android:layout_height="match_parent"
-                android:gravity="center" />
-
-            <!--所属资源-->
-            <ImageView
-                android:id="@+id/itemsOfThisMission"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#7718ffff"
-                android:gravity="center"
-                android:paddingBottom="2dp"
-                android:src="@drawable/to_items_btn"
-                android:textSize="24sp" />
-            <!--按键组的分割条-->
-            <TextView
-                android:layout_width="3dp"
-                android:layout_height="match_parent"
-                android:gravity="center" />
-            <!--所属分组-->
-            <ImageView
-                android:id="@+id/groupsOfThisMission"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#772979ff"
-                android:gravity="center"
-                android:paddingBottom="2dp"
-                android:src="@drawable/to_groups_btn"
-                android:textSize="24sp" />
-
-        </LinearLayout>
-
+        <!--下方的空space是为了撑开CardView以便显示下方的按键区-->
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="42dp" />
 
     </LinearLayout>
+
+
+
+    <!--下方是两个按钮（摆放更多按钮不好看）-->
+    <!--llt的缩进是为了不挡圆角-->
+    <LinearLayout
+        android:id="@+id/llt_triBtn_rvAllMissions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:paddingStart="2dp"
+        android:paddingEnd="2dp"
+        android:paddingBottom="2dp"
+        android:alpha="0.7"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/tv_toMissionDetails_rvAllMissions"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_gravity="center|bottom"
+            android:layout_weight="2"
+            android:background="#69f0ae"
+            android:gravity="center"
+            android:text="@string/to_details" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_gravity="center|bottom"
+            android:layout_weight="1"
+            android:background="#fbc02d"
+            android:gravity="center"
+            android:text="@string/reserved_btn" />
+
+    </LinearLayout>
+
+
+
+
 
 
 </android.support.v7.widget.CardView>

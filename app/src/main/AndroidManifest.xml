@@ -22,7 +22,8 @@
         <activity android:name=".GroupDetailActivity" />
         <activity android:name=".LearningActivity" />
         <activity android:name=".AccomplishActivity" />
-        <activity android:name=".PrepareForLearningActivity"></activity>
+        <activity android:name=".PrepareForLearningActivity" />
+        <activity android:name=".validatingEditor.MissionDetailsctivity"></activity>
     </application>
 
 </manifest>
