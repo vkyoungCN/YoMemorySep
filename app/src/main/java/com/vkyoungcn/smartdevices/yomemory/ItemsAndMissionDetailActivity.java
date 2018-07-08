@@ -1,5 +1,6 @@
 package com.vkyoungcn.smartdevices.yomemory;
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +66,7 @@ public class ItemsAndMissionDetailActivity extends AppCompatActivity {
         learnedPercentage = (TextView) findViewById(R.id.learnedPercentageOfTotalItemsOfMission);
 
         maskFrameLayout = (FrameLayout)findViewById(R.id.maskOverRv_MissionItemsDetail);
-        missionFromIntent = getIntent().getParcelableExtra("Mission");
+        missionFromIntent = getIntent().getParcelableExtra("MISSION");
 
         if (missionFromIntent == null) {
             Toast.makeText(this, "任务信息传递失败", Toast.LENGTH_SHORT).show();
@@ -106,17 +108,25 @@ public class ItemsAndMissionDetailActivity extends AppCompatActivity {
         public void run() {
             //获取原始数据
             ArrayList<SingleItem> items = (ArrayList<SingleItem>) memoryDbHelper.getAllItemsOfMission(tableItemSuffix);
-            float percentage = memoryDbHelper.getLearnedPercentageOfMission(tableItemSuffix);
-            int percentageTimes100 = (int)(percentage*100);
+            int learnedNumOfItems = memoryDbHelper.getLearnedNumOfItemsOfMission(tableItemSuffix);
+            float percentage = (float) learnedNumOfItems/(float)items.size();
+
             Message message =new Message();
             message.what = MESSAGE_ITEMS_DB_PRE_FETCHED;
-            message.arg1 = percentageTimes100;
+            message.arg1 = items.size();
             message.obj = items;
+
+            //百分比限定两位小数
+            DecimalFormat decimalFormat = new DecimalFormat("###.#");
+            Bundle bundleForFloat = new Bundle();
+            bundleForFloat.putString("STR_PERCENTAGE",decimalFormat.format(percentage)+"%");
+            message.setData(bundleForFloat);
 
             handler.sendMessage(message);
         }
     }
 
+    @SuppressLint("StringFormatInvalid")
     void handleMessage(Message message){
         switch (message.what){
             case MESSAGE_ITEMS_DB_PRE_FETCHED://此时是已从DB获取数据
@@ -124,7 +134,6 @@ public class ItemsAndMissionDetailActivity extends AppCompatActivity {
                 //取消Rv区域的遮罩，从消息提取数据。
                 maskFrameLayout.setVisibility(View.GONE);
                 itemList = (ArrayList<SingleItem>)message.obj;
-                float percentageWithPoint = ((float) (message.arg1))/100;
 
                 //初始化Rv构造器，令UI加载Rv控件……
                 adapter = new ItemsOfMissionRvAdapter(itemList, this);
@@ -133,8 +142,8 @@ public class ItemsAndMissionDetailActivity extends AppCompatActivity {
                 mRv.setAdapter(adapter);
 
                 //修改上方详情区的两个字段
-                itemsTotalNumber.setText(String.valueOf(itemList.size()));
-                learnedPercentage.setText(String.valueOf(percentageWithPoint));
+                itemsTotalNumber.setText(String.valueOf(message.arg1));
+                learnedPercentage.setText((String)message.getData().get("STR_PERCENTAGE"));
         }
     }
 

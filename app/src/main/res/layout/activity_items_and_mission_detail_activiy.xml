@@ -73,7 +73,7 @@
                 android:gravity="center"
                 android:textSize="18sp"
                 android:textColor="#d84315"
-                android:text="@string/num_10800"
+                android:text="@string/holder_pureNum_1"
                 />
 
             <TextView
@@ -91,7 +91,7 @@
                 android:gravity="center"
                 android:textSize="18sp"
                 android:textColor="#d84315"
-                android:text="@string/percentage_one"
+                android:text="@string/holder_numPercentage_1"
                 />
 
             <!--横向分割线-->

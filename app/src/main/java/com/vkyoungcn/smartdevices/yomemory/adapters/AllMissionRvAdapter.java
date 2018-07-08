@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.vkyoungcn.smartdevices.yomemory.ItemsAndMissionDetailActivity;
 import com.vkyoungcn.smartdevices.yomemory.MainActivity;
+import com.vkyoungcn.smartdevices.yomemory.MissionDetailsActivity;
 import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMission;
 
@@ -77,11 +78,10 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
                         break;*/
 
                     case R.id.tv_toMissionDetails_rvAllMissions:
-                        //跳转到任务资源详情页。
-                        if(position!=0){return;}//测试期间由于只有第一项任务是有效数据，临时禁止其他项目的跳转
-                        Intent intentToItems = new Intent(context, ItemsAndMissionDetailActivity.class);
-                        intentToItems.putExtra("Mission",missions.get(position));
-                        context.startActivity(intentToItems);
+                        //跳转到任务详情页。
+                        Intent intentToMDA = new Intent(context, MissionDetailsActivity.class);
+                        intentToMDA.putExtra("MISSION",missions.get(position));
+                        context.startActivity(intentToMDA);
                         break;
 
                     case R.id.starAtStart:

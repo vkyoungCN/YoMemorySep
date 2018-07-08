@@ -50,7 +50,8 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
                     YoMemoryContract.Group._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     YoMemoryContract.Group.COLUMN_DESCRIPTION + " TEXT, "+
                     YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG + " INTEGER, "+
-                    YoMemoryContract.Group.COLUMN_MISSION_ID + " INTEGER REFERENCES "+
+                    YoMemoryContract.Group.COLUMN_MISSION_ID + " INTEGER, "+
+                    "FOREIGN KEY("+YoMemoryContract.Group.COLUMN_MISSION_ID +") REFERENCES "+
                     YoMemoryContract.Mission.TABLE_NAME+"("+ YoMemoryContract.Mission._ID+") " +
                     "ON DELETE CASCADE)"; //外键采用级联删除
 
@@ -59,7 +60,9 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
                     YoMemoryContract.LearningLogs._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG + " INTEGER, "+
                     YoMemoryContract.LearningLogs.COLUMN_IS_MS_EFFECTIVE + " BOOLEAN, "+
-                    YoMemoryContract.LearningLogs.COLUMN_GROUP_ID + " INTEGER REFERENCES "+
+                    YoMemoryContract.LearningLogs.COLUMN_GROUP_ID + " INTEGER,"+
+                    "FOREIGN KEY ("+YoMemoryContract.LearningLogs.COLUMN_GROUP_ID+
+                    ") REFERENCES "+
                     YoMemoryContract.Group.TABLE_NAME+"("+ YoMemoryContract.Group._ID+") " +
                     "ON DELETE CASCADE)"; //外键采用级联删除
 
@@ -75,11 +78,13 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
                 YoMemoryContract.ItemBasic.COLUMN_PHONETIC + " TEXT, " +
                 YoMemoryContract.ItemBasic.COLUMN_TRANSLATIONS + " TEXT, " +
 
-                YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE + " BOOLEAN" +
-                YoMemoryContract.ItemBasic.COLUMN_IS_LEARNED + " BOOLEAN" +
+                YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE + " BOOLEAN, " +
+                YoMemoryContract.ItemBasic.COLUMN_IS_LEARNED + " BOOLEAN, " +
                 YoMemoryContract.ItemBasic.COLUMN_PRIORITY + " INTEGER, " +
                 YoMemoryContract.ItemBasic.COLUMN_FAILED_SPELLING_TIMES + " INTEGER, " +
-                YoMemoryContract.ItemBasic.COLUMN_GROUP_ID + " INTEGER REFERENCES "+
+                YoMemoryContract.ItemBasic.COLUMN_GROUP_ID + " INTEGER, " +
+                " FOREIGN KEY("+YoMemoryContract.ItemBasic.COLUMN_GROUP_ID+
+                ") REFERENCES "+
                 YoMemoryContract.Group.TABLE_NAME+"("+ YoMemoryContract.Group._ID+"))"; //外键无约束
         //当Group表中删除分组时，需由程序负责所属Items的归属归零；DB似乎没有直接适用的外键约束规则。
     }
@@ -346,9 +351,91 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
     }*/
 
+    /*
+    * 一个任务的资源总量
+    * */
+    public int getNumOfItemsOfMission(String tableNameSuffix){
+        int totalNum = 0;
+        if(tableNameSuffix == null ||tableNameSuffix.isEmpty()){
+            return totalNum;
+        }
+        String selectQuery = "SELECT COUNT(*) FROM "+ YoMemoryContract.ItemBasic.TABLE_NAME+tableNameSuffix;
+
+        getReadableDatabaseIfClosedOrNull();
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectQuery,null);
+
+        if(cursor.moveToFirst()){
+            totalNum = cursor.getInt(0);
+        }
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        closeDB();
+
+        return totalNum;
+    }
+
+    /*
+     * 一个任务的已学资源总量
+     * */
+    public int getLearnedNumOfItemsOfMission(String tableNameSuffix){
+        int totalNum = 0;
+        if(tableNameSuffix == null ||tableNameSuffix.isEmpty()){
+            return totalNum;
+        }
+        String selectQuery = "SELECT COUNT(*) FROM "+ YoMemoryContract.ItemBasic.TABLE_NAME+tableNameSuffix+
+                " WHERE "+YoMemoryContract.ItemBasic.COLUMN_IS_LEARNED+" = 1";
+
+        getReadableDatabaseIfClosedOrNull();
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectQuery,null);
+
+        if(cursor.moveToFirst()){
+            totalNum = cursor.getInt(0);
+        }
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        closeDB();
+
+        return totalNum;
+    }
+
+    /*
+     * 一个任务的分组总量
+    * */
+    public int getGroupsNumOfMission(int missionId){
+        int totalNum = 0;
+        String selectQuery = "SELECT COUNT(*) FROM "+ YoMemoryContract.Group.TABLE_NAME+
+                " WHERE "+YoMemoryContract.Group.COLUMN_MISSION_ID+" = "+missionId;
+
+        getReadableDatabaseIfClosedOrNull();
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectQuery,null);
+
+        if(cursor.moveToFirst()){
+            totalNum = cursor.getInt(0);
+        }
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        closeDB();
+
+        return totalNum;
+    }
+
+
 
     public List<SingleItem> getAllItemsOfMission(String tableNameSuffix){
         List<SingleItem> items = new ArrayList<>();
+        if(tableNameSuffix == null ||tableNameSuffix.isEmpty()){
+            return items;
+        }
+
         String selectQuery = "SELECT * FROM "+ YoMemoryContract.ItemBasic.TABLE_NAME+tableNameSuffix;
 
         getReadableDatabaseIfClosedOrNull();
@@ -381,32 +468,6 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         closeDB();
 
         return items;
-    }
-
-    /*
-    * 使用了sqlite聚合函数
-    * */
-    public float getLearnedPercentageOfMission(String tableNameSuffix){
-        Log.i(TAG, "getLearnedPercentageOfMission: before.");
-        float percentage = -1;
-        String selectQuery = "SELECT COUNT("+YoMemoryContract.ItemBasic.COLUMN_IS_LEARNED+")/" +
-                "COUNT(*) FROM "+ YoMemoryContract.ItemBasic.TABLE_NAME+tableNameSuffix;
-
-        getReadableDatabaseIfClosedOrNull();
-        Cursor cursor = mSQLiteDatabase.rawQuery(selectQuery,null);
-
-        if(cursor.moveToFirst()){
-                percentage = cursor.getFloat(0);
-        }
-
-        try {
-            cursor.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        closeDB();
-
-        return percentage;
     }
 
 

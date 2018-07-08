@@ -95,7 +95,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         maskFrameLayout = (FrameLayout) findViewById(R.id.maskOverRv_MissionDetail_GMDA);
         rltFabPanel = (RelativeLayout) findViewById(R.id.rlt_fabFlat_GMDA);
 
-        missionFromIntent = getIntent().getParcelableExtra("Mission");
+        missionFromIntent = getIntent().getParcelableExtra("MISSION");
         if (missionFromIntent == null) {
             Toast.makeText(self, "任务信息传递失败", Toast.LENGTH_SHORT).show();
             return;

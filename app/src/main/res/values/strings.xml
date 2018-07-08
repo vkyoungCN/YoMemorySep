@@ -243,5 +243,20 @@
     <string name="res_belongs">所属资源</string>
     <string name="groups_belongs">所属分组</string>
     <string name="to_details">查看详情</string>
+    <string name="mission_introduction">任务简介</string>
+    <string name="holder_total_itemNum">资源总量：%1$d</string>
+    <string name="holder_learned_itemNum">已学数量：%1$d</string>
+    <string name="holder_total_groupNum">分组数量：%1$d</string>
+    <string name="detail_2">详情</string>
+    <string name="str_clickAndGo_2">点击分组详情，查看列表，然后开始复习。  ↑</string>
+    <string name="introduction_Mission13531">\t\t一个背单词的任务。共有词条数量13500余个，涵盖考博、雅思、专八、GRT等多种高级别英语考试的应试词汇。
+        简单词如am/is/are等已剔除。本任务适合有一定基础，并希望一步到位式地挑战自己词汇量的同学使用。\n
+        \n\t\t*词汇是学好、用好英语的天然基础，若要出色胜任如口笔译等高端的使用场景，学习者约需掌握13000个词汇。
+        本任务采用应试词汇为来源基础，完美结合了词汇的高频和海量特性。如能成功通关，那么完全可以说，在通向英语巅峰的道路上，已经没有什么能阻挡你了！
+        \nYou are UNSTOPPABLE!!
+    </string>
+    <string name="holder_mission_description">任务描述：%1$s</string>
+    <string name="holder_pureNum_1">%1$d</string>
+    <string name="holder_numPercentage_1">%1$f%%</string>
 
 </resources>
