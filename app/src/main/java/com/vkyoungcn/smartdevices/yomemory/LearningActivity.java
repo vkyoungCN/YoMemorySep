@@ -21,6 +21,7 @@ import com.vkyoungcn.smartdevices.yomemory.fragments.LearningTimeUpDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
+import com.vkyoungcn.smartdevices.yomemory.customUI.HorizontalProgressBar;
 import com.vkyoungcn.smartdevices.yomemory.stripeProgressBar.StripeProgressBar;
 import com.vkyoungcn.smartdevices.yomemory.validatingEditor.ValidatingEditor;
 
@@ -159,7 +160,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
         tv_finish = (TextView)findViewById(R.id.finish_tv_learningActivity);
         fab_finish = (FloatingActionButton)findViewById(R.id.finish_fab_learningActivity);
 
-        spb_bar = (StripeProgressBar)findViewById(R.id.stripeProgressBar_LearningActivity);
+        spb_bar = (StripeProgressBar) findViewById(R.id.stripeProgressBar_LearningActivity);
         for (SingleItem si : items) {
             targetCodes.add(si.getName());
         }

@@ -22,4 +22,7 @@
 
     <color name="ve_background">#44b2ff59</color>
     <color name="ve_background_not_correct">#33ff5252</color>
+    <color name="horizontalPB_color_done">#76ff03</color>
+    <color name="horizontalPB_color_notYet">#a0a0a0</color>
+    <color name="horizontalPB_color_char">#3f3f3f</color>
 </resources>

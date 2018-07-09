@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.vkyoungcn.smartdevices.yomemory.LogoPageActivity;
+import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.models.*;
 
 import java.io.BufferedReader;
@@ -42,6 +44,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
                     YoMemoryContract.Mission.COLUMN_NAME + " TEXT, "+
                     YoMemoryContract.Mission.COLUMN_TABLE_ITEM_SUFFIX + " TEXT, "+
                     YoMemoryContract.Mission.COLUMN_STAR + " INTEGER, "+
+                    YoMemoryContract.Mission.COLUMN_DETAIL_DESCRIPTION + " TEXT, "+
                     YoMemoryContract.Mission.COLUMN_DESCRIPTION + " TEXT)";
 
 
@@ -141,7 +144,8 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         db.execSQL(getSqlCreateItemWithSuffix(DEFAULT_ITEM_SUFFIX));
 
         //向Mission表增加默认记录
-        Mission defaultMission  = new Mission("EnglishWords13531","螺旋式背单词",DEFAULT_ITEM_SUFFIX,1);
+        String detail_13531 = context.getResources().getString(R.string.introduction_Mission13531);
+        Mission defaultMission  = new Mission("EnglishWords13531","螺旋式背单词",detail_13531,DEFAULT_ITEM_SUFFIX,1);
         createMission(db,defaultMission);//传入db是避免调用getDataBase，后者（会调用onCreate）导致递归调用错误
 
         //Item_default13531表数据导入
@@ -159,12 +163,18 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         InputStream is = null;
         try {
             is = context.getAssets().open(csvFileName);
+            int totalBytes = is.available();
+            boolean reported_1 = false,reported_2=false,reported_3=false,reported_4 = false;
+//            boolean reported_5=false;
+            //Java可以一行声明多个，但是需要分布赋值（另，布尔的默认初始值可能本身就是false）
+
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 
             db.beginTransaction();
 
-            int number = 0;
+            int readBytes = 0;
             while ((line = bufferedReader.readLine()) != null) {
+                readBytes+=line.length();//大体估算吧，我不知道要不要+1（把结束符号算上）
                 String[] str = line.split(",");
 
                 ContentValues values = new ContentValues();
@@ -179,6 +189,22 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
                 values.put(YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE, false);//v9,补【经提取测试，log.i中输出为0,并且是数字0，如果再提取，需要匹配为 = 0】
                 values.put(YoMemoryContract.ItemBasic.COLUMN_IS_LEARNED, false);
                 db.insert(YoMemoryContract.ItemBasic.TABLE_NAME + DEFAULT_ITEM_SUFFIX, null, values);
+
+                if(!reported_1 && readBytes>(totalBytes/5)){
+                    //读取了20%了，通知(只能通知一次)
+                    reported_1 = true;
+                    //【以下这种操作要求本方法所在的“DB初始填充逻辑”只能在LogoPageActivity中运行。】
+                    ((LogoPageActivity)context).setNewPercentNum(21);
+                }else if(!reported_2 && readBytes>(totalBytes/2)){
+                    reported_2 =true;
+                    ((LogoPageActivity)context).setNewPercentNum(50);
+                }else if(!reported_3 && readBytes>((totalBytes/4)*3)){
+                    reported_3 =true;
+                    ((LogoPageActivity)context).setNewPercentNum(75);
+                }else if(!reported_4 && readBytes>((totalBytes/100)*95)){
+                    reported_4 =true;
+                    ((LogoPageActivity)context).setNewPercentNum(99);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -227,7 +253,8 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         values.put(YoMemoryContract.Mission.COLUMN_NAME, mission.getName());
-        values.put(YoMemoryContract.Mission.COLUMN_DESCRIPTION, mission.getDescription());
+        values.put(YoMemoryContract.Mission.COLUMN_DESCRIPTION, mission.getSimpleDescription());
+        values.put(YoMemoryContract.Mission.COLUMN_DETAIL_DESCRIPTION, mission.getDetailDescriptions());
         values.put(YoMemoryContract.Mission.COLUMN_TABLE_ITEM_SUFFIX, mission.getTableItem_suffix());
         values.put(YoMemoryContract.Mission.COLUMN_STAR,mission.getStarType());
 
@@ -245,7 +272,8 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         values.put(YoMemoryContract.Mission.COLUMN_NAME, mission.getName());
-        values.put(YoMemoryContract.Mission.COLUMN_DESCRIPTION, mission.getDescription());
+        values.put(YoMemoryContract.Mission.COLUMN_DESCRIPTION, mission.getSimpleDescription());
+        values.put(YoMemoryContract.Mission.COLUMN_DETAIL_DESCRIPTION, mission.getDetailDescriptions());
         values.put(YoMemoryContract.Mission.COLUMN_TABLE_ITEM_SUFFIX, mission.getTableItem_suffix());
 
         db.insert(YoMemoryContract.Mission.TABLE_NAME, null, values);
@@ -282,7 +310,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         if(cursor.moveToFirst()){
             mission.setId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Mission._ID)));
             mission.setName(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_NAME)));
-            mission.setDescription(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_DESCRIPTION)));
+            mission.setSimpleDescription(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_DESCRIPTION)));
             mission.setTableItem_suffix(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_TABLE_ITEM_SUFFIX)));
         }else{
             return null;
@@ -310,7 +338,8 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
                 Mission mission = new Mission();
                 mission.setId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Mission._ID)));
                 mission.setName(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_NAME)));
-                mission.setDescription(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_DESCRIPTION)));
+                mission.setSimpleDescription(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_DESCRIPTION)));
+                mission.setDetailDescriptions(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_DETAIL_DESCRIPTION)));
                 mission.setTableItem_suffix(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_TABLE_ITEM_SUFFIX)));
 
                 missions.add(mission);

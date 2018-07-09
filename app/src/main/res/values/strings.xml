@@ -258,5 +258,6 @@
     <string name="holder_mission_description">任务描述：%1$s</string>
     <string name="holder_pureNum_1">%1$d</string>
     <string name="holder_numPercentage_1">%1$f%%</string>
+    <string name="introduction_here">此处详细说明</string>
 
 </resources>

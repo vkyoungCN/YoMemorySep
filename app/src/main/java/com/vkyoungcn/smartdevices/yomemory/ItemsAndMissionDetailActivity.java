@@ -74,7 +74,7 @@ public class ItemsAndMissionDetailActivity extends AppCompatActivity {
         } else {
             //根据Mission数据填充Mission信息两项
             missionDetailName.setText(missionFromIntent.getName());
-            missionDetailDescription.setText(missionFromIntent.getDescription());
+            missionDetailDescription.setText(missionFromIntent.getSimpleDescription());
             tableItemSuffix = missionFromIntent.getTableItem_suffix();
             //资源总数、已学习百分比、资源列表数据均在新线程获取。
         }

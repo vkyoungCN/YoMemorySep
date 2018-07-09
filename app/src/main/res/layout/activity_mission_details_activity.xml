@@ -208,11 +208,12 @@
         </FrameLayout>
 
         <TextView
+            android:id="@+id/tv_mission_detailDescription_MDA"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="18dp"
             android:gravity="center"
-            android:text="@string/introduction_Mission13531"
+            android:text="@string/introduction_here"
             />
 
     </FrameLayout>

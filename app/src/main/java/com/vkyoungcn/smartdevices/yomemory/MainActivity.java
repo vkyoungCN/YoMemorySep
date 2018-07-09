@@ -6,11 +6,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.adapters.AllMissionRvAdapter;
+import com.vkyoungcn.smartdevices.yomemory.customUI.HorizontalProgressBar;
 import com.vkyoungcn.smartdevices.yomemory.models.Mission;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMission;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
@@ -29,6 +31,9 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
     private YoMemoryDbHelper memoryDbHelper;
     private ArrayList<Integer> starClickedPositions = new ArrayList<>();
     private ArrayList<RvMission> rvMissions;//应为要跨方法使用，最后需要存入DB。所以全局。
+//    private HorizontalProgressBar hpb_progress;//测试用，暂时按时间更新进度。
+//    int count  = 5;//测试用
+//    public static final int MESSAGE_CHANGE_20 =5002;//测试用
     ;
     private Handler handler = new MainActivity.MainActivityHandler(this);//通过其发送消息。
 
@@ -46,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
         new Thread(new FetchMissionsFromDBRunnable()).start();
 
         allMissionRecyclerView = (RecyclerView) findViewById(R.id.all_missions_rv);
+//        hpb_progress = findViewById(R.id.hpb_MDA);
 
     }
 
@@ -67,6 +73,27 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
             handler.sendMessage(message);
         }
     }
+
+    /*public class UpdateHpbOnTimeRunnable implements Runnable{
+        @Override
+        public void run() {
+            while(count!=0){//时间未到
+                try {
+                        Thread.sleep(2000);     // sleep 2 秒；
+
+                        //消息发回UI，改变数值20
+                        Message message = new Message();
+                        message.what = MESSAGE_CHANGE_20;
+                        message.arg1 = 6-count;
+                        count--;
+                        handler.sendMessage(message);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }*/
+
 
     final static class MainActivityHandler extends Handler {
         private final WeakReference<MainActivity> activityWeakReference;
@@ -94,7 +121,12 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
                 allMissionRvAdapter = new AllMissionRvAdapter(rvMissions,this);//只要是从本消息到达，则rvMs一定有数据。
                 allMissionRecyclerView.setAdapter(allMissionRvAdapter);
 
+//                new Thread(new UpdateHpbOnTimeRunnable()).start();
+
                 break;
+//            case MESSAGE_CHANGE_20:
+//                hpb_progress.setNewPercentage(message.arg1*20);
+//                break;
         }
     }
 
@@ -136,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
     //临时点击方法，仅用于增加显示任务
     public void createMission(View view){
         long line;
-        Mission mission = new Mission("演示任务"+System.currentTimeMillis()%10000,"","",1);
+        Mission mission = new Mission("演示任务"+System.currentTimeMillis()%10000,"简述","详细说明……","",1);
 
         line = memoryDbHelper.createMission(mission);
         if(line == -1){

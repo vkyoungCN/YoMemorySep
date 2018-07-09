@@ -2,12 +2,14 @@ package com.vkyoungcn.smartdevices.yomemory.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.ItemsAndMissionDetailActivity;
 import com.vkyoungcn.smartdevices.yomemory.MainActivity;
@@ -32,6 +34,7 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private final TextView title;
         private final ImageView star;
+        private final TextView simpleDetail;
 
 //        private final TextView groupsOfThis;//跳到任务详情与所属分组页
         private final TextView tv_toMissionDetails;//跳到任务详情与所属资源页
@@ -46,6 +49,7 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
 //            fgsList = itemView.findViewById(R.id.fragmentGroupsList);
 //            groupsOfThis = itemView.findViewById(R.id.groupsOfThisMission);
             tv_toMissionDetails = itemView.findViewById(R.id.tv_toMissionDetails_rvAllMissions);
+            simpleDetail = itemView.findViewById(R.id.tv_sDetail_rvAllMission);
             star = itemView.findViewById(R.id.starAtStart);
 
             title.setOnClickListener(this);//点击名称区域后，下方llt展开显示
@@ -61,6 +65,10 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
 
         public ImageView getStar() {
             return star;
+        }
+
+        public TextView getSimpleDetail() {
+            return simpleDetail;
         }
 
         @Override
@@ -80,7 +88,10 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
                     case R.id.tv_toMissionDetails_rvAllMissions:
                         //跳转到任务详情页。
                         Intent intentToMDA = new Intent(context, MissionDetailsActivity.class);
-                        intentToMDA.putExtra("MISSION",missions.get(position));
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("MISSION",missions.get(position));
+                        intentToMDA.putExtra("BUNDLE_FOR_MISSION",bundle);
+//                        Toast.makeText(context, "mission's detail Description:"+missions.get(position).getDetailDescription(), Toast.LENGTH_SHORT).show();
                         context.startActivity(intentToMDA);
                         break;
 
@@ -137,6 +148,7 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
         RvMission mission = missions.get(position);
         holder.getTitle().setText(mission.getName());
         holder.getStar().setImageDrawable(context.getDrawable(mission.getStartResourceId()));
+        holder.getSimpleDetail().setText(mission.getSimpleDescription());
 
     }
 

@@ -11,7 +11,8 @@ import android.os.Parcelable;
 public class Mission implements Parcelable {
     private int id=0;
     private String name="";
-    private String description="";
+    private String simpleDescription ="";
+    private String detailDescriptions="";
     private String tableItem_suffix="";
     private int starType = 1;//星标类型，默认1（对应蓝色？）。【目前没什么意义，考虑后期改成任务“标签类型”】
 
@@ -20,21 +21,26 @@ public class Mission implements Parcelable {
     }
 
     //完全构造器
-    public Mission(int id, String name, String description, String tableItem_suffix, int starType) {
+
+
+    public Mission(int id, String name, String simpleDescription, String detailDescriptions, String tableItem_suffix, int starType) {
         this.id = id;
         this.name = name;
-        this.description = description;
+        this.simpleDescription = simpleDescription;
+        this.detailDescriptions = detailDescriptions;
         this.tableItem_suffix = tableItem_suffix;
         this.starType = starType;
     }
 
     //无id构造器
-    public Mission(String name, String description, String tableItem_suffix, int starType) {
+    public Mission(String name, String simpleDescription, String detailDescriptions, String tableItem_suffix, int starType) {
         this.name = name;
-        this.description = description;
+        this.simpleDescription = simpleDescription;
+        this.detailDescriptions = detailDescriptions;
         this.tableItem_suffix = tableItem_suffix;
         this.starType = starType;
     }
+
 
     public int getId() {
         return id;
@@ -52,12 +58,12 @@ public class Mission implements Parcelable {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public String getSimpleDescription() {
+        return simpleDescription;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setSimpleDescription(String simpleDescription) {
+        this.simpleDescription = simpleDescription;
     }
 
     public int getStarType() {
@@ -76,6 +82,13 @@ public class Mission implements Parcelable {
         this.tableItem_suffix = tableItem_suffix;
     }
 
+    public String getDetailDescriptions() {
+        return detailDescriptions;
+    }
+
+    public void setDetailDescriptions(String detailDescriptions) {
+        this.detailDescriptions = detailDescriptions;
+    }
 
     /*
      * 以下是Parcelable要求的内容
@@ -88,7 +101,8 @@ public class Mission implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(id);
         parcel.writeString(name);
-        parcel.writeString(description);
+        parcel.writeString(simpleDescription);
+        parcel.writeString(detailDescriptions);
         parcel.writeString(tableItem_suffix);
         parcel.writeInt(starType);
     }
@@ -108,7 +122,8 @@ public class Mission implements Parcelable {
     private Mission(Parcel in){
         id = in.readInt();
         name = in.readString();
-        description = in.readString();
+        simpleDescription = in.readString();
+        detailDescriptions = in.readString();
         tableItem_suffix = in.readString();
         starType = in.readInt();
     }

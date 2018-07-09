@@ -102,7 +102,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         } else {
             //根据Mission数据填充Mission信息两项
             missionDetailName.setText(missionFromIntent.getName());
-            missionDetailDescription.setText(missionFromIntent.getDescription());
+            missionDetailDescription.setText(missionFromIntent.getSimpleDescription());
             tableItemSuffix = missionFromIntent.getTableItem_suffix();
         }
 

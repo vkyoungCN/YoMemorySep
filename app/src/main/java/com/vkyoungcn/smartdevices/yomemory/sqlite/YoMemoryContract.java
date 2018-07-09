@@ -29,12 +29,13 @@ public final class YoMemoryContract {
      * */
 
 
-//    id列交由DB自动负责。
+//    id列交似乎是由BC类自动设为_ID=_id的。
     /*任务表*/
     public static class Mission implements BaseColumns {
         public static final String TABLE_NAME = "missions";
         public static final String COLUMN_NAME ="mission_name";
         public static final String COLUMN_DESCRIPTION = "mission_description";
+        public static final String COLUMN_DETAIL_DESCRIPTION = "mission_detail";
         public static final String COLUMN_TABLE_ITEM_SUFFIX = "table_item_suffix";
         public static final String COLUMN_STAR = "star_color";//星标标记，数字形式对应不同的图片。
     }

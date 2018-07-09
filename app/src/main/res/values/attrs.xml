@@ -14,4 +14,21 @@
         <attr name="sectionAmount"
             format="integer"/>
     </declare-styleable>
+
+
+    <!---->
+    <declare-styleable name="HorizontalProgressBar">
+        <attr name="desiredTotalWidth" format="dimension" />
+        <attr name="desiredTotalHeight" format="dimension" />
+
+        <attr name="startPadding" format="dimension" />
+        <attr name="endPadding" format="dimension" />
+        <attr name="bottomPadding" format="dimension" />
+
+        <attr name="barHeight" format="dimension" />
+        <attr name="numberSize" format="dimension" />
+
+        <attr name="lineWidth" format="dimension" />
+    </declare-styleable>
+
 </resources>

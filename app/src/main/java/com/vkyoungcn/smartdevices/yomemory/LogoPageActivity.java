@@ -1,5 +1,6 @@
 package com.vkyoungcn.smartdevices.yomemory;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.animation.Animator;
@@ -9,10 +10,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
+import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vkyoungcn.smartdevices.yomemory.customUI.HorizontalProgressBar;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 
 import java.lang.ref.WeakReference;
@@ -25,12 +29,13 @@ import java.lang.ref.WeakReference;
 public class LogoPageActivity extends AppCompatActivity {
     
     private static final String TAG = "LogoPageActivity";
-    private android.os.Handler handler = new LogoPageActivity.FirstActivityHandler(this);//通过其发送消息。
+    private Handler handler = new LogoPageActivity.FirstActivityHandler(this);//通过其发送消息。
     public static final int MESSAGE_DB_POPULATED = 5001;
-    public static final int MESSAGE_SLEEP_DONE = 5002;
+    public static final int MESSAGE_NEW_PERCENTAGE_NUMBER = 5002;
 
-    private android.widget.TextView logoStrCn;
-    private android.widget.TextView reTry;
+    private TextView logoStrCn;
+    private HorizontalProgressBar hpb_progress;//需要传入百分比的分子数值。
+    private Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +43,7 @@ public class LogoPageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_logo_page);
 
         logoStrCn = (TextView)findViewById(R.id.logo_cn);
+        hpb_progress = findViewById(R.id.hpb_LPA);
 
         SharedPreferences sharedPreferences=getSharedPreferences("yoMemorySP", MODE_PRIVATE);
         boolean isFirstLaunch=sharedPreferences.getBoolean("IS_FIRST_LAUNCH", true);
@@ -45,6 +51,7 @@ public class LogoPageActivity extends AppCompatActivity {
         if(isFirstLaunch){
             //第一次运行：开启新线程执行DB填充操作然，同时提示。
             //完成后跳转下一页
+            hpb_progress.setVisibility(View.VISIBLE);
             Toast.makeText(this, "首次运行，正在填充数据，请稍等……", Toast.LENGTH_LONG).show();
             new Thread(new PopTheDatabaseRunnable()).start();
 
@@ -59,9 +66,7 @@ public class LogoPageActivity extends AppCompatActivity {
     public class PopTheDatabaseRunnable implements Runnable{
         @Override
         public void run() {
-            YoMemoryDbHelper memoryDbHelper = YoMemoryDbHelper.getInstance(getApplicationContext());//应该是在获取DB-Helper后直接触发数据填充吧。
-//            ArrayList<Mission> missions = (ArrayList<Mission>) memoryDbHelper.getAllMissions();不再预获取数据
-            //应改造填充函数，使返回可判断执行情况的结果值。
+            YoMemoryDbHelper memoryDbHelper = YoMemoryDbHelper.getInstance(context);//应该是在获取DB-Helper后直接触发数据填充吧。
 
             Message message = new Message();
             message.what = MESSAGE_DB_POPULATED;
@@ -69,6 +74,15 @@ public class LogoPageActivity extends AppCompatActivity {
 
             handler.sendMessage(message);
         }
+
+        public void setPercentNum(int num){
+            Message msgForNum = new Message();
+            msgForNum.what = MESSAGE_NEW_PERCENTAGE_NUMBER;
+            msgForNum.arg1 = num;
+            handler.sendMessage(msgForNum);
+        }
+
+
     }
 
 
@@ -96,6 +110,8 @@ public class LogoPageActivity extends AppCompatActivity {
                 Intent intent= new Intent(this,MainActivity.class);
                 startActivity(intent);
                 break;
+            case MESSAGE_NEW_PERCENTAGE_NUMBER:
+                hpb_progress.setNewPercentage(message.arg1);
         }
     }
 
@@ -130,4 +146,14 @@ public class LogoPageActivity extends AppCompatActivity {
             logoStrCn.setAlpha(value/100);
         }
     }
+
+    public void setNewPercentNum(int percentageNum){
+        Log.i(TAG, "setNewPercentNum:"+percentageNum);
+        Message msgForNum = new Message();
+        msgForNum.what = MESSAGE_NEW_PERCENTAGE_NUMBER;
+        msgForNum.arg1 = percentageNum;
+        handler.sendMessage(msgForNum);
+
+    }
+
 }

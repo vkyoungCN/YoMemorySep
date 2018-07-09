@@ -12,13 +12,13 @@ import com.vkyoungcn.smartdevices.yomemory.R;
 import java.util.ArrayList;
 
 /*
-* 条纹状进度条，根据对应卡片的正误情况显示相应颜色。当前页显示白色稍长的（竖）线。
-* */
+ * 条纹状进度条，根据对应卡片的正误情况显示相应颜色。当前页显示白色稍长的（竖）线。
+ * */
 public class StripeProgressBar extends View {
     private static final String TAG = "StripeProgressBar";
     private static final int DEFAULT_LENGTH = 36;
     private Context mContext;
-    
+
     private ArrayList<String> currentCode;
     private ArrayList<String> targetCode;
     private ArrayList<Integer> emptyCards;//从0起,存的是卡片序列（字串列表序列）的索引。
