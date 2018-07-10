@@ -12,7 +12,9 @@
     <!--页面上部，任务Info区域-->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="70dp">
+        android:layout_height="56dp"
+        android:background="#ffffff"
+        >
 
         <!--名称，居中，较大字-->
         <TextView
@@ -21,14 +23,14 @@
             android:layout_height="match_parent"
             android:layout_marginBottom="10dp"
             android:gravity="center"
-            android:textSize="20sp"
-            android:text="@string/mission_name_default" />
+            android:text="@string/mission_name_default"
+            android:textSize="20sp" />
 
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#efefef"
             android:layout_gravity="end|bottom"
+            android:background="#efefef"
             android:padding="1dp">
 
             <TextView
@@ -41,147 +43,155 @@
         </FrameLayout>
 
 
-
-
     </FrameLayout>
 
-
+    <!--横向分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#cccccc" />
     <!--上中部，items及groups说明-->
+
+
+    <!--其中items信息分左右两列，左列信息，右列饼状图-->
+
+    <!--第一行I&G区域-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingTop="2dp"
-        android:paddingBottom="5dp"
-        android:paddingStart="4dp"
-        android:paddingEnd="2dp"
-        android:background="#efefef"
-        >
+        android:layout_height="200dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <!--I&G区内第一行，item信息-->
+
+        <!--I&G区内第1列，item信息-->
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="42dp"
-            android:orientation="horizontal"
-            android:background="#ffffff"
-            >
+            android:layout_width="132dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+
             <TextView
                 android:id="@+id/tv_totalItemsNum_MDA"
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:layout_height="match_parent"
-                android:text="@string/holder_total_itemNum"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
                 android:gravity="center"
-                android:textColor="#f57f17"
-                />
-            <!--竖向小分割线-->
+                android:text="@string/holder_total_itemNum"
+                android:textColor="#f57f17" />
+            <!--横向小分割线-->
             <TextView
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="#efefef"/>
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#efefef" />
 
             <TextView
                 android:id="@+id/tv_totalItemsLearnedNum_MDA"
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:gravity="center"
                 android:text="@string/holder_learned_itemNum"
-                android:textColor="#f57f17"
-                android:gravity="center"
-                />
+                android:textColor="#f57f17" />
 
 
-            <!--竖向小分割线-->
+            <!--横向小分割线-->
             <TextView
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="#efefef"/>
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#efefef" />
 
-            <TextView
-                android:layout_width="56dp"
-                android:layout_height="match_parent"
-                android:text="@string/detail_2"
-                android:gravity="center"
-                android:textSize="12sp"
-                android:background="#ea80fc"
-                android:layout_margin="2dp"
-                android:onClick="toAllItemsDetails"
-                />
-        </LinearLayout>
-        <!--横向分割线-->
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            />
-
-        <!--I&G区内第2行，item图示-->
-        <!--自定义UI，待完成-->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="36dp"
-            android:background="#ffffff"
-            />
-        <!--横向分割线-->
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            />
-
-        <!--I&G区内第3行，group信息+图示-->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="42dp"
-            android:background="#ffffff"
-            >
             <TextView
                 android:id="@+id/tv_totalGroupsNum_MDA"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:text="@string/holder_total_groupNum"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
                 android:gravity="center"
-                />
-            <Space
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent" />
-            <!--竖向小分割线-->
-            <TextView
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="#efefef"/>
+                android:text="@string/holder_total_groupNum" />
 
+            <!--横向小分割线-->
             <TextView
-                android:layout_width="56dp"
-                android:layout_height="match_parent"
-                android:text="@string/detail_2"
-                android:gravity="center"
-                android:textSize="12sp"
-                android:background="#69f0ae"
-                android:layout_margin="2dp"
-                android:onClick="toAllGroupsDetails"
-                />
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#efefef" />
+
 
         </LinearLayout>
 
+        <!--竖分割线-->
+        <TextView
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="#efefef" />
+
+        <!--I&G区内第2列，饼图区-->
         <Space
             android:layout_width="match_parent"
-            android:layout_height="1dp" />
-        <!--I&G区内第4行，解释条-->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:gravity="end|center"
-            android:paddingEnd="24dp"
-            android:paddingStart="2dp"
-            android:textColor="#ef5350"
-            android:text="@string/str_clickAndGo_2"
-            android:background="#ffffff"
-            android:textSize="12sp"
-            />
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#efefef"
+        />
+    <!--按钮组-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="1dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="1dp"
+            android:layout_weight="9"
+            android:background="#ea80fc"
+            android:gravity="center"
+            android:onClick="toAllItemsDetails"
+            android:text="@string/go_items" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="1dp"
+            android:layout_weight="8"
+            android:background="#69f0ae"
+            android:gravity="center"
+            android:onClick="toAllItemsDetails"
+            android:text="@string/go_now_1" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="1dp"
+            android:layout_weight="10"
+            android:background="#dce775"
+            android:gravity="center"
+            android:onClick="toAllGroupsDetails"
+            android:text="@string/go_groups" />
+
+
+
+    </LinearLayout>
+
+    <!--I&G区内第4行，解释条-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:gravity="end|center"
+        android:paddingEnd="24dp"
+        android:paddingStart="2dp"
+        android:text="@string/str_clickAndGo_2"
+        android:textColor="#ef5350"
+        android:textSize="12sp" />
+
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#cccccc"
+        />
 
 
 
@@ -192,10 +202,11 @@
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:layout_marginStart="4dp"
             android:background="#efefef"
             android:paddingBottom="1dp"
+            android:translationZ="1dp"
             >
             <TextView
                 android:layout_width="wrap_content"
@@ -211,9 +222,12 @@
             android:id="@+id/tv_mission_detailDescription_MDA"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="20dp"
             android:padding="18dp"
             android:gravity="center"
+            android:background="#ffffff"
             android:text="@string/introduction_here"
+            android:scrollbars="vertical"
             />
 
     </FrameLayout>

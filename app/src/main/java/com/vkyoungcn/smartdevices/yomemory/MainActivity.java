@@ -117,7 +117,12 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
 
                 //取到数据后，应更新UI的显示
 //                allMissionRecyclerView.setHasFixedSize(true);//暂时只有固定数量的任务，可以设fix。
-                allMissionRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+                LinearLayoutManager llm = new LinearLayoutManager(this);
+                llm.setOrientation(LinearLayoutManager.HORIZONTAL);
+                llm.setReverseLayout(false);//如果设true则第一个出现在最右边。
+//                llm.setStackFromEnd(false);//没有影响。
+
+                allMissionRecyclerView.setLayoutManager(llm);
                 allMissionRvAdapter = new AllMissionRvAdapter(rvMissions,this);//只要是从本消息到达，则rvMs一定有数据。
                 allMissionRecyclerView.setAdapter(allMissionRvAdapter);
 

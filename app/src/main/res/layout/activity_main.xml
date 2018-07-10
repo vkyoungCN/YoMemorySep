@@ -33,7 +33,9 @@
         android:gravity="center_horizontal|top"
         />
 
-
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="12dp" />
 
     <!--横向全屏分割线-->
     <TextView
@@ -41,95 +43,23 @@
         android:layout_height="1dp"
         android:background="#e0e0e0"
         />
-    <LinearLayout
+
+    <!--下方区域安排横向Rv即底部按钮栏-->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
         >
-
-        <!--左列纵向按键栏-->
+        <!--Rv标题、横向Rv区-->
         <LinearLayout
-            android:layout_width="82dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingTop="1dp"
-            android:paddingBottom="1dp"
-            android:paddingStart="0dp"
-            android:paddingEnd="1dp"
-            >
-            <!--左列·第一个按键-->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:background="#efefef"
-                android:text="@string/category"
-                android:padding="8dp"
-                android:textSize="18sp"
-                android:gravity="center|start"
-                />
-
-            <!--小横分割线-->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#cccccc"/>
-
-
-            <!--左列·第2个按键-->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:background="#efefef"
-                android:text="@string/str_default"
-                android:padding="8dp"
-                android:textSize="18sp"
-                android:gravity="center|start"
-                />
-
-            <!--小横分割线-->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#cccccc"/>
-
-            <!--左列·第3个按键-->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:background="#efefef"
-                android:padding="8dp"
-                android:textSize="18sp"
-                android:text="@string/plus"
-                android:gravity="center"
-                android:onClick="createMission"
-                />
-
-            <!--小横分割线-->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#cccccc"/>
-
-        </LinearLayout>
-        <!--竖向长分割线-->
-        <TextView
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="#efefef"
-            />
-
-
-        <!--右列：标题、Rv区-->
-        <LinearLayout
+            android:id="@+id/llt_top_rlt_MA"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             >
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:layout_marginStart="1dp"
+                android:layout_height="32dp"
                 android:text="@string/missions_list"
                 android:textSize="18sp"
                 android:gravity="center"
@@ -149,9 +79,112 @@
 
         </LinearLayout>
 
+        <!--次次底部的提示条-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/scroll_right"
+            android:textColor="#dd2c00"
+            android:layout_gravity="top"
+            android:layout_marginTop="312dp"
+            android:translationZ="1dp"
+            />
 
 
-    </LinearLayout>
+        <!--次底部的提示条-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingEnd="12dp"
+            android:paddingStart="12dp"
+            android:text="@string/for_more_missions"
+            android:textStyle="bold"
+            android:textColor="#e65100"
+            android:layout_gravity="bottom"
+            android:textSize="16sp"
+            android:gravity="end"
+            android:layout_marginBottom="58dp"
+            android:translationZ="1dp"
+            />
+        <!--底部横向按键栏-->
+        <LinearLayout
+            android:id="@+id/llt_rlt_bottom_MA"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="#efefef"
+            android:orientation="horizontal"
+            android:padding="1dp"
+            android:layout_gravity="bottom"
+            >
+            <!--底部·第一个按键-->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="9"
+                android:text="@string/category"
+                android:padding="8dp"
+                android:textSize="18sp"
+                android:gravity="center"
+                />
+
+            <!--小分割线-->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#cccccc"/>
+
+
+            <!--底部·第2个按键-->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="9"
+                android:layout_height="match_parent"
+                android:text="@string/str_default"
+                android:padding="8dp"
+                android:textSize="18sp"
+                android:gravity="center"
+                />
+
+            <!--小横分割线-->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#cccccc"/>
+
+            <!--底部·第3个按键-->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="9"
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                android:textSize="18sp"
+                android:text="@string/plus"
+                android:gravity="center"
+                />
+
+            <!--小横分割线-->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#cccccc"/>
+
+            <!--底部·第4个按键-->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="10"
+                android:layout_height="match_parent"
+                android:background="@drawable/new_for_btn_2"
+                android:padding="8dp"
+                android:textSize="18sp"
+                android:text="@string/get_more"
+                android:gravity="center"
+                />
+
+        </LinearLayout>
+
+
+    </FrameLayout>
 
 
 </LinearLayout>

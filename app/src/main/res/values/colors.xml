@@ -25,4 +25,13 @@
     <color name="horizontalPB_color_done">#76ff03</color>
     <color name="horizontalPB_color_notYet">#a0a0a0</color>
     <color name="horizontalPB_color_char">#3f3f3f</color>
+
+    <color name="pieChart_total">#bdbdbd</color>
+    <color name="pieChart_fraction">#ff8a65</color>
+    <color name="pieChart_empty_out">#ffffff</color>
+    <color name="picChart_line">#3f3f3f</color>
+    <color name="picChart_text">#616161</color>
+
+
+
 </resources>

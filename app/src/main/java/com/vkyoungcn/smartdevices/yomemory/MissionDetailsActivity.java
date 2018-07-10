@@ -42,7 +42,7 @@ public class MissionDetailsActivity extends AppCompatActivity {
         tv_AllGroupsNum = findViewById(R.id.tv_totalGroupsNum_MDA);
 
         tv_MissionName.setText(mission.getName());
-        tv_MissionDescription.setText(String.format(getResources().getString(R.string.holder_mission_description),mission.getSimpleDescription()));
+        tv_MissionDescription.setText(mission.getSimpleDescription());
         tv_MissionDetailDescription.setText(mission.getDetailDescription());
 
         int totalItemsNum = memoryDbHelper.getNumOfItemsOfMission(mission.getTableItem_suffix());

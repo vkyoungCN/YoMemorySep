@@ -13,6 +13,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +36,7 @@ public class LogoPageActivity extends AppCompatActivity {
 
     private TextView logoStrCn;
     private HorizontalProgressBar hpb_progress;//需要传入百分比的分子数值。
+    private LinearLayout llt_firstRun;
     private Context context = this;
 
     @Override
@@ -44,6 +46,7 @@ public class LogoPageActivity extends AppCompatActivity {
 
         logoStrCn = (TextView)findViewById(R.id.logo_cn);
         hpb_progress = findViewById(R.id.hpb_LPA);
+        llt_firstRun = findViewById(R.id.llt_forFirstRun_LPA);
 
         SharedPreferences sharedPreferences=getSharedPreferences("yoMemorySP", MODE_PRIVATE);
         boolean isFirstLaunch=sharedPreferences.getBoolean("IS_FIRST_LAUNCH", true);
@@ -51,8 +54,7 @@ public class LogoPageActivity extends AppCompatActivity {
         if(isFirstLaunch){
             //第一次运行：开启新线程执行DB填充操作然，同时提示。
             //完成后跳转下一页
-            hpb_progress.setVisibility(View.VISIBLE);
-            Toast.makeText(this, "首次运行，正在填充数据，请稍等……", Toast.LENGTH_LONG).show();
+            llt_firstRun.setVisibility(View.VISIBLE);
             new Thread(new PopTheDatabaseRunnable()).start();
 
             editor.putBoolean("IS_FIRST_LAUNCH", false);
@@ -74,14 +76,6 @@ public class LogoPageActivity extends AppCompatActivity {
 
             handler.sendMessage(message);
         }
-
-        public void setPercentNum(int num){
-            Message msgForNum = new Message();
-            msgForNum.what = MESSAGE_NEW_PERCENTAGE_NUMBER;
-            msgForNum.arg1 = num;
-            handler.sendMessage(msgForNum);
-        }
-
 
     }
 
@@ -147,6 +141,11 @@ public class LogoPageActivity extends AppCompatActivity {
         }
     }
 
+    /*
+    * 此方法在DB的填充逻辑中调用，用于根据填充的进度修改进度条的显示
+    * 【但是注意，由于DB的填充逻辑是在新线程中发起的，因而不能直接在此对hpb控件设置，
+    * 否则程序崩溃，提示大致为“新线程触碰了UI线程，不应这样做”】
+    * */
     public void setNewPercentNum(int percentageNum){
         Log.i(TAG, "setNewPercentNum:"+percentageNum);
         Message msgForNum = new Message();

@@ -190,20 +190,21 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
                 values.put(YoMemoryContract.ItemBasic.COLUMN_IS_LEARNED, false);
                 db.insert(YoMemoryContract.ItemBasic.TABLE_NAME + DEFAULT_ITEM_SUFFIX, null, values);
 
-                if(!reported_1 && readBytes>(totalBytes/5)){
-                    //读取了20%了，通知(只能通知一次)
+                if(!reported_1 && readBytes>(totalBytes/10)){
+                    //读取了10%了，通知(只能通知一次)
                     reported_1 = true;
                     //【以下这种操作要求本方法所在的“DB初始填充逻辑”只能在LogoPageActivity中运行。】
-                    ((LogoPageActivity)context).setNewPercentNum(21);
-                }else if(!reported_2 && readBytes>(totalBytes/2)){
+                    ((LogoPageActivity)context).setNewPercentNum(20);//设置为一个稍大的数字。
+                }else if(!reported_2 && readBytes>(totalBytes/4)){
                     reported_2 =true;
-                    ((LogoPageActivity)context).setNewPercentNum(50);
-                }else if(!reported_3 && readBytes>((totalBytes/4)*3)){
+                    ((LogoPageActivity)context).setNewPercentNum(45);
+                }else if(!reported_3 && readBytes>(totalBytes/2)){
                     reported_3 =true;
-                    ((LogoPageActivity)context).setNewPercentNum(75);
-                }else if(!reported_4 && readBytes>((totalBytes/100)*95)){
+                    ((LogoPageActivity)context).setNewPercentNum(90);
+                }else if(!reported_4 && readBytes>((totalBytes/10)*8)){
+                    //如果在8/10时通知，来不及显示。
                     reported_4 =true;
-                    ((LogoPageActivity)context).setNewPercentNum(99);
+                    ((LogoPageActivity)context).setNewPercentNum(100);
                 }
             }
         } catch (IOException e) {

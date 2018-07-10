@@ -131,7 +131,7 @@ public class HorizontalProgressBar extends View {
                 注意，本方法中传递的后一个参数（颜色int）只是用做默认值】
                 【本程序中直接在代码里设置了（initColor()）。】
                 case R.styleable.HorizontalProgressBar_numberSize:
-                    numberSize = typedArray.getDimensionPixelSize(attr, (int) TypedValue.applyDimension(
+                    textSize = typedArray.getDimensionPixelSize(attr, (int) TypedValue.applyDimension(
                             TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
                     break;
                     */

@@ -55,22 +55,36 @@
     </LinearLayout>
 
 
-    <com.vkyoungcn.smartdevices.yomemory.customUI.HorizontalProgressBar
-        android:id="@+id/hpb_LPA"
+    <!--下方放置HBP和一个提示tv-->
+    <LinearLayout
+        android:id="@+id/llt_forFirstRun_LPA"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="12dp"
-        app:desiredTotalHeight="70dp"
-        app:desiredTotalWidth="200dp"
-        app:barHeight="20dp"
-        app:startPadding="30dp"
-        app:endPadding="30dp"
-        app:bottomPadding="10dp"
-        app:lineWidth="2dp"
-        app:numberSize="12sp"
-        android:visibility="gone"
-        />
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tv_forFirstRun_LPA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/first_running" />
+
+        <com.vkyoungcn.smartdevices.yomemory.customUI.HorizontalProgressBar
+            android:id="@+id/hpb_LPA"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            app:barHeight="20dp"
+            app:bottomPadding="10dp"
+            app:desiredTotalHeight="70dp"
+            app:desiredTotalWidth="200dp"
+            app:endPadding="30dp"
+            app:lineWidth="2dp"
+            app:numberSize="12sp"
+            app:startPadding="30dp" />
+    </LinearLayout>
+
 
     <!--<TextView
         android:id="@+id/re_try_firstActivity"
