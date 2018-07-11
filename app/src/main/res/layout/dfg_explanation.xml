@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".fragments.GiveExplanationDiaFragment">
+
+    <!--标题-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp"
+        android:text="@string/explanation"
+        android:textColor="#424242"
+        android:background="#e0e0e0"
+        android:textSize="12sp" />
+    <!--文本-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp"
+        android:text="@string/explanations_all_app_01"
+        android:textColor="#424242"
+        android:textSize="12sp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp"
+        android:text="@string/explanations_all_app_02"
+        android:textColor="#424242"
+        android:textSize="12sp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp"
+        android:text="@string/explanations_all_app_11"
+        android:textColor="#424242"
+        android:textSize="12sp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp"
+        android:text="@string/explanations_all_app_12"
+        android:textColor="#424242"
+        android:textSize="12sp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp"
+        android:text="@string/explanations_all_app_13"
+        android:textColor="#424242"
+        android:textSize="12sp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp"
+        android:text="@string/explanations_all_app_14"
+        android:textColor="#424242"
+        android:textSize="12sp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp"
+        android:text="@string/explanations_all_app_15"
+        android:textColor="#424242"
+        android:textSize="12sp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp"
+        android:text="@string/explanations_all_app_16"
+        android:textColor="#424242"
+        android:textSize="12sp" />
+
+
+    <!--按钮-->
+    <TextView
+        android:id="@+id/btn_confirm_explanationGel"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="1dp"
+        android:background="#e0e0e0"
+        android:gravity="center"
+        android:text="@string/confirm"
+        android:textSize="16sp"
+        />
+
+
+</LinearLayout>

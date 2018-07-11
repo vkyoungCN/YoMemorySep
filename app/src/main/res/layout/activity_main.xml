@@ -111,7 +111,7 @@
         <LinearLayout
             android:id="@+id/llt_rlt_bottom_MA"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="52dp"
             android:background="#efefef"
             android:orientation="horizontal"
             android:padding="1dp"
@@ -119,13 +119,14 @@
             >
             <!--底部·第一个按键-->
             <TextView
+                android:id="@+id/btn_explain_MA"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="9"
-                android:text="@string/category"
+                android:layout_weight="8"
+                android:text="@string/explanations_1"
                 android:padding="8dp"
-                android:textSize="18sp"
                 android:gravity="center"
+                android:onClick="toExplanation"
                 />
 
             <!--小分割线-->
@@ -138,7 +139,7 @@
             <!--底部·第2个按键-->
             <TextView
                 android:layout_width="0dp"
-                android:layout_weight="9"
+                android:layout_weight="8"
                 android:layout_height="match_parent"
                 android:text="@string/str_default"
                 android:padding="8dp"

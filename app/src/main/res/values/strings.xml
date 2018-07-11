@@ -269,5 +269,21 @@
     <string name="for_more_missions">点击获取更多任务↓</string>
     <string name="get_more">更多+</string>
     <string name="scroll_right">向右滑动查看其他任务……</string>
+    <string name="explanations_1">程序\n使用说明</string>
+    <string name="explanations_all_app_01">字符字符字符：字符字符字符字符字符字符字符字符字符字符字符字符”</string>
+    <string name="explanations_all_app_02">字符字符字符字符字，字符字符字符字符字符字符字符字符字符字符字符字符</string>
+    <string name="explanations_all_app_11">认知规律表明：字符字符字符字符字符字符字，符字符字符字符字符字符。
+        字符字符字符字,符字①符字符字符字符字符字符字符字符，②字符字符字符字符字符字符字符字符。</string>
+    <string name="explanations_all_app_12">字符字符字符字符字符字符字符字符字符字符字符字符：①xxx：符字符字；②MS：符字符字。</string>
+    <string name="explanations_all_app_13">字符字符字符字符字符字符字符字符,字符字符字符字符。字符字符字符字符字符字。
+        字符字符字符字符字符字符,字符字符字符字符字符字符。</string>
+    <string name="explanations_all_app_14">字符字符字符字符字符字符字符字符字符字符字符字符字符字符字符字符
+        字符字符字。符字符字符字符字符字符字符字。符字符字符字符字符字符</string>
+    <string name="explanations_all_app_15">通常来说，字符字符字符字符字符字符字符字符字符字符字符字符。
+        如果间隔时间过久，字符字符字符字符字符字符字符字符字符字符字符字符，字符字符字符字符字符字符字符字符字。</string>
+    <string name="explanations_all_app_16">鼓励更早、更频繁的复习，这样有助于记忆效果的强化。但是必须指出，
+        字符字符字符字符字符字符字符字符字符字符字符字符</string>
+    <string name="explanation">说明</string>
+
 
 </resources>

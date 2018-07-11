@@ -58,14 +58,14 @@
     <!--第一行I&G区域-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="180dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
 
         <!--I&G区内第1列，item信息-->
         <LinearLayout
-            android:layout_width="128dp"
+            android:layout_width="125dp"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
@@ -127,7 +127,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="6dp"
+            android:padding="4dp"
             android:background="#ffffff"
             >
             <com.vkyoungcn.smartdevices.yomemory.customUI.PieChart
@@ -146,22 +146,23 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#efefef"
+        android:background="#cccccc"
         />
     <!--按钮组-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="48dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="1dp">
 
+        <!--彩色按键在这里反而很丑，不知道为什么-->
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_margin="1dp"
             android:layout_weight="9"
-            android:background="#ea80fc"
+            android:background="#f5f5f5"
             android:gravity="center"
             android:onClick="toAllItemsDetails"
             android:text="@string/go_items" />
@@ -171,16 +172,16 @@
             android:layout_height="match_parent"
             android:layout_margin="1dp"
             android:layout_weight="8"
-            android:background="#69f0ae"
+            android:background="#f5f5f5"
             android:gravity="center"
-            android:onClick="toAllItemsDetails"
+            android:onClick="learnNow"
             android:text="@string/go_now_1" />
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_margin="1dp"
             android:layout_weight="10"
-            android:background="#dce775"
+            android:background="#f5f5f5"
             android:gravity="center"
             android:onClick="toAllGroupsDetails"
             android:text="@string/go_groups" />
@@ -192,13 +193,14 @@
     <!--I&G区内第4行，解释条-->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="24dp"
         android:layout_marginBottom="2dp"
-        android:gravity="end|center"
+        android:gravity="end|top"
         android:paddingEnd="24dp"
         android:paddingStart="2dp"
         android:text="@string/str_clickAndGo_2"
         android:textColor="#ef5350"
+        android:background="#ffffff"
         android:textSize="12sp" />
 
     <!--横分割线-->

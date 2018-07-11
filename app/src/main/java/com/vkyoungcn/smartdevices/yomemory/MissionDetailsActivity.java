@@ -49,12 +49,12 @@ public class MissionDetailsActivity extends AppCompatActivity {
         tv_MissionDescription.setText(mission.getSimpleDescription());
         tv_MissionDetailDescription.setText(mission.getDetailDescription());
 
-//        int totalItemsNum = memoryDbHelper.getNumOfItemsOfMission(mission.getTableItem_suffix());
-        int totalItemsNum = 10000;
+        int totalItemsNum = memoryDbHelper.getNumOfItemsOfMission(mission.getTableItem_suffix());
+//        int totalItemsNum = 10000;
         tv_AllItemsNum.setText(String.format(getResources().getString(R.string.holder_total_itemNum),totalItemsNum));
 
-//        int totalLearnedItemsNum = memoryDbHelper.getLearnedNumOfItemsOfMission(mission.getTableItem_suffix());
-        int totalLearnedItemsNum =8700;
+        int totalLearnedItemsNum = memoryDbHelper.getLearnedNumOfItemsOfMission(mission.getTableItem_suffix());
+//        int totalLearnedItemsNum =8700;
         tv_LearnedItemsNum.setText(String.format(getResources().getString(R.string.holder_learned_itemNum),totalLearnedItemsNum));
 
         pc_pieChart.setData(totalItemsNum,totalLearnedItemsNum);
@@ -75,6 +75,11 @@ public class MissionDetailsActivity extends AppCompatActivity {
         Intent intentToGroups = new Intent(this,GroupsAndMissionDetailActivity.class);
         intentToGroups.putExtra("MISSION",mission);
         this.startActivity(intentToGroups);
+    }
+
+    public void learnNow(View view){
+        //弹出dfg提示：将进行“创建式学习”，系统会准备36个词汇，请尽力完成，最后根据实际完成的数量
+        // 生成一个新的分组。*完成后的分组也要及时进行复习哦。
     }
 
 }

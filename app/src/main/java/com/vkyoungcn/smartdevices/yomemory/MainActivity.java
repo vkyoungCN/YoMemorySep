@@ -1,5 +1,9 @@
 package com.vkyoungcn.smartdevices.yomemory;
 
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -9,10 +13,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.adapters.AllMissionRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.customUI.HorizontalProgressBar;
+import com.vkyoungcn.smartdevices.yomemory.fragments.GiveExplanationDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.models.Mission;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMission;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
@@ -31,6 +37,10 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
     private YoMemoryDbHelper memoryDbHelper;
     private ArrayList<Integer> starClickedPositions = new ArrayList<>();
     private ArrayList<RvMission> rvMissions;//应为要跨方法使用，最后需要存入DB。所以全局。
+    private TextView btn_explain;
+
+    SharedPreferences sharedPreferences;
+    boolean isBtnExplainBeenClicked;
 //    private HorizontalProgressBar hpb_progress;//测试用，暂时按时间更新进度。
 //    int count  = 5;//测试用
 //    public static final int MESSAGE_CHANGE_20 =5002;//测试用
@@ -52,6 +62,16 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
 
         allMissionRecyclerView = (RecyclerView) findViewById(R.id.all_missions_rv);
 //        hpb_progress = findViewById(R.id.hpb_MDA);
+        btn_explain = findViewById(R.id.btn_explain_MA);
+
+        //没有点击过“程序使用说明”按键时，将在其左上显示小标记。
+        sharedPreferences = getSharedPreferences("yoMemorySP", MODE_PRIVATE);
+        isBtnExplainBeenClicked = sharedPreferences.getBoolean("BTN_EXPLAIN_CLICKED", false);
+
+        if(!isBtnExplainBeenClicked){
+            //未曾点击过
+            btn_explain.setBackgroundResource(R.drawable.red_mark_for_btn);
+        }
 
     }
 
@@ -184,4 +204,29 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
         }
 
     }
+
+    public void toExplanation(View view){
+        //弹出说明
+        //取消按钮上的新按钮标识
+        btn_explain.setBackgroundResource(0);
+        //改变相应记录
+        isBtnExplainBeenClicked = true;
+        //改变相应全局记录。
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("BTN_EXPLAIN_CLICKED", true);
+        editor.apply();
+
+        //弹出DFG
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag("GIVE_EXPLANATION");
+
+        if (prev != null) {
+            Toast.makeText(this, "Old DialogFg still there, removing first...", Toast.LENGTH_SHORT).show();
+            transaction.remove(prev);
+        }
+        DialogFragment dfg = GiveExplanationDiaFragment.newInstance();
+        dfg.show(transaction, "GIVE_EXPLANATION");
+
+    }
+
 }
