@@ -65,7 +65,7 @@
 
         <!--I&G区内第1列，item信息-->
         <LinearLayout
-            android:layout_width="132dp"
+            android:layout_width="128dp"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
@@ -76,6 +76,7 @@
                 android:layout_height="36dp"
                 android:gravity="center"
                 android:text="@string/holder_total_itemNum"
+                android:lines="1"
                 android:textColor="#f57f17" />
             <!--横向小分割线-->
             <TextView
@@ -88,6 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:gravity="center"
+                android:lines="1"
                 android:text="@string/holder_learned_itemNum"
                 android:textColor="#f57f17" />
 
@@ -103,6 +105,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:gravity="center"
+                android:lines="1"
                 android:text="@string/holder_total_groupNum" />
 
             <!--横向小分割线-->
@@ -121,9 +124,21 @@
             android:background="#efefef" />
 
         <!--I&G区内第2列，饼图区-->
-        <Space
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:padding="6dp"
+            android:background="#ffffff"
+            >
+            <com.vkyoungcn.smartdevices.yomemory.customUI.PieChart
+                android:id="@+id/pieChart_MDA"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                />
+
+        </FrameLayout>
+
 
     </LinearLayout>
 
