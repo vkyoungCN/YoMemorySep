@@ -151,7 +151,7 @@
     <!--按钮组-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="46dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="1dp">
@@ -189,11 +189,16 @@
 
 
     </LinearLayout>
-
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#b2ff59"
+        />
     <!--I&G区内第4行，解释条-->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="24dp"
+        android:layout_height="20dp"
         android:layout_marginBottom="2dp"
         android:gravity="end|top"
         android:paddingEnd="24dp"

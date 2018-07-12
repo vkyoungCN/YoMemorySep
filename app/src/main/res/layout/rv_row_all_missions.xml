@@ -66,9 +66,31 @@
             android:layout_width="match_parent"
             android:layout_height="42dp" />
 
+
+
+
     </LinearLayout>
 
 
+
+    <!--进度·文本，依靠下边距来躲开下方各控件-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/progress"
+        android:textSize="12sp"
+        android:layout_marginStart="2dp"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="95dp"
+        />
+    <com.vkyoungcn.smartdevices.yomemory.customUI.LiteProgress
+        android:id="@+id/litePB_RvAM"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="49dp"
+        android:translationZ="1dp"
+        />
 
     <!--下方是两个按钮（摆放更多按钮不好看）-->
     <!--llt的缩进是为了不挡圆角-->
@@ -80,7 +102,9 @@
         android:paddingStart="2dp"
         android:paddingEnd="2dp"
         android:paddingBottom="2dp"
-        android:gravity="center">
+        android:gravity="center"
+        android:translationZ="2dp"
+        >
 
         <TextView
             android:layout_width="0dp"
@@ -104,10 +128,5 @@
 
 
     </LinearLayout>
-
-
-
-
-
 
 </android.support.v7.widget.CardView>

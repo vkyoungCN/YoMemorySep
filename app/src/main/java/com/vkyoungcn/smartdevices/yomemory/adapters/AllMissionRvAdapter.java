@@ -15,6 +15,7 @@ import com.vkyoungcn.smartdevices.yomemory.ItemsAndMissionDetailActivity;
 import com.vkyoungcn.smartdevices.yomemory.MainActivity;
 import com.vkyoungcn.smartdevices.yomemory.MissionDetailsActivity;
 import com.vkyoungcn.smartdevices.yomemory.R;
+import com.vkyoungcn.smartdevices.yomemory.customUI.LiteProgress;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMission;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
         private final TextView title;
         private final ImageView star;
         private final TextView simpleDetail;
+        private final LiteProgress litePB;
 
 //        private final TextView groupsOfThis;//跳到任务详情与所属分组页
         private final TextView tv_toMissionDetails;//跳到任务详情与所属资源页
@@ -51,6 +53,7 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
             tv_toMissionDetails = itemView.findViewById(R.id.tv_toMissionDetails_rvAllMissions);
             simpleDetail = itemView.findViewById(R.id.tv_sDetail_rvAllMission);
             star = itemView.findViewById(R.id.starAtStart);
+            litePB = itemView.findViewById(R.id.litePB_RvAM);
 
             title.setOnClickListener(this);//点击名称区域后，下方llt展开显示
 //            groupsOfThis.setOnClickListener(this);
@@ -69,6 +72,10 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
 
         public TextView getSimpleDetail() {
             return simpleDetail;
+        }
+
+        public LiteProgress getLitePB() {
+            return litePB;
         }
 
         @Override
@@ -149,6 +156,8 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
         holder.getTitle().setText(mission.getName());
         holder.getStar().setImageDrawable(context.getDrawable(mission.getStartResourceId()));
         holder.getSimpleDetail().setText(mission.getSimpleDescription());
+        holder.getLitePB().setPercentage(mission.getDonePercentage());
+//        holder.getLitePB().setPercentage(0.9f);
 
     }
 

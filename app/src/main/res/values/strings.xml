@@ -284,6 +284,7 @@
     <string name="explanations_all_app_16">鼓励更早、更频繁的复习，这样有助于记忆效果的强化。但是必须指出，
         字符字符字符字符字符字符字符字符字符字符字符字符</string>
     <string name="explanation">说明</string>
+    <string name="progress">进度：</string>
 
 
 </resources>

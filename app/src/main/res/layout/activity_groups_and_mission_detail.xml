@@ -86,7 +86,7 @@
                 android:gravity="center"
                 android:textSize="20sp"
                 android:textColor="#4527a0"
-                android:text="@string/num_18"
+                android:text="@string/sharp_x2_default"
                 android:background="#f5f5f5"
                 />
 
@@ -291,7 +291,7 @@
         android:alpha="0.7"
         android:background="#111111"
         android:translationZ="4dp"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <!--FAB组的解释性文本组，位于FAB下方。其中设置44底边距，以让出下方按键的空间-->
         <LinearLayout

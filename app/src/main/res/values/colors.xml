@@ -26,6 +26,11 @@
     <color name="horizontalPB_color_notYet">#a0a0a0</color>
     <color name="horizontalPB_color_char">#3f3f3f</color>
 
+    <color name="litePB_color_done">#ffe082</color>
+    <color name="litePB_color_outLine">#a0a0a0</color>
+    <color name="litePB_color_index">#ff9800</color>
+    <color name="litePB_color_char">#616161</color>
+
     <color name="pieChart_total">#bdbdbd</color>
     <color name="pieChart_fraction">#ff8a65</color>
     <color name="pieChart_empty_out">#ffffff</color>

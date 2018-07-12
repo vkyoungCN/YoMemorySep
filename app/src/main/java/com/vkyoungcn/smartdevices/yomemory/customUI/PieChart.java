@@ -123,7 +123,7 @@ public class PieChart extends View {
                     textSize =  (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics());
 
                     padding_H = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 9, getResources().getDisplayMetrics());
-           // rectF = new RectF();
+           // totalRectF = new RectF();
 
     }
 

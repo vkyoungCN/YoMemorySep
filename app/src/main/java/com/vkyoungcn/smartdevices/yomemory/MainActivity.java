@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
             //转换成适合于Rv显示的RvMission类。
             rvMissions = new ArrayList<>();
             for (Mission m :missions) {
-                rvMissions.add(new RvMission(m));
+                rvMissions.add(new RvMission(getApplicationContext(),m));
             }
 
             Message message = new Message();
@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
         if(line == -1){
             Toast.makeText(this, "something goes wrong!", Toast.LENGTH_SHORT).show();
         }else {
-            rvMissions.add(new RvMission(mission));
+            rvMissions.add(new RvMission(getApplicationContext(),mission));
             allMissionRvAdapter.notifyDataSetChanged();
         }
 
