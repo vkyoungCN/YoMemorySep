@@ -29,7 +29,13 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 /*
-* 进入本Activity之前，经过一个预准备数据用的专用Activity，从该页面传来的数据有：
+ *
+ * 作者1：杨胜@中国海洋大学图馆
+ * 作者2：杨镇时@中国海洋大学
+ * author：Victor Young @Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ *
+ * 进入本Activity之前，经过一个预准备数据用的专用Activity，从该页面传来的数据有：
 * ①tableSuffix；②learningType；③ArrayList<SingleItems>主体数据；以及：
 * ④（仅LG）gid；⑤(仅LMerge)gids列表List。
 * 数据的获取和完结分别在前、后页面完成。本页只负责学习逻辑（和最小限度的确保前后逻辑完整的业务）。
@@ -63,7 +69,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
     private int learningType;//Intent传入。
     private String tableNameSuffix;//Intent传入。
     private ArrayList<SingleItem> items;//Intent传入。数据源
-    private ArrayList<String> targetCodes;//用于条纹进度条。
+    private ArrayList<String> targetCodes = new ArrayList<>();//用于条纹进度条。
 
     private int groupId;//Intent传入。（仅LG模式下）
     private int missionId;//Intent传入。（仅LCO/LCR模式下）仅在最后（完成页）创建新组时使用
@@ -73,6 +79,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
     //【原方案还有一个布尔List用于记录各VE正误情况，今认为应少建高开销资源，直接在Activity中利用上一List对比。且实际状态有三，布尔不符】
     private String veCacheString = "";//记录正在输入的VE的内容，在滑动卡片时存入list并置空。
     // (该字串在回调监听中设置，设计为VE每增删一个有效字符本字串被改写一次，但上下限与VE同不会越界修改)
+    private ArrayList<Byte> restChances;
 
 //    private boolean autoSliding = true;//（在VE填写正确时）自动向后滑动的设置开关。
 
@@ -154,8 +161,8 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
 
         tv_currentPageNum = (TextView)findViewById(R.id.currentPageNum_learningActivity);
         tv_totalPageNum = (TextView)findViewById(R.id.totalPageNum_learningActivity);//总数字需要在数据加载完成后设置，在handleMessage中处理
-
-        tv_rollLabel = (TextView)findViewById(R.id.tv_rollLabel_learningActivity) ;
+        tv_totalPageNum.setText(String.valueOf(items.size()));
+//        tv_rollLabel = (TextView)findViewById(R.id.tv_rollLabel_learningActivity) ;
 
         tv_finish = (TextView)findViewById(R.id.finish_tv_learningActivity);
         fab_finish = (FloatingActionButton)findViewById(R.id.finish_fab_learningActivity);
@@ -165,12 +172,19 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
             targetCodes.add(si.getName());
         }
         spb_bar.setTargetCodes(targetCodes);
-        veFillings = new ArrayList<>();
+        veFillings = new ArrayList<>();//只这样初始化是不够的，后面按索引位置设置值时会提示越界错误
+        restChances = new ArrayList<>();
+        //彻底初始化如下
+        for (int i =0;i<items.size();i++){
+            veFillings.add("");
+            restChances.add((byte)3);//默认可提示次数，3。【后期可开放修改】
+        }
+
         spb_bar.setCurrentCodes(veFillings);
 
         viewPager = (ViewPager) findViewById(R.id.viewPager_ItemLearning);
 
-        LearningViewPrAdapter learningVpAdapter = new LearningViewPrAdapter(getSupportFragmentManager(), items);
+        LearningViewPrAdapter learningVpAdapter = new LearningViewPrAdapter(getSupportFragmentManager(), items,restChances);
         viewPager.setAdapter(learningVpAdapter);
 
         //给Vpr设置监听
@@ -185,6 +199,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
 
             /*
             * 本方法中需要完成的任务：
+            * 0,获取当前卡片索引位置
             * ①设置页脚数字
             * ②判断并设置最大已滑动值
             * ③（由于刚进入新页）将VE缓存（对应上一页内容）存入String列表；并检测本页对应位置上是否有值，有则传入。
@@ -197,6 +212,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 //据文档，本方法调用时，滑动已经完成。
+                currentPagePosition = position;//其他方法需使用
 
                 //任务一：
                 //设置底端页码显示逻辑
@@ -211,20 +227,25 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
                 }
 
                 //任务三：
-                //将上一页的（用于记录输入信息的）临时字串存入List，临时字串清空备用
+                //将上一页的（用于记录输入信息的）临时字串存入List，临时字串清空备用。
                 veFillings.set(oldPagePosition, veCacheString);
                 //本页VE缓存（如果有）设置给VE
                 if(veFillings.get(position)!=null){//若为空串""则是可以设置的。
-                    ValidatingEditor vdEt = ((LearningViewPrAdapter)viewPager.getAdapter()).currentFragment.getView().findViewById(R.id.ve_singleItemLearning);
-                    vdEt.setInitText(veFillings.get(position));
+                    try {
+                        ValidatingEditor vdEt = ((LearningViewPrAdapter)viewPager.getAdapter()).currentFragment.getView().findViewById(R.id.ve_singleItemLearning);
+                        vdEt.setInitText(veFillings.get(position));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     veCacheString = veFillings.get(position);//缓存要保持一致，否则（比如非空VE而cache置空的话）第三次滑到时内容就删除了。
 
                 }else {
                     veCacheString = "";//列表内无缓存时置空
                 }
 
-                //任务四，重设UI应该位于任务三修改字串列表之后。因为需要基于字串列表来修改状态。
-                spb_bar.reFreshStripes(oldPagePosition,position);
+                //任务四，重设UI。
+                // 本任务位于任务三修改字串列表之后。因为需要基于字串列表来修改状态。
+                spb_bar.resetStripeAt(oldPagePosition,position);
 
 
                 if(!isFabShowing){
@@ -485,7 +506,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
         //先将当前页的缓存字串存入缓存字串列表
         veFillings.set(currentPagePosition, veCacheString);
         //部分更新spb，并重绘
-        spb_bar.handyCurrentReFresh(currentPagePosition);
+//        spb_bar.handyCurrentReFresh(currentPagePosition);
 
 
         //记录所剩时间
@@ -501,6 +522,16 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
         }
         DialogFragment dfg = LearningHandyFinishDiaFragment.newInstance(spb_bar.getEmptyPositions(),spb_bar.getWrongPositions(),(int)timeRestInSec);
         dfg.show(transaction,"HANDY_FINISH");
+
+    }
+
+
+    /*
+    * 用于：在所含有的SingleLearningFragment（所对应卡片）的提示次数变动时，
+    * 通知本Activity修改所持有的相对应的全局状态列表
+    * */
+    public void modifyCardsRestTipChances(int newNumber){
+        restChances.set(currentPagePosition,(byte)newNumber);
 
     }
 

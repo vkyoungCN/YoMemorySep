@@ -4,14 +4,23 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
+    <color name="yo_orange">#ff9800</color>
+    <color name="yo_light_green">#b2ff59</color>
+    <color name="yo_gray_light">#f5f5f5</color>
+    <color name="yo_gray_middle">#e0e0e0</color>
+    <color name="yo_gray_heavy">#bdbdbd</color>
+    <color name="yo_red">#dd2c00</color>
+    <color name="yo_teal">#1de9b6</color>
+
+
     <color name="bottomLine_default_color">#aeea00</color>
     <color name="bottomLine_nonCorrect_color">#eef44336</color>
 
-    <color name="singleStripe_color_correct">#aeea00</color>
-    <color name="singleStripe_color_nonCorrect">#ff6e40</color>
+    <color name="singleStripe_color_correct">#76ff03</color>
+    <color name="singleStripe_color_nonCorrect">#f06292</color>
     <color name="singleStripe_color_empty">#e0e0e0</color>
     <color name="some_thing_wrong">#757575</color>
-    <color name="enclose_white">#ffffff</color>
+    <color name="singleStripe_color_outLine">#ff9800</color>
 
     <color name="lite_gray">#f5f5f5</color>
     <color name="white">#ffffff</color>

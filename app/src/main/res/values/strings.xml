@@ -285,6 +285,21 @@
         字符字符字符字符字符字符字符字符字符字符字符字符</string>
     <string name="explanation">说明</string>
     <string name="progress">进度：</string>
+    <string name="random_re_pick">随机复习</string>
+    <string name="fast_re_pick">快速复习</string>
+    <string name="fast_learn">快速学习</string>
+    <string name="random_or_order">随机or顺序</string>
+    <string name="set_as_default">设为默认</string>
+    <string name="tip_fastLearn_1">将预先以顺序或随机方式选取一定数量的词汇，根据最终学习完成的数量记录为新的分组。
+        \n分散复习的效率高于集中复习，故容量将限制在36个以内。</string>
+    <string name="tip_fastLearn_3">*可在程序→设置中取消本提示框的显示。</string>
+    <string name="fast_learn_2">开始快速学习</string>
+    <string name="no_more_show">不再显示本对话框</string>
+    <string name="confirm_go">确认并开始</string>
+    <string name="commit_when_confirm">点击确定时提交↑</string>
+    <string name="could_change_in_setting">*可以在程序→设置中重新开启显示。</string>
+    <string name="under_learning">正在学习</string>
+    <string name="rest_chances_1">剩余提示次数</string>
 
 
 </resources>

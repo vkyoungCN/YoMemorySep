@@ -14,7 +14,7 @@
         android:layout_gravity="center"
         android:gravity="center_horizontal|bottom"
         android:text="@string/YouMemoryEn"
-        android:textColor="#006064"
+        android:textColor="#3F51B5"
         android:textSize="28sp" />
     <TextView
         android:layout_width="wrap_content"
@@ -79,8 +79,9 @@
 
         </LinearLayout>
 
-        <!--次次底部的提示条-->
+        <!--次次底部的提示条.仅在任务数量>3（此时布满全横屏）时提示滑动-->
         <TextView
+            android:id="@+id/tv_slideForMore_MA"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -89,6 +90,7 @@
             android:layout_gravity="top"
             android:layout_marginTop="312dp"
             android:translationZ="1dp"
+            android:visibility="gone"
             />
 
 
@@ -184,7 +186,13 @@
 
         </LinearLayout>
 
-
+        <!--横分割线。此线位于最下，要保留-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#b2ff59"
+            android:layout_gravity="bottom"
+            />
     </FrameLayout>
 
 

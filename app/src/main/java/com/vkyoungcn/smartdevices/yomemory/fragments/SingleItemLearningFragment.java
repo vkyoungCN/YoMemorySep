@@ -10,10 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.vkyoungcn.smartdevices.yomemory.LearningActivity;
 import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
 import com.vkyoungcn.smartdevices.yomemory.validatingEditor.ValidatingEditor;
@@ -30,8 +32,7 @@ public class SingleItemLearningFragment extends Fragment implements View.OnClick
 
     private SingleItem singleItem;
 
-    private TextView tv_restChances;
-    private int restTipChances = 3;//默认3次开始。
+    private int restTipChances;//默认3次开始（外部有传入）。
 
     private TextView tv_priorityAdd;
     private TextView tv_priorityNum;
@@ -39,8 +40,11 @@ public class SingleItemLearningFragment extends Fragment implements View.OnClick
     private TextView tv_errNum;
 
     private TextView tv_surfaceName;
+    private FrameLayout flt_surfaceName;
     private LinearLayout llt_surfaceVe;
-    private ImageView imv_surfaceVe;
+    private TextView tv_TipRestTimes;
+    private FrameLayout flt_showTips;
+    private ImageView imv_showTips;//图标在可用次数用完时消失（实际上的点击监听是所由在的flt监听的。）
     private ValidatingEditor ve_ValidatingEditor;
 
     private TextView tv_phonetic;
@@ -57,10 +61,11 @@ public class SingleItemLearningFragment extends Fragment implements View.OnClick
         // Required empty public constructor
     }
 
-    public static SingleItemLearningFragment newInstance(SingleItem singleItem) {
+    public static SingleItemLearningFragment newInstance(SingleItem singleItem,int restTipChances) {
         SingleItemLearningFragment fragment = new SingleItemLearningFragment();
         Bundle args = new Bundle();
         args.putParcelable(SINGLE_ITEM, singleItem);
+        args.putInt("REST_TIP_CHANCES",restTipChances);
         fragment.setArguments(args);
         return fragment;
     }
@@ -70,6 +75,7 @@ public class SingleItemLearningFragment extends Fragment implements View.OnClick
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             singleItem = getArguments().getParcelable(SINGLE_ITEM);
+            restTipChances = getArguments().getInt("REST_TIP_CHANCES",3);
         }
         manager = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
 
@@ -80,17 +86,24 @@ public class SingleItemLearningFragment extends Fragment implements View.OnClick
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView =  inflater.inflate(R.layout.fragment_single_item_learning, container, false);
-        CardView cardView =(CardView) rootView.findViewById(R.id.card_view);
+        CardView cardView =(CardView) rootView.findViewById(R.id.cardView_sIL);
+        cardView.setOnClickListener(this);
 
-        tv_restChances = (TextView)rootView.findViewById(R.id.tv_restChances_sIL_CDV);
         tv_priorityAdd = (TextView)rootView.findViewById(R.id.tv_priorityAdd_sIL_CDV);
         tv_priorityNum = (TextView)rootView.findViewById(R.id.tv_priorityNum_sIL_CDV);
         tv_priorityMinus = (TextView)rootView.findViewById(R.id.tv_priorityMinus_sIL_CDV);
         tv_errNum = (TextView)rootView.findViewById(R.id.tv_errNum_sIL_CDV);
 
         tv_surfaceName = (TextView) rootView.findViewById(R.id.tv_surfaceName_sIL_CDV);
+        flt_surfaceName = (FrameLayout) rootView.findViewById(R.id.flt_surfaceName_sIL_CDV);
         llt_surfaceVe = (LinearLayout) rootView.findViewById(R.id.llt_surfaceVe_sIL_CDV);
-        imv_surfaceVe = (ImageView)rootView.findViewById(R.id.imv_showTip_sIL_CDV);
+        flt_showTips = (FrameLayout) rootView.findViewById(R.id.flt_showTips_sIL);
+        flt_showTips.setOnClickListener(this);
+
+        imv_showTips = (ImageView)rootView.findViewById(R.id.imv_showTips_sIL);
+
+        tv_TipRestTimes = (TextView)rootView.findViewById(R.id.tv_restTipTimes_sIL_CDV);
+        tv_TipRestTimes.setText(String.valueOf(restTipChances));
 
         ve_ValidatingEditor = (ValidatingEditor) rootView.findViewById(R.id.ve_singleItemLearning);
 //        ve_ValidatingEditor.requestFocus();//因为发现焦点默认在cardView上。[改为点击后申请获取]
@@ -99,7 +112,6 @@ public class SingleItemLearningFragment extends Fragment implements View.OnClick
         tv_translation = (TextView) rootView.findViewById(R.id.tv_translation_singleItemLearning);
 
 
-        tv_restChances.setText(String.format(getContext().getResources().getString(R.string.rest_chances),restTipChances));
 
         tv_priorityAdd.setOnClickListener(this);
         tv_priorityNum.setText(String.valueOf(singleItem.getPriority()));
@@ -116,7 +128,7 @@ public class SingleItemLearningFragment extends Fragment implements View.OnClick
 
         ve_ValidatingEditor.setTargetText(singleItem.getName());
         ve_ValidatingEditor.setCodeReadyListener(mListener);//该监听由Activity实现，这样就将二者关联起来了。
-        ve_ValidatingEditor.setOnClickListener(this);//【新版中，VE点击只获取焦点】
+        ve_ValidatingEditor.setOnClickListener(this);//VE点击只获取焦点
 
         EditorInfo veEditorInfo = new EditorInfo();
         veEditorInfo.inputType = InputType.TYPE_NULL;
@@ -162,44 +174,49 @@ public class SingleItemLearningFragment extends Fragment implements View.OnClick
                     break;
                     //【考虑到都是引用参数，故而最后应该不需特别处理就能存入DB】
 
-                case R.id.tv_surfaceName_sIL_CDV:
+               /* case R.id.flt_surfaceName_sIL_CDV:
                     //点击后翻转到VE层面。
                     isNameSurfaceOn = false;
                     llt_surfaceVe.setVisibility(View.VISIBLE);
-                    tv_surfaceName.setVisibility(View.GONE);
+                    flt_surfaceName.setVisibility(View.GONE);
 
                     //其中，如果已是多次提示状态，则翻面后不再显示提示按钮。
+                    //【这里需要由Activity全局持有，以免翻页翻回后重置】
                     if(restTipChances==0){
-                        imv_surfaceVe.setVisibility(View.INVISIBLE);
-                        imv_surfaceVe.setClickable(false);
+                        tv_TipRestTimes.setVisibility(View.INVISIBLE);
+                        tv_TipRestTimes.setClickable(false);
                     }
 
-                    break;
-                case R.id.imv_showTip_sIL_CDV:
+                    break;*/
+                case R.id.flt_showTips_sIL:
                     //点击后（限次3次）翻转到Name层面
                     //3次后设为invisible（不能设gone）
-                    if(restTipChances>0) {
-                        //仍有可用的提示次数，则
+
+                    if(restTipChances>0&&!isNameSurfaceOn) {
+                        //仍有可用的提示次数，且处于翻面（正面就不用触发了，否则只减次数没效果。）
                         isNameSurfaceOn = true;
                         restTipChances--;
+                        //可用次数减少则通知Activity，修改其持有的全局可用次数总列表
+                        ((LearningActivity)getActivity()).modifyCardsRestTipChances(restTipChances);
+
                         llt_surfaceVe.setVisibility(View.GONE);
-                        tv_surfaceName.setVisibility(View.VISIBLE);
+                        flt_surfaceName.setVisibility(View.VISIBLE);
+                        tv_TipRestTimes.setText(String.valueOf(restTipChances));
+                        if(restTipChances == 0){
+                            //图标消失
+                            imv_showTips.setVisibility(View.GONE);
+                        }
 
                     }
 
                     break;
 
-                case R.id.card_view:
+                case R.id.cardView_sIL:
                     if(isNameSurfaceOn) {
                         isNameSurfaceOn = false;
-                        //当前是正面，要反转
-                        tv_surfaceName.setVisibility(View.GONE);
+                        //当前是正面，要反转【点击卡片时只允许从正到翻面，以免影响提示次数统计】
+                        flt_surfaceName.setVisibility(View.GONE);
                         llt_surfaceVe.setVisibility(View.VISIBLE);
-                    }else {
-                        isNameSurfaceOn = true;
-                        //当前是反面，要反转
-                        tv_surfaceName.setVisibility(View.VISIBLE);
-                        llt_surfaceVe.setVisibility(View.GONE);
                     }
                     break;
                 case R.id.ve_singleItemLearning:
@@ -208,5 +225,9 @@ public class SingleItemLearningFragment extends Fragment implements View.OnClick
             }
 
         }
+
+   /* public int getRestTipChances() {
+        return restTipChances;
+    }*/
 
 }

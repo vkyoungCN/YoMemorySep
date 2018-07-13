@@ -36,6 +36,12 @@ import java.util.List;
 
 
 /*
+ *
+ * 作者1：杨胜@中国海洋大学图馆
+ * 作者2：杨镇时@中国海洋大学
+ * author：Victor Young @Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ *
  * 单个Mission及其所属分组的详情页；
  * 页面上部是Mission详情；
  * 页面下部是所属分组的集合展示（Rv）；默认要按某种顺序（待定）

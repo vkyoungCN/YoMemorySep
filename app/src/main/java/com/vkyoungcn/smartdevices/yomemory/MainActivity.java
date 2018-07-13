@@ -26,7 +26,14 @@ import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+import static com.vkyoungcn.smartdevices.yomemory.LogoPageActivity.YO_MEMORY_SP;
+
 /*
+ * 作者1：杨胜@中国海洋大学图书馆
+ * 作者2：杨镇时@中国海洋大学
+ * author：Victor Young @Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ *
  * 首页。
  * 上部预留横向图片式广告位（间隔滚动式）
  * 下方是任务列表；点击可进入新Activity查看任务情况。
@@ -38,16 +45,13 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
     private ArrayList<Integer> starClickedPositions = new ArrayList<>();
     private ArrayList<RvMission> rvMissions;//应为要跨方法使用，最后需要存入DB。所以全局。
     private TextView btn_explain;
+    private TextView tv_slideForMore;
 
     SharedPreferences sharedPreferences;
     boolean isBtnExplainBeenClicked;
-//    private HorizontalProgressBar hpb_progress;//测试用，暂时按时间更新进度。
-//    int count  = 5;//测试用
-//    public static final int MESSAGE_CHANGE_20 =5002;//测试用
     ;
     private Handler handler = new MainActivity.MainActivityHandler(this);//通过其发送消息。
 
-//    private ArrayList<RvMission> missions = new ArrayList<>();
     private RecyclerView allMissionRecyclerView;
 
     private AllMissionRvAdapter allMissionRvAdapter;//便于更新UI时调用，注意检查非空
@@ -61,18 +65,17 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
         new Thread(new FetchMissionsFromDBRunnable()).start();
 
         allMissionRecyclerView = (RecyclerView) findViewById(R.id.all_missions_rv);
-//        hpb_progress = findViewById(R.id.hpb_MDA);
         btn_explain = findViewById(R.id.btn_explain_MA);
+        tv_slideForMore = findViewById(R.id.tv_slideForMore_MA);
 
         //没有点击过“程序使用说明”按键时，将在其左上显示小标记。
-        sharedPreferences = getSharedPreferences("yoMemorySP", MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(YO_MEMORY_SP, MODE_PRIVATE);
         isBtnExplainBeenClicked = sharedPreferences.getBoolean("BTN_EXPLAIN_CLICKED", false);
 
         if(!isBtnExplainBeenClicked){
             //未曾点击过
             btn_explain.setBackgroundResource(R.drawable.red_mark_for_btn);
         }
-
     }
 
     public class FetchMissionsFromDBRunnable implements Runnable{
@@ -146,6 +149,9 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
                 allMissionRvAdapter = new AllMissionRvAdapter(rvMissions,this);//只要是从本消息到达，则rvMs一定有数据。
                 allMissionRecyclerView.setAdapter(allMissionRvAdapter);
 
+                if(rvMissions.size()>=3) {
+                    tv_slideForMore.setVisibility(View.VISIBLE);
+                }
 //                new Thread(new UpdateHpbOnTimeRunnable()).start();
 
                 break;

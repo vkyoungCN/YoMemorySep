@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
@@ -19,9 +20,15 @@ import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteract
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_AND_CREATE_RANDOM;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_AND_MERGE;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_GENERAL;
-
+/*
+ *
+ * 作者1：杨胜@中国海洋大学图馆
+ * 作者2：杨镇时@中国海洋大学
+ * author：Victor Young @Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+* */
 public class PrepareForLearningActivity extends AppCompatActivity {
-
+    private static final String TAG = "PrepareForLearningActiv";
     private int learningType;//Intent传来
     private String tableNameSuffix;
     private int groupId;//Intent传来，仅边建边学没有此数据。
@@ -140,7 +147,7 @@ public class PrepareForLearningActivity extends AppCompatActivity {
                 intentToLearningActivity_LCO.putExtra("TABLE_NAME_SUFFIX",tableNameSuffix);
                 intentToLearningActivity_LCO.putExtra("MISSION_ID",missionId);
                 intentToLearningActivity_LCO.putParcelableArrayListExtra("ITEMS_FOR_LEARNING",items);
-
+//                Log.i(TAG, "handleMessage: items done,size="+items.size());
                 intentToLearningActivity_LCO.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);//要求不记录
                 this.startActivity(intentToLearningActivity_LCO);
 

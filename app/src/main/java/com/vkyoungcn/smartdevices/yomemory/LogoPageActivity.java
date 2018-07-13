@@ -23,9 +23,14 @@ import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 import java.lang.ref.WeakReference;
 
 /*
+* 作者1：杨胜@中国海洋大学图书馆
+* 作者2：杨镇时@中国海洋大学
+* author：Victor Young @Ocean University of China
+* email: yangsheng@ouc.edu.cn
+*
 * 本页面是程序第一个页面
 * 职能：①欢迎（Logo动画）；②首次运行时向DB填充数据；③获取Mission信息向后传递（本项取消）
-* 本页一旦离开不能退回（在下一页特别实现）
+* 本页一旦离开不能退回（在下一页以禁止回退方式实现）
 * */
 public class LogoPageActivity extends AppCompatActivity {
     
@@ -33,6 +38,7 @@ public class LogoPageActivity extends AppCompatActivity {
     private Handler handler = new LogoPageActivity.FirstActivityHandler(this);//通过其发送消息。
     public static final int MESSAGE_DB_POPULATED = 5001;
     public static final int MESSAGE_NEW_PERCENTAGE_NUMBER = 5002;
+    public static final String YO_MEMORY_SP = "YO_MEMORY_SP";
 
     private TextView logoStrCn;
     private HorizontalProgressBar hpb_progress;//需要传入百分比的分子数值。
@@ -48,7 +54,7 @@ public class LogoPageActivity extends AppCompatActivity {
         hpb_progress = findViewById(R.id.hpb_LPA);
         llt_firstRun = findViewById(R.id.llt_forFirstRun_LPA);
 
-        SharedPreferences sharedPreferences=getSharedPreferences("yoMemorySP", MODE_PRIVATE);
+        SharedPreferences sharedPreferences=getSharedPreferences(YO_MEMORY_SP, MODE_PRIVATE);
         boolean isFirstLaunch=sharedPreferences.getBoolean("IS_FIRST_LAUNCH", true);
         SharedPreferences.Editor editor=sharedPreferences.edit();
         if(isFirstLaunch){

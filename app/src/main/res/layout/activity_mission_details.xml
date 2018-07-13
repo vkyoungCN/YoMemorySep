@@ -148,10 +148,10 @@
         android:layout_height="1dp"
         android:background="#cccccc"
         />
-    <!--按钮组-->
+    <!--按钮组1-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="46dp"
+        android:layout_height="42dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="1dp">
@@ -161,7 +161,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_margin="1dp"
-            android:layout_weight="9"
+            android:layout_weight="10"
             android:background="#f5f5f5"
             android:gravity="center"
             android:onClick="toAllItemsDetails"
@@ -171,21 +171,11 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_margin="1dp"
-            android:layout_weight="8"
-            android:background="#f5f5f5"
-            android:gravity="center"
-            android:onClick="learnNow"
-            android:text="@string/go_now_1" />
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_margin="1dp"
             android:layout_weight="10"
-            android:background="#f5f5f5"
+            android:background="#e0e0e0"
             android:gravity="center"
             android:onClick="toAllGroupsDetails"
             android:text="@string/go_groups" />
-
 
 
     </LinearLayout>
@@ -195,7 +185,7 @@
         android:layout_height="2dp"
         android:background="#b2ff59"
         />
-    <!--I&G区内第4行，解释条-->
+    <!--&lt;!&ndash;I&G区内第4行，解释条&ndash;&gt;
     <TextView
         android:layout_width="match_parent"
         android:layout_height="20dp"
@@ -206,7 +196,7 @@
         android:text="@string/str_clickAndGo_2"
         android:textColor="#ef5350"
         android:background="#ffffff"
-        android:textSize="12sp" />
+        android:textSize="12sp" />-->
 
     <!--横分割线-->
     <TextView
@@ -218,32 +208,25 @@
 
 
     <!--页面下部,任务简介-->
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <FrameLayout
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/mission_introduction"
             android:layout_marginTop="4dp"
             android:layout_marginStart="4dp"
-            android:background="#efefef"
-            android:paddingBottom="1dp"
+            android:textSize="18sp"
+            android:background="#ffffff"
             android:translationZ="1dp"
-            >
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/mission_introduction"
-
-                android:textSize="18sp"
-                android:background="#ffffff"
-                />
-        </FrameLayout>
+            />
 
         <TextView
             android:id="@+id/tv_mission_detailDescription_MDA"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_above="@+id/llt_btn2_MDA"
             android:layout_marginTop="20dp"
             android:padding="18dp"
             android:gravity="center"
@@ -252,6 +235,47 @@
             android:scrollbars="vertical"
             />
 
-    </FrameLayout>
+        <!--横分割线-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#64dd17"
+            android:layout_alignParentBottom="true"
+            />
+        <!--按钮组2-->
+        <LinearLayout
+            android:id="@+id/llt_btn2_MDA"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="1dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="1dp"
+                android:layout_weight="9"
+                android:background="#f5f5f5"
+                android:gravity="center"
+                android:onClick="learnNow"
+                android:text="@string/fast_learn" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="1dp"
+                android:layout_weight="9"
+                android:background="#e0e0e0"
+                android:gravity="center"
+                android:onClick="toAllItemsDetails"
+                android:text="@string/fast_re_pick" />
+
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
 
 </LinearLayout>

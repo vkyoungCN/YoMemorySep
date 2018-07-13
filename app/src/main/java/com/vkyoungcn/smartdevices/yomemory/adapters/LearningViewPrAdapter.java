@@ -8,21 +8,24 @@ import android.view.ViewGroup;
 import com.vkyoungcn.smartdevices.yomemory.fragments.SingleItemLearningFragment;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LearningViewPrAdapter extends FragmentStatePagerAdapter {
 //    private static final String TAG = "LearningViewPrAdapter";
     private List<SingleItem> singleItems;
+    private ArrayList<Byte> restChances;
     public SingleItemLearningFragment currentFragment;
 
-    public LearningViewPrAdapter(FragmentManager fm, List<SingleItem> singleItems) {
+    public LearningViewPrAdapter(FragmentManager fm, List<SingleItem> singleItems, ArrayList<Byte> restChances) {
         super(fm);
         this.singleItems = singleItems;
+        this.restChances = restChances;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return SingleItemLearningFragment.newInstance(singleItems.get(position));
+        return SingleItemLearningFragment.newInstance(singleItems.get(position),restChances.get(position));
     }
 
     @Override

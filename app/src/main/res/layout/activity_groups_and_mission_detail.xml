@@ -105,14 +105,32 @@
             android:layout_height="6dp"
             android:src="@drawable/slash_bars_red"
             android:scaleType="centerCrop"/>
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="28dp"
-            android:textSize="20sp"
-            android:gravity="center"
-            android:text="@string/groups_list"
-            android:background="#f8f8f8"
-            />
+            android:layout_height="36dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:textSize="20sp"
+                android:gravity="center"
+                android:text="@string/groups_list"
+                android:background="#f8f8f8"
+                />
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/find_gray"
+                android:padding="4dp"
+                android:scaleType="centerInside"
+                android:background="#efefef"
+                android:layout_margin="1dp"/>
+
+        </LinearLayout>
+
+
         <!--横向分割线-->
         <TextView
             android:layout_width="match_parent"
@@ -226,13 +244,14 @@
             android:id="@+id/maskOverRv_MissionDetail_GMDA"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            >
+            android:visibility="gone">
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="16sp"
                 android:gravity="center"
-                android:text="@string/hold_on_a_moment"/>
+                android:text="@string/hold_on_a_moment"
+                android:textSize="16sp" />
         </FrameLayout>
 
         <!--Rv部分-->
@@ -242,43 +261,21 @@
             android:layout_height="match_parent"
             />
 
-        <!--两个横排按钮，是FAB的主按键，位于Fl底部-->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginBottom="1dp"
-            android:layout_marginTop="1dp"
-            android:orientation="horizontal"
-            android:layout_gravity="bottom|center_horizontal"
-            android:elevation="2dp"
-            >
-            <!--增-->
-            <ImageView
-                android:id="@+id/addGroup_GroupAndMissionDetailActivity"
-                android:layout_width="64dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textSize="24sp"
-                android:background="#00e676"
-                android:src="@drawable/more"
-                android:onClick="fabMainClick"
-                />
+        <!--FAB主按键，位于Fl底部-->
+        <!--增-->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/addGroup_GroupAndMissionDetailActivity"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="12dp"
+            android:layout_marginEnd="12dp"
+            android:onClick="fabMainClick"
+            android:scaleType="fitCenter"
+            android:src="@drawable/plus_4"
+            app:backgroundTint="@color/litePB_color_index" />
 
 
-            <!--查-->
-            <ImageView
-                android:id="@+id/queryGroup_GroupAndMissionDetailActivity"
-                android:layout_width="64dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:background="#f9a825"
-                android:src="@drawable/find"
-                android:onClick="findGroup"
-                />
-
-        </LinearLayout>
     </FrameLayout>
 
 
