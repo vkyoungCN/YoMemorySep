@@ -34,7 +34,7 @@
     <string name="cancel">取消</string>
     <string name="add_new_group">创建新任务分组</string>
     <string name="default_group_decs3">默认可自动生成</string>
-    <string name="detail01">详情</string>
+    <string name="detail_1">详情</string>
     <string name="reserved">预留</string>
     <string name="items_belongs_to_group">所属项目列表</string>
     <string name="group_detail">分组详情</string>
@@ -180,10 +180,12 @@
     <string name="str_nothingHappend">就当没学过（放弃记录）</string>
     <string name="confirm_andSetErrs">不拆分\n（记错误项的出错次数+1）</string>
     <string name="confirm_andDevide">按正误拆分本组</string>
-    <string name="wrong_info_all_correct">所有单词填写正确</string>
-    <string name="wrong_info_un_correct">%1$d个单词错误，确认则错误记录+1</string>
+    <string name="wrong_info_all_correct">已填写的单词全部正确</string>
+    <string name="wrong_info_un_correct">已填写的单词中有%1$d个错误，点击确认后错误记录+1</string>
     <string name="empty_info_all_correct">所有单词已填写</string>
     <string name="empty_info_un_correct">%1$d个单词未填，确认将拆分分组</string>
+    <string name="empty_amount_divide">%1$d个单词未完成，将按完成与否拆分分组</string>
+    <string name="empty_amount_create">%1$d个单词未完成，未完成者将不被纳入分组</string>
     <string name="rest_min_and_sec">还剩%1$d分%2$d秒，可以返回查看</string>
     <string name="still_has_wrong_item">仍有%1$d个未填写正确，请检查。（点击可强行结束）</string>
     <string name="learn_and_repick">学而时习之……</string>
@@ -300,6 +302,19 @@
     <string name="could_change_in_setting">*可以在程序→设置中重新开启显示。</string>
     <string name="under_learning">正在学习</string>
     <string name="rest_chances_1">剩余提示次数</string>
+    <string name="finish_amount_equals_zero_LC">一个都没完成哦！不会生成新分组。</string>
+    <string name="finish_amount_equals_zero_LG">一个都没完成哦！</string>
+    <string name="finish_amount_some_LC">完成的%1$d个单词将记录为新的分组</string>
+    <string name="finish_amount_some_LG">总量%1$d个，未完成的%2$d个单词会被拆分到新分组</string>
+    <string name="finish_amount_some_LM">总量%1$d个，完成的%2$d个单词会合并到一个分组</string>
+    <string name="wrong_amount_equals_zero">完成部分全部正确！</string>
+    <string name="wrong_amount_some">完成部分有%1$d个单词错误。</string>
+    <string name="confirm_finish_2">确认结束</string>
+    <string name="click_and_more">更多功能</string>
+    <string name="click_and_more_2">更多功能</string>
+    <string name="re_pick">复习</string>
+    <string name="confirm_delete">确认删除</string>
+    <string name="confirm_delete_2">点击确认后将删除分组！</string>
 
 
 </resources>

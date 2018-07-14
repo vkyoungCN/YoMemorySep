@@ -285,8 +285,9 @@ public class ValidatingEditor extends View {
             if (characters.size() >= bottomLineSectionAmount ) {//满了
                 if(getCurrentString().compareTo(targetText) == 0) {
                     if(listener != null) {
-                        listener.onCodeCorrectAndReady();
-                        listener.onCodeChanged(getCurrentString());
+                        listener.onCodeChanged(getCurrentString());//需要在onCCA方法前调用，
+                        // 实测如果放在下一方法后，则最后一个字符无法传出。可能原因如下，
+                        listener.onCodeCorrectAndReady();//【本方法之后卡片自动滑动，相应组件可能已销毁，后续方法无效？】
                     }
                 }
             }else {//还没满（但显然也必须是输入开始后，每次输入（且已成功输入到了characters中后）才会触发）
@@ -298,11 +299,9 @@ public class ValidatingEditor extends View {
                         leastWrongPosition = currentPosition;//只需记录一次（最小索引位置）即可
                     }
                 }
+                listener.onCodeChanged(getCurrentString());
             }
 
-            //既然是输入动作（且已存入字符栈；也即会显示出来），就应通知Activity改变缓存字串。
-            //【此外，回删、存满都需要通知改变】
-            listener.onCodeChanged(getCurrentString());
             return true;
         } else {
             return false;

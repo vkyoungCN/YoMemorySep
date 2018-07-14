@@ -25,7 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:background="#f6f6f6f6"
+                android:background="#f5f5f5"
                 android:padding="8dp"
                 android:text="@string/mission_name_default"
                 android:textSize="16sp" />
@@ -33,16 +33,14 @@
             <TextView
                 android:id="@+id/tv_mission_detail_description"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:lines="2"
                 android:padding="4dp"
                 android:text="@string/mission_description_extra"
                 android:textSize="14sp"
-
                 />
-
 
         </LinearLayout>
 
@@ -50,7 +48,7 @@
         <TextView
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="#cdcdcd" />
+            android:background="#efefef" />
 
         <!--上部的右半区域-->
         <LinearLayout
@@ -72,10 +70,15 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="18sp"
-                android:textColor="#d84315"
+                android:textColor="@color/yo_orange"
                 android:text="@string/holder_pureNum_1"
                 />
-
+            <!--横向分割线-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#efefefef"
+                />
             <TextView
                 android:padding="2dp"
                 android:layout_width="match_parent"
@@ -122,7 +125,7 @@
             android:scaleType="centerCrop"/>
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="28dp"
+            android:layout_height="32dp"
             android:textSize="20sp"
             android:gravity="center"
             android:text="@string/resource_list"
@@ -131,12 +134,12 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#ff666666"
+            android:background="#9e9e9e"
             />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="36dp"
+            android:layout_height="28dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             >
@@ -152,7 +155,7 @@
             <TextView
                 android:layout_width="1dp"
                 android:layout_height="36dp"
-                android:background="#cce0e0e0"
+                android:background="#efefef"
                 />
 
             <!--列2：资源名-->
@@ -168,7 +171,7 @@
             <TextView
                 android:layout_width="1dp"
                 android:layout_height="36dp"
-                android:background="#cce0e0e0"
+                android:background="#efefef"
                 />
 
 
@@ -181,7 +184,12 @@
                 android:layout_height="match_parent"
                 android:text="@string/phonetic"
                 />
-
+            <!--分割线 -->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="36dp"
+                android:background="#efefef"
+                />
             <!--列4：释义-->
             <TextView
                 android:padding="2dp"
@@ -221,72 +229,30 @@
             android:layout_height="match_parent"
             />
 
-        <!--两个横排按钮，位于Fl底部-->
-        <LinearLayout
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_IAMD"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginBottom="1dp"
-            android:layout_marginTop="1dp"
-            android:orientation="horizontal"
-            android:layout_gravity="bottom|center_horizontal"
-            android:elevation="2dp"
-            >
-
-            <!--占位-->
-            <!--<ImageView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                />-->
-            <!--增-->
-            <ImageView
-                android:id="@+id/addItem_ItemAndMissionDetailActivity"
-                android:layout_width="64dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textSize="24sp"
-                android:background="#dd00e676"
-                android:src="@drawable/add_plus_gray"
-                />
-
-            <!--删-->
-            <!--删除操作改为长按
-            <ImageView
-                android:id="@+id/deleteItem_ItemAndMissionDetailActivity"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:background="#bbd50000"
-                android:src="@drawable/delete_minus_gray"
-                />-->
-
-            <!--改-->
-            <!--
-            改的按钮改为直接设计在条项内
-            <ImageView
-                android:id="@+id/modifyItem_ItemAndMissionDetailActivity"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:background="#f9a825"
-                android:src="@drawable/modify_spot_light_gray"
-                />-->
-            <!--查-->
-            <ImageView
-                android:id="@+id/queryItem_ItemAndMissionDetailActivity"
-                android:layout_width="64dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:background="#f9a825"
-                android:src="@drawable/query_right_gray"
-                />
-
-
-        </LinearLayout>
+            android:layout_height="wrap_content"
+            app:fabSize="normal"
+            android:layout_gravity="start|bottom"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="64dp"
+            android:src="@drawable/more_2"
+            android:scaleType="centerCrop"
+            android:translationZ="2dp"
+            />
+        <TextView
+            android:id="@+id/fabTv_IAMD"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/click_and_more_2"
+            android:layout_gravity="start|bottom"
+            android:layout_marginStart="12dp"
+            android:textSize="12sp"
+            android:textColor="#424242"
+            android:layout_marginBottom="48dp"
+            />
 
     </FrameLayout>
 

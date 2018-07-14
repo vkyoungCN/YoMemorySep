@@ -502,7 +502,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
 
     public ArrayList<SingleItem> getItemsByGroupId(int groupId, String tableNameSuffix){
-        Log.i(TAG, "getItemsByGroupId: before any.");
+//        Log.i(TAG, "getItemsByGroupId: before any.");
         ArrayList<SingleItem> items = new ArrayList<>();
 
         String selectQuery = "SELECT * FROM "+ YoMemoryContract.ItemBasic.TABLE_NAME+tableNameSuffix
@@ -526,7 +526,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
                 items.add(item);
             }while (cursor.moveToNext());
-            Log.i(TAG, "getItemsByGroupId: cursor ok.");
+//            Log.i(TAG, "getItemsByGroupId: cursor ok.");
         }else{
             return null;
         }
@@ -545,7 +545,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     * 新建的分组没由学习记录，不需要向Logs表写内容。
     * 新版Group类已不再持有所含Items的id列表，因而需要额外传入
     * */
-    public long createGroup(DBGroup dbGroup, ArrayList<Integer> subItemIds, String tableSuffix){
+    public int createGroup(DBGroup dbGroup, ArrayList<Integer> subItemIds, String tableSuffix){
         long l;
         getWritableDatabaseIfClosedOrNull();
 
@@ -558,12 +558,31 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
         l = mSQLiteDatabase.insert(YoMemoryContract.Group.TABLE_NAME, null, values);
 
-        setItemsChose(tableSuffix, subItemIds);
+        //需要获取新生成记录的gid列数据
+        String strGetGid = "SELECT "+YoMemoryContract.Group._ID+" FROM "+
+                YoMemoryContract.Group.TABLE_NAME+" WHERE "+
+                YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG+
+                " = "+dbGroup.getSettingUptimeInLong();
+        Cursor cursor = mSQLiteDatabase.rawQuery(strGetGid, null);
+        int gid = 0;
+        if(cursor.moveToFirst()){
+            gid  = cursor.getInt(0);
+        }
+//        int groupId = getGroupIdByLineWithOutOpenDb(l,tableSuffix);
+
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        setItemsChose(tableSuffix, gid, subItemIds);
         mSQLiteDatabase.setTransactionSuccessful();
         mSQLiteDatabase.endTransaction();
 
+
         closeDB();
-        return l;
+        return gid;
     }
 
     /*
@@ -589,6 +608,11 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         Cursor cursor = mSQLiteDatabase.rawQuery(queryNewGroupId,null);
         if(cursor.moveToFirst()){
             gid = cursor.getInt(0);
+        }
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         closeDB();
@@ -661,6 +685,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     * 需要读取两个表，group表获取4个字段、Logs表（经计算）获取两个字段
     * */
     public ArrayList<DBGroup> getAllGroupsByMissionId(int missionsId, String tableSuffix){
+//        Log.i(TAG, "getAllGroupsByMissionId: be");
         ArrayList<DBGroup> groups = new ArrayList<>();
         String selectQuery = "SELECT * FROM "+ YoMemoryContract.Group.TABLE_NAME+
                 " WHERE "+ YoMemoryContract.Group.COLUMN_MISSION_ID+" = "+missionsId;
@@ -709,7 +734,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     * 但是时间区间下限的记录则需要使用有效复习中的最大时间记录。
     * */
     private long getLastLearningTimeInLong(int groupId){
-        Log.i(TAG, "getLastLearningTimeInLong: be.");
+//        Log.i(TAG, "getLastLearningTimeInLong: be.");
         String selectLastTimeQuery = "SELECT "+YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG+
                 " FROM "+YoMemoryContract.LearningLogs.TABLE_NAME+" WHERE "+
                 YoMemoryContract.LearningLogs.COLUMN_GROUP_ID+" = "+groupId+" ORDER BY "+
@@ -737,7 +762,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     * 需要使用本时间记录。（不区分MS有效性的学习记录中的最大值，对于RMA和时间区间上限的计算有效）
     * */
     private long getLastEffectiveLearningTimeInLong(int groupId){
-        Log.i(TAG, "getLastEffectiveLearningTimeInLong: be.");
+//        Log.i(TAG, "getLastEffectiveLearningTimeInLong: be.");
         String selectLastTimeQuery = "SELECT "+YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG+
                 " FROM "+YoMemoryContract.LearningLogs.TABLE_NAME+" WHERE "+
                 YoMemoryContract.LearningLogs.COLUMN_GROUP_ID+" = "+groupId+
@@ -762,7 +787,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     }
 
     private byte getEffectiveLearningTime(int groupId){
-        Log.i(TAG, "getEffectiveLearningTime: be");
+//        Log.i(TAG, "getEffectiveLearningTime: be");
         String selectCountEffectiveQuery = "SELECT COUNT(*) "+" FROM "+
                 YoMemoryContract.LearningLogs.TABLE_NAME+" WHERE "+
                 YoMemoryContract.LearningLogs.COLUMN_GROUP_ID+" = "+groupId+
@@ -787,7 +812,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     * 用于内部
     * */
     private short getTotalSubItemsNumOfGroup(int groupId, String tableSuffix){
-        Log.i(TAG, "getTotalSubItemsNumOfGroup: be.");
+//        Log.i(TAG, "getTotalSubItemsNumOfGroup: be.");
         String selectNumSubItemsQuery = "SELECT COUNT(*) "+" FROM "+
                 YoMemoryContract.ItemBasic.TABLE_NAME+tableSuffix+" WHERE "+
                 YoMemoryContract.ItemBasic.COLUMN_GROUP_ID+" = "+groupId;
@@ -813,7 +838,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     * 用于外部，带关DB。
     * */
     public int getSubItemsNumOfGroup(int groupId, String tableSuffix){
-        Log.i(TAG, "getSubItemsNumOfGroup: be.");
+//        Log.i(TAG, "getSubItemsNumOfGroup: be.");
         String selectNumSubItemsQuery = "SELECT COUNT(*) "+" FROM "+
                 YoMemoryContract.ItemBasic.TABLE_NAME+tableSuffix+" WHERE "+
                 YoMemoryContract.ItemBasic.COLUMN_GROUP_ID+" = "+groupId;
@@ -888,10 +913,41 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
         }
         closeDB();
-
     }
 
 
+    /*
+    * 要删除一个分组，需要①group组删除，②items表资源还原（groupId列置-1，isChose置否……）
+    * ③logs表中的资源groupId置-1。【暂定用-1代表被删除资源】(Logs表是否要手动处理？)
+    * */
+    public void deleteGroupById(int groupId,String tableSuffix){
+        String deleteSingleGroupSql = "DELETE FROM "+ YoMemoryContract.Group.TABLE_NAME+" WHERE "+
+                YoMemoryContract.Group._ID+" = "+groupId;
+        getWritableDatabaseIfClosedOrNull();
+        mSQLiteDatabase.beginTransaction();
+
+        //这个方法没法返回结构状态【待。】
+        mSQLiteDatabase.execSQL(deleteSingleGroupSql);
+        setItemsUnChoseAndRemoveGid(tableSuffix,groupId);
+        setLogsWithMinusGid(groupId);
+
+        mSQLiteDatabase.setTransactionSuccessful();
+        mSQLiteDatabase.endTransaction();
+
+        closeDB();
+
+    }
+
+    public void setLogsWithMinusGid(int gid){
+        //gid暂定置为-1。表示是被删除过的。
+        String logsMinusGidSql = "UPDATE "+ YoMemoryContract.LearningLogs.TABLE_NAME+
+                " SET "+ YoMemoryContract.LearningLogs.COLUMN_GROUP_ID +
+                " = -1 WHERE "+ YoMemoryContract.LearningLogs.COLUMN_GROUP_ID+
+                " = "+gid;
+
+        mSQLiteDatabase.execSQL(logsMinusGidSql);
+        //因为位于其他方法开启的事务内，所以不能关DB。
+    }
 
 
     /*
@@ -949,6 +1005,28 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         return group;
     }
 
+    //取指定第几行上的分组的gid，但是在事务内，不需要开db
+    /*public int getGroupIdByLineWithOutOpenDb(long line,String tableSuffix){
+        int gid = 0;
+        String selectOneByLinesQuery = "SELECT "+YoMemoryContract.Group._ID+" FROM "+
+                YoMemoryContract.Group.TABLE_NAME+" LIMIT "+line+",1";
+        //【取最后一条的写法：】 " LIMIT (SELECT COUNT(*) FROM "+YoMemoryContract.Group.TABLE_NAME+" )-1,1";
+
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectOneByLinesQuery, null);
+
+        if(cursor.moveToFirst()){
+            gid  = cursor.getInt(0);
+        }
+
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return gid;
+    }
+*/
     /*
     * 为指定分组新增一条Logs学习记录
     * （在程序中提前判断好是否是“有效学习”，直接记在Log类中，此处直接使用。）
@@ -1107,7 +1185,25 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
     }
 
-    private void setItemsUnChose(String tableSuffix, ArrayList<Integer> itemIds){
+    /*
+    * 删除分组时，所含的items应当①置为未使用；②将item对应的gid置为-1。
+    * 置为未使用可以通过gid快速处理，而抽取时似乎只能构造iid范围列表字串
+    * */
+    private void setItemsUnChoseAndRemoveGid(String tableSuffix, int groupId){
+        getWritableDatabaseIfClosedOrNull();
+
+        //gid暂定置为-1。表示是被删除过的。
+        String itemsGiveBackSql = "UPDATE "+ YoMemoryContract.ItemBasic.TABLE_NAME+tableSuffix+
+                " SET "+ YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE +
+                " = 0,"+YoMemoryContract.ItemBasic.COLUMN_GROUP_ID+" = -1 "+
+                " WHERE "+ YoMemoryContract.ItemBasic.COLUMN_GROUP_ID+
+                " = "+groupId;
+
+        mSQLiteDatabase.execSQL(itemsGiveBackSql);
+        //因为位于其他方法开启的事务内，所以不能关DB。
+    }
+
+    /*private void setItemsUnChoseAndRemoveGid(String tableSuffix, ArrayList<Integer> itemIds){
         getWritableDatabaseIfClosedOrNull();
 
         if(itemIds==null||itemIds.isEmpty()){
@@ -1126,18 +1222,19 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         sbr.deleteCharAt(sbr.length()-2);
         sbr.append(")");
 
+        //gid暂定置为-1。表示是被删除过的。
         String itemsGiveBackSql = "UPDATE "+ YoMemoryContract.ItemBasic.TABLE_NAME+tableSuffix+
                 " SET "+ YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE +
-                " = 0 WHERE "+ YoMemoryContract.ItemBasic._ID+
+                " = 0,"+YoMemoryContract.ItemBasic.COLUMN_GROUP_ID+" = -1 "+
+                " WHERE "+ YoMemoryContract.ItemBasic._ID+
                 " IN "+sbr.toString();
 
         mSQLiteDatabase.execSQL(itemsGiveBackSql);
         //因为位于其他方法开启的事务内，所以不能关DB。
-    }
+    }*/
 
 
-    private void setItemsChose(String tableSuffix, ArrayList<Integer> subItemIds){
-        getWritableDatabaseIfClosedOrNull();
+    private void setItemsChose(String tableSuffix,int groupId, ArrayList<Integer> subItemIds){
 
         if(subItemIds==null||subItemIds.isEmpty()){
             return;
@@ -1155,7 +1252,8 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
         String itemsChoseSql = "UPDATE "+ YoMemoryContract.ItemBasic.TABLE_NAME+tableSuffix+
                 " SET "+ YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE +
-                " = 1 WHERE "+ YoMemoryContract.ItemBasic._ID+
+                " = 1, "+YoMemoryContract.ItemBasic.COLUMN_GROUP_ID+" = "+
+                +groupId+" WHERE "+ YoMemoryContract.ItemBasic._ID+
                 " IN "+sbr.toString();
 
         mSQLiteDatabase.execSQL(itemsChoseSql);
@@ -1342,7 +1440,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
      * 根据ItemId列表来获取Items。
      * */
     public ArrayList<SingleItem> getItemsWithList(ArrayList<Integer> idList,String tableNameSuffix){
-        Log.i(TAG, "getItemsWithList: before any.");
+//        Log.i(TAG, "getItemsWithList: before any.");
         ArrayList<SingleItem> items = new ArrayList<>();
 
         StringBuilder sbd = new StringBuilder();
@@ -1374,7 +1472,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
                 items.add(item);
             }while (cursor.moveToNext());
-            Log.i(TAG, "getItemsWithList: cursor ok.");
+//            Log.i(TAG, "getItemsWithList: cursor ok.");
         }else{
             return null;
         }
@@ -1394,7 +1492,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
      * 获取的items按照所属Group的id进行分组，且按gid升序。
      * */
     public ArrayList<SingleItem> getItemsWithInGidList(ArrayList<Integer> gidList,String tableNameSuffix){
-        Log.i(TAG, "getItemsWithInGidList: before any.");
+//        Log.i(TAG, "getItemsWithInGidList: before any.");
         ArrayList<SingleItem> items = new ArrayList<>();
 
         StringBuilder sbd = new StringBuilder();
@@ -1427,7 +1525,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
                 items.add(item);
             }while (cursor.moveToNext());
-            Log.i(TAG, "getItemsWithList: cursor ok.");
+//            Log.i(TAG, "getItemsWithList: cursor ok.");
         }else{
             return null;
         }

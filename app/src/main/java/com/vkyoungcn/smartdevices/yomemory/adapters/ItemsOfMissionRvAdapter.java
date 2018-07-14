@@ -27,7 +27,7 @@ public class ItemsOfMissionRvAdapter extends RecyclerView.Adapter<ItemsOfMission
         private final TextView phonetic;
         private final TextView translations;
 
-        private final ImageView goDetail;
+        private final TextView goDetail;
 
         private ViewHolder(View itemView) {
             super(itemView);
@@ -65,7 +65,7 @@ public class ItemsOfMissionRvAdapter extends RecyclerView.Adapter<ItemsOfMission
             return translations;
         }
 
-        public ImageView getGoDetail() {
+        public TextView getGoDetail() {
             return goDetail;
         }
 

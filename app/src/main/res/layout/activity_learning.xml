@@ -56,6 +56,7 @@
 
         <!-- 计时组件群，位于fab上方 -->
         <LinearLayout
+            android:id="@+id/llt_timeCountGroup"
             android:layout_width="match_parent"
             android:layout_height="42dp"
             android:padding="2dp"

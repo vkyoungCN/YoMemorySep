@@ -23,8 +23,8 @@ import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 import java.lang.ref.WeakReference;
 
 /*
-* 作者1：杨胜@中国海洋大学图书馆
-* 作者2：杨镇时@中国海洋大学
+* 作者1：杨胜 @中国海洋大学
+* 作者2：杨镇时 @中国海洋大学
 * author：Victor Young @Ocean University of China
 * email: yangsheng@ouc.edu.cn
 *

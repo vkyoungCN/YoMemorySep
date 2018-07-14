@@ -21,7 +21,12 @@ import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
 import com.vkyoungcn.smartdevices.yomemory.validatingEditor.ValidatingEditor;
 
 @SuppressWarnings("all")
-/**
+/*
+ * 作者1：杨胜 @中国海洋大学
+ * 作者2：杨镇时 @中国海洋大学
+ * author：Victor Young @Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ *
  * 用于单项Item的复习学习
  * 此时，默认显示英文+音标，点击翻面后显示汉译；
  * 需要点击翻面后并输入正确的拼写才能滑动到下一页。

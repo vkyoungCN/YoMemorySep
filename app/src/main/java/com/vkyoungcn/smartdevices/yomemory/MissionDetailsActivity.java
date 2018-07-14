@@ -22,7 +22,12 @@ import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 import static com.vkyoungcn.smartdevices.yomemory.LogoPageActivity.YO_MEMORY_SP;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.FastLearnDiaFragment.DEFAULT_MANNER_ORDER;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.FastLearnDiaFragment.DEFAULT_MANNER_RANDOM;
-
+/*
+* 作者1：杨胜 @中国海洋大学
+* 作者2：杨镇时 @中国海洋大学
+* author：Victor Young @Ocean University of China
+* email: yangsheng@ouc.edu.cn
+* */
 public class MissionDetailsActivity extends AppCompatActivity implements OnGeneralDfgInteraction {
     private static final String TAG = "MissionDetailsActivity";
     private RvMission mission;

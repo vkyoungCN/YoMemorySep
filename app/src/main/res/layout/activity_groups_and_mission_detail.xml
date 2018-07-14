@@ -80,7 +80,7 @@
                 android:background="#cccccc"
                 />
             <TextView
-                android:id="@+id/numberOfTotalGroupsOfMission"
+                android:id="@+id/tv_groupAmount_GMD"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -107,7 +107,7 @@
             android:scaleType="centerCrop"/>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="36dp"
+            android:layout_height="42dp"
             android:orientation="horizontal">
             <TextView
                 android:layout_width="0dp"
@@ -118,14 +118,23 @@
                 android:text="@string/groups_list"
                 android:background="#f8f8f8"
                 />
-
             <ImageView
-                android:layout_width="48dp"
+                android:layout_width="42dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/refresh"
+                android:padding="4dp"
+                android:scaleType="centerInside"
+                android:background="#efefef"
+                android:onClick="handyRefresh"
+                android:layout_margin="1dp"/>
+            <ImageView
+                android:layout_width="42dp"
                 android:layout_height="match_parent"
                 android:src="@drawable/find_gray"
                 android:padding="4dp"
                 android:scaleType="centerInside"
                 android:background="#efefef"
+                android:onClick="findGroup"
                 android:layout_margin="1dp"/>
 
         </LinearLayout>
@@ -157,8 +166,8 @@
             <!--分割线 -->
             <TextView
                 android:layout_width="1dp"
-                android:layout_height="36dp"
-                android:background="#cce0e0e0"
+                android:layout_height="match_parent"
+                android:background="#efefef"
                 />
             <TextView
                 android:padding="2dp"
@@ -174,8 +183,8 @@
             <!--分割线 -->
             <TextView
                 android:layout_width="1dp"
-                android:layout_height="36dp"
-                android:background="#cce0e0e0"
+                android:layout_height="match_parent"
+                android:background="#efefef"
                 />
             <TextView
                 android:padding="2dp"
@@ -190,8 +199,8 @@
             <!--分割线 -->
             <TextView
                 android:layout_width="1dp"
-                android:layout_height="36dp"
-                android:background="#cce0e0e0"
+                android:layout_height="match_parent"
+                android:background="#efefef"
                 />
 
             <TextView
@@ -204,8 +213,8 @@
             <!--分割线 -->
             <TextView
                 android:layout_width="1dp"
-                android:layout_height="36dp"
-                android:background="#cce0e0e0"
+                android:layout_height="match_parent"
+                android:background="#efefef"
                 />
 
             <TextView
@@ -218,8 +227,8 @@
             <!--分割线 -->
             <TextView
                 android:layout_width="1dp"
-                android:layout_height="36dp"
-                android:background="#cce0e0e0"
+                android:layout_height="match_parent"
+                android:background="#efefef"
                 />
 
             <Space
@@ -271,8 +280,8 @@
             android:layout_marginBottom="12dp"
             android:layout_marginEnd="12dp"
             android:onClick="fabMainClick"
-            android:scaleType="fitCenter"
-            android:src="@drawable/plus_4"
+            android:scaleType="centerCrop"
+            android:src="@drawable/more_2"
             app:backgroundTint="@color/litePB_color_index" />
 
 

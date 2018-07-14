@@ -11,17 +11,20 @@ import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.adapters.LearningViewPrAdapter;
-import com.vkyoungcn.smartdevices.yomemory.fragments.LearningHandyFinishDiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.HandyFinishLcDiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.HandyFinishLgDiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.HandyFinishLmDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningTimeUpDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
-import com.vkyoungcn.smartdevices.yomemory.customUI.HorizontalProgressBar;
 import com.vkyoungcn.smartdevices.yomemory.stripeProgressBar.StripeProgressBar;
 import com.vkyoungcn.smartdevices.yomemory.validatingEditor.ValidatingEditor;
 
@@ -30,7 +33,7 @@ import java.util.ArrayList;
 
 /*
  *
- * 作者1：杨胜@中国海洋大学图馆
+ * 作者1：杨胜@中国海洋大学
  * 作者2：杨镇时@中国海洋大学
  * author：Victor Young @Ocean University of China
  * email: yangsheng@ouc.edu.cn
@@ -80,6 +83,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
     private String veCacheString = "";//记录正在输入的VE的内容，在滑动卡片时存入list并置空。
     // (该字串在回调监听中设置，设计为VE每增删一个有效字符本字串被改写一次，但上下限与VE同不会越界修改)
     private ArrayList<Byte> restChances;
+//    private ArrayList<Integer> itemIds;//需要先把items的id列表传给进度条中的EmptyCard列表，然后随进度再把非空的删除。
 
 //    private boolean autoSliding = true;//（在VE填写正确时）自动向后滑动的设置开关。
 
@@ -87,6 +91,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
 
     private int timeCount = 59;//for循环控制变量。执行60次for循环，即1h。（for循环包含60次1秒间隔的执行，一次完整的for=1min）
     private boolean isTimeUp = false;//计时线程的控制变量【旧版采用timeCount兼任。存在-1:59问题】
+    private boolean finishByHand = false;
     private long startingTimeMillis;//学习开始的时间。（需要在……时间内完成，否则拆分）【最后的时间区间计算可令开始时间大于下限，结束小于上限】
     private long finishTimeMillis;//用于最后传递
 //    private int timePastInMinute = 60;//流逝分钟数【借用timeCount即可】
@@ -95,6 +100,8 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
 
     private boolean AutoSliding = true;//在填写了正确VE后，是否运行自动滑动。
     private int currentPagePosition = 0;//从0起，用于跨方法使用当前卡片索引值。
+    private int oldPagePosition = 0;//由于三个监听方法都不能真正直接获取正确旧页码（滑动发起的页码），因而需要采取其他方法绕行。
+
     private long timeRestInSec = 360;//当手动结束而又返回时使用。
     private boolean isFirstLoop = true;//因为从DFG返回本LA时，继续计时，其秒数不一定是59开始，因而存在逻辑错误，需要单独跑一圈
     // 跑掉秒数的余数，然后开始正常计时。统一起见，开头第一圈同样视为余数跑完。
@@ -111,6 +118,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
     private ViewPager viewPager;//原是自定义的HalfScrollableVP
     private TextView tv_timeRestMin;
     private TextView tv_timeRestScd;
+    private LinearLayout llt_timeCount;
     private TextView totalMinutes;//应在xx分钟内完成，的数字部分。
     private TextView tv_rollLabel;//上方滚动标语栏
     private TextView tv_currentPageNum;
@@ -159,6 +167,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
         tv_timeRestMin.setTypeface(typeFace);
         tv_timeRestScd.setTypeface(typeFace);
 
+        llt_timeCount = (LinearLayout)findViewById(R.id.llt_timeCountGroup);
         tv_currentPageNum = (TextView)findViewById(R.id.currentPageNum_learningActivity);
         tv_totalPageNum = (TextView)findViewById(R.id.totalPageNum_learningActivity);//总数字需要在数据加载完成后设置，在handleMessage中处理
         tv_totalPageNum.setText(String.valueOf(items.size()));
@@ -167,18 +176,18 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
         tv_finish = (TextView)findViewById(R.id.finish_tv_learningActivity);
         fab_finish = (FloatingActionButton)findViewById(R.id.finish_fab_learningActivity);
 
-        spb_bar = (StripeProgressBar) findViewById(R.id.stripeProgressBar_LearningActivity);
-        for (SingleItem si : items) {
-            targetCodes.add(si.getName());
-        }
-        spb_bar.setTargetCodes(targetCodes);
         veFillings = new ArrayList<>();//只这样初始化是不够的，后面按索引位置设置值时会提示越界错误
         restChances = new ArrayList<>();
-        //彻底初始化如下
-        for (int i =0;i<items.size();i++){
+
+        spb_bar = (StripeProgressBar) findViewById(R.id.stripeProgressBar_LearningActivity);
+        for (SingleItem si : items) {
+            //需要这样彻底初始化
+            targetCodes.add(si.getName());
             veFillings.add("");
             restChances.add((byte)3);//默认可提示次数，3。【后期可开放修改】
+//            itemIds.add(si.getId());//【其实这样一来可能就不必传递Merge时的itemsId了。待】
         }
+        spb_bar.initNecessaryData(targetCodes);
 
         spb_bar.setCurrentCodes(veFillings);
 
@@ -189,13 +198,15 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
 
         //给Vpr设置监听
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
-            int oldPagePosition = 0;//用于记录页面滑动操作的“起始页”
 
-            @Override
+            /*@Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                //【本方法有问题，log.i测试表明会持续输出多次旧索引但是最后会输出一个新索引！简直有病】
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels);
                 oldPagePosition = position;//获取滑动开始时的页面索引
-            }
+                Log.i(TAG, "onPageScrolled: oldPageIndex="+oldPagePosition);
+            }*/
+
 
             /*
             * 本方法中需要完成的任务：
@@ -211,8 +222,10 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
+                oldPagePosition = currentPagePosition;
                 //据文档，本方法调用时，滑动已经完成。
                 currentPagePosition = position;//其他方法需使用
+                Log.i(TAG, "onPageSelected: currentPageIndex = "+currentPagePosition);
 
                 //任务一：
                 //设置底端页码显示逻辑
@@ -295,7 +308,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
 
         @Override
         public void run() {
-            while(!isTimeUp){//时间未到
+            while(!isTimeUp&&!finishByHand){//时间未到
                 try {
 //                    for (int i = 0; i < 60&&!learningFinishedCorrectly; i++) {//这样才能在学习完成而分钟数未到的情况下终止计时。
                     //先把秒数减完一圈（为了使“从dfg返回恢复”时的计时逻辑正确）
@@ -443,12 +456,13 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
 
             case LEARNING_FINISH_DFG_BACK:
                 //恢复计时，设置时间tv的正确值
+                llt_timeCount.setVisibility(View.VISIBLE);
+
                 tv_timeRestMin.setText(String.valueOf(timeRestInSec/60));
                 tv_timeRestScd.setText(String.valueOf(timeRestInSec%60));
                 timeCount = (int)timeRestInSec/60;
                 timeInSecond = (int)timeRestInSec%60;
                 isFirstLoop = true;
-
 
                 break;
 
@@ -501,7 +515,11 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
         //【注意，由于目前设计的进度条更新、缓存字串列表更新都是在滑动页面时更新；所以需要在本方法中增加一次更新，
         // 用于校正当前页面已作出的改动】
 
-        timingThread.interrupt();//先停止计时
+//        timingThread.interrupt();//无效
+//        finishByHand = true;//标记变量也无效，计时一样在跑。（后来在某一时刻又停止了，干脆不停表了）
+// 【按照逻辑，计时也不该停止，否则就是无限暂停bug】
+        llt_timeCount.setVisibility(View.GONE);//控件隐藏
+
         finishTimeMillis = System.currentTimeMillis();
         //先将当前页的缓存字串存入缓存字串列表
         veFillings.set(currentPagePosition, veCacheString);
@@ -510,9 +528,9 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
 
 
         //记录所剩时间
-        timeRestInSec = (System.currentTimeMillis()-startingTimeMillis)/1000;
+        timeRestInSec = 3600-(System.currentTimeMillis()-startingTimeMillis)/1000;//但是这样得到的数据和倒计时略有差别
 
-        //根据情况弹出对应dfg【统一弹出，传入两个list在dfg中判断】
+        //根据情况弹出对应dfg
         FragmentTransaction transaction = (getFragmentManager().beginTransaction());
         Fragment prev = (getFragmentManager().findFragmentByTag("HANDY_FINISH"));
 
@@ -520,8 +538,25 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
             Toast.makeText(this, "Old Dfg still there, removing...", Toast.LENGTH_SHORT).show();
             transaction.remove(prev);
         }
-        DialogFragment dfg = LearningHandyFinishDiaFragment.newInstance(spb_bar.getEmptyPositions(),spb_bar.getWrongPositions(),(int)timeRestInSec);
-        dfg.show(transaction,"HANDY_FINISH");
+        int totalAmount =items.size();
+        int emptyAmount = spb_bar.getEmptyPositions().size();
+        int finishAmount = totalAmount-emptyAmount;
+        int wrongAmount = spb_bar.getWrongPositions().size();
+        switch (learningType){
+            case LEARNING_AND_CREATE_ORDER:
+            case LEARNING_AND_CREATE_RANDOM:
+                DialogFragment dfgLC = HandyFinishLcDiaFragment.newInstance(finishAmount,wrongAmount,(int)timeRestInSec);
+                dfgLC.show(transaction,"HANDY_FINISH");
+                break;
+            case LEARNING_GENERAL:
+                DialogFragment dfgLG = HandyFinishLgDiaFragment.newInstance(totalAmount,emptyAmount,wrongAmount,(int)timeRestInSec);
+                dfgLG.show(transaction,"HANDY_FINISH");
+                break;
+            case LEARNING_AND_MERGE:
+                DialogFragment dfg = HandyFinishLmDiaFragment.newInstance(totalAmount,finishAmount,wrongAmount,(int)timeRestInSec);
+                dfg.show(transaction,"HANDY_FINISH");
+                break;
+        }
 
     }
 

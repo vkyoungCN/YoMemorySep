@@ -31,13 +31,14 @@ import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 
 /*
  *
- * 作者1：杨胜@中国海洋大学图馆
+ * 作者1：杨胜@中国海洋大学
  * 作者2：杨镇时@中国海洋大学
  * author：Victor Young @Ocean University of China
  * email: yangsheng@ouc.edu.cn
@@ -52,43 +53,39 @@ import java.util.List;
  * 失败则产生一条消息【待实现】。
  * */
 public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
-        CreateGroupDiaFragment.onCreateGroupDFgConfirmListner,OnGeneralDfgInteraction {
-    private static final String TAG = "MissionDetailActivity";
-
-    public static final int EFFECTIVE_PICKING = 316;//先判断好是否仍在有效时期内，然后直接传递给后续页面。（学习完成需要将新Log存入DB，Log需要此信息。）
-//    public static final int PICKING_TYPE_INIT = 311;//新版的逻辑中，只需要区分是新学还是复习两组情况。不再需要传递具体状态，因再需要据此生成特殊Logs。
-//    public static final int PICKING_TYPE_RE_PICK =312;
+        OnGeneralDfgInteraction {
+    private static final String TAG = "GroupsAndMissionDetailActivity";
 
     public static final int MESSAGE_PRE_DB_FETCHED = 5011;
     public static final int MESSAGE_RE_FETCH_DONE = 5012;
     public static final int MESSAGE_RV_SCHEDULE_REFRESHING = 5013;
 
     private static final String ITEM_TABLE_SUFFIX = "item_table_suffix";
-    private static final String GROUP_SUB_ITEM_ID_STR = "group_sub_item_ids_str";
     public static final int REQUEST_CODE_LEARNING = 2011;//学习完成后，要回送然后更新Rv数据源和显示。
+    private ArrayList<FragGroupForMerge>[][] groupsInTwoDimensionArray;//用于后续DFG的数据装载，两个维度分别对应MS、同MS下<4,<8。
+    private int clickPosition;//点击（前往学习页面）发生的位置，需要该数据来更新rv位置
 
     private boolean isFabPanelExtracted = false;//FAB面板组默认处于回缩状态。
 
     private RvMission missionFromIntent;//从前一页面获取。后续页面需要mission的id，suffix字段。
     List<RVGroup> rvGroups = new ArrayList<>();//分开设计的目的是避免适配器内部的转换。让转换在外部完成，适配器直接使用数据才能降低卡顿。
-
-    private ArrayList<FragGroupForMerge>[][] groupsInTwoDimensionArray;//用于后续DFG的数据装载，两个维度分别对应MS、同MS下<4,<8。
+    TextView tv_groupAmount;
 
     private YoMemoryDbHelper memoryDbHelper;
     private String tableItemSuffix;//由于各任务所属的Item表不同，后面所有涉及Item的操作都需要通过后缀才能构建出完整表名。
     private RecyclerView mRv;
     private GroupsOfMissionRvAdapter adapter = null;//Rv适配器引用
-    private int clickPosition;//点击（前往学习页面）发生的位置，需要该数据来更新rv位置
-
-    private FrameLayout maskFrameLayout;
-    //另外，页面上部的Mission详情区“任务名称、描述”两个控件不声明为全局变量。在onCreate内以局部变量声明。
-    private RelativeLayout rltFabPanel;
-
     private Activity self;//为了后方Timer配合runOnUiThread.
     private Handler handler = new GroupOfMissionHandler(this);//涉及弱引用，通过其发送消息。
     private Boolean fetched = false;//是否已执行完成过从DB获取分组数据的任务；如完成，则onResume中可以重启UI-Timer
     private Boolean needForScheduleRefreshing = true;//分组列表数据定时更新线程的控制变量。当刷新分组列表时暂停该更新；（？退出到Pause状态时，是否需要手动停止？）
-    private Boolean isHandyRefreshing = false;//点击刷新列表的按键后，会重新执行加载数据的线程，为与首次的自动运行相区分，此标志变量会设true。
+    //【实际上，目前的经验表明，无论是interrupt方法还是布尔变量置否，似乎都不能使线程立即停止】
+//    private Boolean isHandyRefreshing = false;//点击刷新列表的按键后，会重新执行加载数据的线程，为与首次的自动运行相区分，此标志变量会设true。
+    List<Integer> refreshingNeededPositionsList = new ArrayList<>();//更新线程会把需要更新的项目的索引Id（每分钟变更一次）存在这个表中
+
+    private FrameLayout maskFrameLayout;
+    private RelativeLayout rltFabPanel;
+    //任务名称、描述两控件在onCreate内以局部变量声明。
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,8 +95,20 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 
         TextView missionDetailName = (TextView) findViewById(R.id.tv_mission_detail_name_GMDA);
         TextView missionDetailDescription = (TextView) findViewById(R.id.tv_mission_detail_description_GMDA);
+        tv_groupAmount = (TextView)findViewById(R.id.tv_groupAmount_GMD);
         maskFrameLayout = (FrameLayout) findViewById(R.id.maskOverRv_MissionDetail_GMDA);
         rltFabPanel = (RelativeLayout) findViewById(R.id.rlt_fabFlat_GMDA);
+
+        rltFabPanel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //在板子展开后，点击板子需要能缩回（隐藏）
+                if(isFabPanelExtracted){
+                    rltFabPanel.setVisibility(View.GONE);
+                    isFabPanelExtracted = false;
+                }//只负责缩回就好了。
+            }
+        });
 
         missionFromIntent = getIntent().getParcelableExtra("MISSION");
         if (missionFromIntent == null) {
@@ -123,11 +132,10 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         if (fetched) {
-            //如果已执行了DB数据的加载（也即本次onResume是onPause后发生的；不是Activity的首次LC环节）
-            //（而Activity的首次LC期间，取决于运行的耗时情况，数据线程可能尚未完成，数据可能尚未准备好。）
+            //如果DB数据的加载已完成（为了避免在onCreate中调用的DB获取线程尚未运行完毕时就已到达了
+            // onResume方法）（onResume还有可能是onPause后发生的，该情景下倒是应该已有数据了）
             needForScheduleRefreshing = true;
-            //【实践验证，只设true，线程不会自动重启。】
-            new Thread(new RMAReCalculateRunnable()).start();         // 启动更新线程
+            new Thread(new RMAReCalculateRunnable()).start();// 启动UI数值刷新线程 //【实践：若只设true，线程不会自动重启。】
         }
     }
 
@@ -163,14 +171,15 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         public void run() {
             //获取各分组原始数据
             ArrayList<DBGroup> dbGroupsOrigin = memoryDbHelper.getAllGroupsByMissionId(missionFromIntent.getId(), tableItemSuffix);
-            //将各分组原始数据转换为UI所需数据，比较耗时。相关数据直接设置给Activity的成员。
+            //将各分组原始数据转换为UI所需数据，比较耗时。不适宜在UI线程操作，更不适合在Rv适配器内进行。
 
             ArrayList<RVGroup> tempRVGroups = new ArrayList<>();
-            //暂时按记忆级别排序
+            //排序。暂时按记忆级别排序
             for (DBGroup dbg : dbGroupsOrigin) {
-                RVGroup RVGroup = new RVGroup(dbg);
-                tempRVGroups.add(RVGroup);
+                RVGroup rvGroup = new RVGroup(dbg);
+                tempRVGroups.add(rvGroup);
                 //尝试过，但似乎无法在此直接排序。无法令最新项同之前所有项目进行比较。
+
             }
 
             rvGroups = ascOrderByMemoryStage(tempRVGroups);
@@ -212,6 +221,9 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         return resultRVGroups;
     }
 
+    /*
+    * 用于手动更新时从新获取数据（注意，Rv列表的刷新展示是基于已有数据进行计算刷新，这里是将底层数据都重新加载）
+    * */
     public class ReFetchForGroupsAndMissionRunnable implements Runnable {
         @Override
         public void run() {
@@ -224,10 +236,9 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
             for (DBGroup dbg : dbGroupsOrigin) {
                 RVGroup RVGroup = new RVGroup(dbg);
                 tempRVGroups.add(RVGroup);
-                //尝试过，但似乎无法在此直接排序。无法令最新项同之前所有项目进行比较。
             }
 
-            rvGroups = ascOrderByMemoryStage(tempRVGroups);
+            rvGroups = ascOrderByMemoryStage(tempRVGroups);//数据列表指向了新数据列表。
 
             Message message = new Message();
             message.what = MESSAGE_RE_FETCH_DONE;
@@ -250,28 +261,26 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
     public class RMAReCalculateRunnable implements Runnable {
         @Override
         public void run() {
-            int n = 0;
+//            int n = 0;
             while (needForScheduleRefreshing) {
-                n++;//每分加一【如果改到最后++，这样线程第一轮即可更新一次，适用于onResume；】
-                //更新频率1分钟一次即可，因为RMA函数的计算单位就是分钟。
+//                n++;//每分加一【如果改到最后++，这样线程第一轮即可更新一次，适用于onResume；】【后来：What】
 
-                List<Integer> refreshingNeededPositionsList = new ArrayList<>();
-                //并不是所有条目都需要更新，有的条目RMA数值许久不变，因而不需更新
-                //旧版的做法其实很精妙，是每秒进行一次检测（remainingTimeAmount），每秒向接收方发送
-                // 一次“需更新”的列表；但是对剩余时间较久的分组，只在秒计数器n到达15、30、60、
-                // 3600时，才加入“需更新”的名单。（也即，有时更新名单可能是空的；负荷主要在每秒的计算上，
-                // 而实际的UI更新方面只更新少量的条目）
+                /*并不是所有条目都需要更新，有的条目RMA数值许久不变，因而不需更新
+                旧版的做法其实很精妙，是每秒进行一次检测（remainingTimeAmount），每秒向接收方发送
+                 一次“需更新”的列表；但是对剩余时间较久的分组，只在秒计数器n到达15、30、60、
+                 3600时，才加入“需更新”的名单。（也即，有时更新名单可能是空的；负荷主要在每秒的计算上，
+                而实际的UI更新方面只更新少量的条目）*/
 
                 try {
-                    Thread.sleep(1000 * 60);//休息1分钟【新版1min更新，负荷已大降】
+                    Thread.sleep(1000 * 60);//休息1分钟（每分钟更新）
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
-                //【待】总觉得这里存在问题——学习结束后，分组的信息是更新了的、而此Schedule更新也是更新，
-                // 可能存在两个操作对一个资源的污染问题。——并不，进入onPause()后会将标记置否吧。
+                refreshingNeededPositionsList.clear();//情况列表为新数据做准备。
+
                 for (RVGroup singleRVGroup : rvGroups) {
-                    if (singleRVGroup.refreshRMA()) {
+                    if (singleRVGroup.needRmaRefresh()) {
                         //新旧值不同，需要更新。（对于不需要更新的不再加以处理）
                         refreshingNeededPositionsList.add(rvGroups.indexOf(singleRVGroup));
                     }
@@ -279,44 +288,34 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 
                 Message message = new Message();
                 message.what = MESSAGE_RV_SCHEDULE_REFRESHING;
-                message.obj = refreshingNeededPositionsList;
 
                 handler.sendMessage(message);
             }
         }
     }
 
-    void handyRefresh() {
-        //手动触发刷新时（是一个底层的彻底的更新，从DB重新获取数据，然后重新计算）
-        //①先停止计时更新（控制变量重设false）；
-        //②清空旧Adapter数据
-        //③设置 手动刷新Rv的识别变量为真（避免重新加载adp）
-        //④开启从DB获取数据的线程获取新数据（不同于预获取的线程，是一个新）
-        //完成后，计时更新控制变量重设真，再次启动计时更新线程【？】
-        needForScheduleRefreshing = false;
-        rvGroups.clear();
-
-        isHandyRefreshing = true;
-        new Thread(new ReFetchForGroupsAndMissionRunnable()).start();         // start thread
-        //控制变量uiRefreshingNeeded重设为true的操作在消息处理方法中进行
-    }
 
 
     void handleMessage(Message message) {
         switch (message.what) {
             case MESSAGE_PRE_DB_FETCHED://此时是从DB获取各分组数据并转换成合适的数据源完成
                 fetched = true;//用于onResume中的判断（如果在LC的首次流程中，数据线程可能尚未完成，此即为false，不会开启刷新线程）。
+
+                //上方还有一个Tv没有设置数据
+                tv_groupAmount.setText(String.valueOf(rvGroups.size()));
+
                 //取消上方遮罩
                 maskFrameLayout.setVisibility(View.GONE);
 
                 //初始化Rv构造器，令UI加载Rv控件……
+
                 adapter = new GroupsOfMissionRvAdapter(rvGroups, this, missionFromIntent.getTableItem_suffix());
                 mRv = findViewById(R.id.groups_in_single_mission_rv);
                 mRv.setLayoutManager(new LinearLayoutManager(this));
                 mRv.setAdapter(adapter);
 
-                //Rv加载后，启动更新计时器【此方式不能实现UI的更新，因为UI所需的数据是提前写好了的；
-                // 要更新显示，必须提供新的数据；这一任务符合较大，改由新线程执行】【后来的我：？啥意思】
+                //Rv加载后，启动更新计时器（要对Rv列表更新，必须必须提供新的数据；
+                // 这一任务负荷较大，由新线程执行）
                 new Thread(new RMAReCalculateRunnable()).start();         // start thread
                 break;
 
@@ -327,16 +326,35 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
                 break;
 
             case MESSAGE_RV_SCHEDULE_REFRESHING:
-                ArrayList<Integer> positionsNeedForUpdate = (ArrayList) (message.obj);
 
                 //所有的批量notify方法都只能用于连续项目，所以只能…
-                if (positionsNeedForUpdate == null || positionsNeedForUpdate.size() == 0)
+                if (refreshingNeededPositionsList == null || refreshingNeededPositionsList.size() == 0)
                     return;//判空
-                for (int i : positionsNeedForUpdate) {
-                    adapter.notifyItemChanged(i);//【旧版似乎是传递的id，但是id和位置不对应啊。】
+                for (int i : refreshingNeededPositionsList) {
+                    adapter.notifyItemChanged(i);
                 }
 
         }
+    }
+
+    public void handyRefresh(View view) {
+        //手动触发刷新时（是一个底层的彻底的更新，从DB重新获取数据，然后重新计算）
+        //①先停止计时更新（控制变量重设false）；
+        //②清空旧Adapter数据
+        //③设置 手动刷新Rv的识别变量为真（避免重新加载adp）
+        //④开启从DB获取数据的线程获取新数据（不同于预获取的线程，是一个新）
+        //完成后，计时更新控制变量重设真，再次启动计时更新线程【？】
+//        Log.i(TAG, "handyRefresh: be");
+        needForScheduleRefreshing = false;
+//        rvGroups.clear();//不需要，直接指向新列表即可。
+//        isHandyRefreshing = true;//此控制变量意义不明，可能思路变了。
+        new Thread(new ReFetchForGroupsAndMissionRunnable()).start();         // start thread
+        //控制变量uiRefreshingNeeded重设为true的操作在消息处理方法中进行
+    }
+
+    public void findGroup(View view) {
+        //查询指定分组（查询的方式和条件还没想好）
+        Toast.makeText(self, "施工中，查询分组的方法。", Toast.LENGTH_SHORT).show();
     }
 
     /*
@@ -375,10 +393,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
         dfg.show(transaction, "CREATE_GROUP");
     }
 
-    public void findGroup(View view) {
-        //查询指定分组（查询的方式和条件还没想好）
-        Toast.makeText(self, "施工中，查询分组的方法。", Toast.LENGTH_SHORT).show();
-    }
+
 
     public void learnAndAddInOrder(View view) {
         //启动DFG，在dfg中点击了确认后，再交互到本Activity下的onLDfgInteraction方法，然后再生成Intent跳转。
@@ -454,27 +469,6 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
     }
 
 
-    /*
-     * 各DialogFragment交互方法
-     * */
-    @Override
-    public void onCreateGroupDFgConfirm(long lines) {
-        Log.i(TAG, "onCreateGroupDFgConfirm: +1");
-        //如果新增操作成功，通知adp变更。
-        if (lines != -1) {
-            //新增操作只影响一行
-            DBGroup dGroup = memoryDbHelper.getGroupByLine(lines, tableItemSuffix);
-            RVGroup newRVGroup = new RVGroup(dGroup);
-
-            rvGroups.add(0, newRVGroup);//新增分组放在最前【逻辑便于处理】
-            adapter.notifyItemInserted(0);//（仍是0起算，但是加到最后时似乎比较奇怪）
-            mRv.scrollToPosition(0);//设置增加后滚动到新增位置。【已查，从0起算】
-        } else {
-            Toast.makeText(self, "操作未能成功，DB：-1.", Toast.LENGTH_SHORT).show();
-        }
-
-    }
-
     @Override
     public void onButtonClickingDfgInteraction(int dfgType, Bundle data) {
         Intent intentToLPA = new Intent(this, PrepareForLearningActivity.class);
@@ -508,6 +502,94 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
                 this.startActivity(intentToLPA);
                 break;
 
+            case DELETE_GROUP:
+                //从DB删除该组，删除后更新UI显示
+                int position = data.getInt("POSITION");
+                memoryDbHelper.deleteGroupById(rvGroups.get(position).getId(),tableItemSuffix);
+                rvGroups.remove(position);
+                adapter.notifyItemRemoved(position);
+                tv_groupAmount.setText(String.valueOf(rvGroups.size()));
+                break;
+
+
+            case CREATE_GROUP:
+                //将执行操作DB建组逻辑，建好后更新UI显示
+                //Item抽取方式，随机或顺序
+                ArrayList<Integer> itemIds = new ArrayList<>();
+
+                boolean isOrder = data.getBoolean("IS_ORDER");
+                int groupSize = data.getInt("GROUP_SIZE");
+
+                //为描述字段获取首词name
+                String description = data.getString("DESCRIPTION");
+                StringBuilder descriptionSB = new StringBuilder();
+                String groupDescriptionStr = null;
+
+                if(isOrder){
+                   //按顺序，获取指定数量的Items
+                   itemIds = memoryDbHelper.getCertainAmountItemIdsOrderly(groupSize,tableItemSuffix);
+
+                   if(itemIds.size()==0){
+                       Toast.makeText(this, "抽取items数量0，顺序抽取失败", Toast.LENGTH_SHORT).show();
+                       return;
+                   }else {
+                       Toast.makeText(this, "抽取成功，数量："+itemIds.size(), Toast.LENGTH_SHORT).show();
+                   }
+
+                    String firstItemName = memoryDbHelper.getSingleItemNameById((long)itemIds.get(0),tableItemSuffix);
+
+                   //如果描述字段留空，构建默认描述字段
+                   if(description == null ||description.isEmpty()){
+                       descriptionSB.append("顺序-");
+                       descriptionSB.append(firstItemName);
+                       descriptionSB.append("开始");
+                       //不附加数量，因为分组拆分后会改变。
+
+                       groupDescriptionStr = descriptionSB.toString();
+                   }
+               }else {
+                   //随机
+                   itemIds = memoryDbHelper.getCertainAmountItemIdsRandomly(groupSize,tableItemSuffix);
+
+                   if(itemIds.size()==0){
+                       Toast.makeText(this, "抽取items数量0，随机抽取失败", Toast.LENGTH_SHORT).show();
+                       return;
+                   }else {
+                       Toast.makeText(this, "抽取成功，数量："+itemIds.size(), Toast.LENGTH_SHORT).show();
+                   }
+                    String firstItemName = memoryDbHelper.getSingleItemNameById((long)itemIds.get(0),tableItemSuffix);
+
+                   //如果描述字段留空，构建默认描述字段“随机分组-时间”
+                   if(description == null ||description.isEmpty()){
+                       descriptionSB.append("随机分组-");
+                       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                       descriptionSB.append(sdf.format(System.currentTimeMillis()));
+                       groupDescriptionStr = descriptionSB.toString();
+                   }
+               }
+
+               //构造数据类
+                DBGroup dbRwaGroup = new DBGroup();
+                dbRwaGroup.setDescription(groupDescriptionStr);
+                dbRwaGroup.setMission_id(missionFromIntent.getId());
+                dbRwaGroup.setSettingUptimeInLong(System.currentTimeMillis());
+
+                //操作DB，生成
+                int gidCreated = memoryDbHelper.createGroup(dbRwaGroup,itemIds,tableItemSuffix);
+
+                //如果新增操作成功，通知adp变更。
+                if (gidCreated != 0) {
+                    DBGroup dGroup = memoryDbHelper.getGroupById(gidCreated, tableItemSuffix);
+                    RVGroup newRVGroup = new RVGroup(dGroup);
+
+                    rvGroups.add(0, newRVGroup);//新增分组放在最前【逻辑便于处理】
+                    adapter.notifyItemInserted(0);//（仍是0起算，但是加到最后时似乎比较奇怪）
+                    mRv.scrollToPosition(0);//设置增加后滚动到新增位置。【已查，从0起算】
+                } else {
+                    Toast.makeText(self, "操作未能成功，returned gid="+gidCreated, Toast.LENGTH_SHORT).show();
+                }
+                tv_groupAmount.setText(String.valueOf(rvGroups.size()));
+                break;
 
         }
     }

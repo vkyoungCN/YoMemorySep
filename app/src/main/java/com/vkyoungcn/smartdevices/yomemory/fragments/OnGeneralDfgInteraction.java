@@ -14,6 +14,11 @@ public interface OnGeneralDfgInteraction {
     int LEARNING_FINISH_DFG_BACK = 2102;
     int LEARNING_FINISH_DFG_GIVE_UP = 2103;
 
+    int LC_FINISH_AMOUNT_ZERO =2121;//对应于结束dfg中，完成数量实际为0（从而不生成新组）的情况
+
+    int DELETE_GROUP = 2221;
+    int CREATE_GROUP = 2222;
+
     int LEARNING_TIME_UP_DFG_CONFIRM = 2111;
     int LEARNING_TIME_UP_DFG_GIVE_UP = 2112;
 

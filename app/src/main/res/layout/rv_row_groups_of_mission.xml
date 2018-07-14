@@ -28,7 +28,7 @@
         <TextView
             android:layout_width="1dp"
             android:layout_height="36dp"
-            android:background="#cce0e0e0"
+            android:background="#efefef"
             />
 
         <TextView
@@ -47,7 +47,7 @@
         <TextView
             android:layout_width="1dp"
             android:layout_height="36dp"
-            android:background="#cce0e0e0"
+            android:background="#efefef"
             />
 
         <TextView
@@ -65,7 +65,7 @@
         <TextView
             android:layout_width="1dp"
             android:layout_height="36dp"
-            android:background="#cce0e0e0"
+            android:background="#efefef"
             />
 
         <TextView
@@ -80,7 +80,7 @@
         <TextView
             android:layout_width="1dp"
             android:layout_height="36dp"
-            android:background="#cce0e0e0"
+            android:background="#efefef"
             />
 
         <TextView
@@ -93,18 +93,20 @@
 
         <!--分割线 -->
         <TextView
-            android:layout_width="1dp"
-            android:layout_height="36dp"
-            android:background="#cce0e0e0"
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="@color/yo_light_green"
             />
 
-        <ImageView
+        <TextView
             android:id="@+id/rv_goBtn_groupOfMission"
             android:layout_width="42dp"
             android:layout_height="match_parent"
-            android:padding="2dp"
-            android:src="@drawable/go_01"
-            android:scaleType="centerInside"
+            android:layout_margin="1dp"
+            android:text="@string/re_pick"
+            android:gravity="center"
+            android:ellipsize="end"
+            android:background="#efefef"
             />
     </LinearLayout>
 

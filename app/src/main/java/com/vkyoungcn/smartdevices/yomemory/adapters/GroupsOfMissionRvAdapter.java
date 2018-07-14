@@ -7,6 +7,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.GroupDetailActivity;
 import com.vkyoungcn.smartdevices.yomemory.R;
+import com.vkyoungcn.smartdevices.yomemory.fragments.DeleteGroupDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningGelDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningLessDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
@@ -31,7 +33,7 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
     private Context context;
     private String tableSuffix = "";//避免null。
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnLongClickListener{
         private final TextView tv_groupId;
         private final TextView tv_groupDescription;
         private final TextView tv_NumSub;
@@ -55,6 +57,7 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
 
             llt_overall = itemView.findViewById(R.id.rvLlt_overall_groupOfMission);
             llt_overall.setOnClickListener(this);
+            llt_overall.setOnLongClickListener(this);
 
         }
 
@@ -115,7 +118,7 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
 
                     break;
 
-                case R.id.rvLlt_overall_groupOfMission:
+               /* case R.id.rvLlt_overall_groupOfMission:
                     //转到详情页（详情页上可以进行编辑、也有学习按钮）
                     Toast.makeText(context, "转到详情页", Toast.LENGTH_SHORT).show();
 
@@ -126,9 +129,32 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
 
                     context.startActivity(intentToGD);
 
-                    break;
+                    break;*/
 
             }
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            switch (v.getId()) {
+                case R.id.rvLlt_overall_groupOfMission:
+                    //弹出dfg确认删除
+                    FragmentTransaction transaction = ((Activity)context).getFragmentManager().beginTransaction();
+                    Fragment prev =  ((Activity)context).getFragmentManager().findFragmentByTag("DELETE_GROUP");
+
+                    if (prev != null) {
+                        Toast.makeText(context, "Old DialogFg still there, removing first...", Toast.LENGTH_SHORT).show();
+                        transaction.remove(prev);
+                    }
+                    DialogFragment dfg = DeleteGroupDiaFragment.newInstance(getAdapterPosition());
+                    dfg.show(transaction, "DELETE_GROUP");
+
+                    break;
+            }
+
+            return false;
+
+
         }
 
         private TextView getTv_groupId() {

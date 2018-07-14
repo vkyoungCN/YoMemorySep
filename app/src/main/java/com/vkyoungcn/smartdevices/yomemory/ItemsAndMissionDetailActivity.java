@@ -21,9 +21,12 @@ import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-
 /*
+ * 作者1：杨胜 @中国海洋大学
+ * 作者2：杨镇时 @中国海洋大学
+ * author：Victor Young @Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ *
  * Mission所属Items的列表页及Mission详情信息；
  * 页面上部是Mission情况简报；
  * 页面下部是所属Items资源的列表展示（Rv）；

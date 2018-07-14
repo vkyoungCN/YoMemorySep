@@ -14,70 +14,98 @@
         android:layout_height="36dp"
         android:padding="4dp"
         android:gravity="center"
-        android:text="@string/confirm_question"
+        android:text="@string/confirm_finish_2"
         android:textSize="16sp"
         android:background="#efefef"
         />
-
-    <!--信息区-->
-    <LinearLayout
+    <!--横分割线-->
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
-        <TextView
-            android:id="@+id/tv_empty_dfgLHFinish"
-            android:layout_width="match_parent"
-            android:layout_height="42dp"
-            android:gravity="center"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:text="@string/empty_info_un_correct"
-            />
-        <!--横分割线-->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#aaaaaa"
-            />
-        <TextView
-            android:id="@+id/tv_wrong_dfgLHFinish"
-            android:layout_width="match_parent"
-            android:layout_height="42dp"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:gravity="center"
-            android:text="@string/wrong_info_un_correct"
-            />
-        <!--横分割线-->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#aaaaaa"
-            />
-        <TextView
-            android:id="@+id/tv_restTime_dfgLHFinish"
-            android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:gravity="center"
-            android:background="#efefef"
-            android:text="@string/rest_min_and_sec"
-            />
-    </LinearLayout>
+        android:layout_height="1dp"
+        android:background="@color/yo_light_green"
+        android:layout_margin="1dp"
+        />
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="24dp" />
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#efefef"
+        />
 
+    <TextView
+        android:id="@+id/tv_empty_dfgLHFinish"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:gravity="center"
+        android:paddingEnd="12dp"
+        android:paddingStart="12dp"
+        android:text="@string/empty_amount_divide" />
+
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#efefef"
+        />
+
+    <TextView
+        android:id="@+id/tv_wrong_dfgLHFinish"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center"
+        android:paddingEnd="12dp"
+        android:paddingStart="12dp"
+        android:text="@string/wrong_info_un_correct" />
+
+
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#efefef"
+        />
+
+    <TextView
+        android:id="@+id/tv_restTime_dfgLHFinish"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:paddingEnd="20dp"
+        android:paddingStart="20dp"
+        android:text="@string/rest_min_and_sec" />
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#efefef"
+        />
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="12dp" />
+    <TextView
+        android:id="@+id/space_64"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:visibility="gone"/>
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/yo_teal"
+        />
 
     <TextView
         android:id="@+id/tvBtn_confirm_dfgLHFinish"
         android:layout_width="match_parent"
-        android:layout_height="46dp"
+        android:layout_height="45dp"
         android:layout_marginTop="2dp"
+        android:background="#77ff9800"
         android:gravity="center"
         android:text="@string/confirm"
-        android:textSize="18sp"
-        android:background="#8bc34a"
-        />
+        android:textSize="18sp" />
     <TextView
         android:id="@+id/tvBtn_back_dfgLHFinish"
         android:layout_width="match_parent"
@@ -85,17 +113,16 @@
         android:layout_marginTop="4dp"
         android:gravity="center"
         android:text="@string/back_2"
-        android:background="#eeff41"
+        android:background="#e0e0e0"
         />
 
     <TextView
         android:id="@+id/tvBtn_giveUp_dfgLHFinish"
         android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:gravity="center"
+        android:layout_height="42dp"
         android:layout_marginTop="4dp"
-        android:text="@string/give_up_2"
         android:background="#efefef"
-        />
+        android:gravity="center"
+        android:text="@string/give_up_2" />
 
 </LinearLayout>

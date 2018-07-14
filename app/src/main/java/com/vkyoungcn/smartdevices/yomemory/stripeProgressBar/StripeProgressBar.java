@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 
@@ -12,17 +13,16 @@ import com.vkyoungcn.smartdevices.yomemory.R;
 
 import java.util.ArrayList;
 
-import static com.vkyoungcn.smartdevices.yomemory.stripeProgressBar.SingleStripe.SINGLE_STRIPE_CORRECT;
-import static com.vkyoungcn.smartdevices.yomemory.stripeProgressBar.SingleStripe.SINGLE_STRIPE_CURRENT;
-import static com.vkyoungcn.smartdevices.yomemory.stripeProgressBar.SingleStripe.SINGLE_STRIPE_EMPTY;
-import static com.vkyoungcn.smartdevices.yomemory.stripeProgressBar.SingleStripe.SINGLE_STRIPE_UN_CORRECT;
+import static com.vkyoungcn.smartdevices.yomemory.stripeProgressBar.StripeProgressBar.SingleStripe.SINGLE_STRIPE_CORRECT;
+import static com.vkyoungcn.smartdevices.yomemory.stripeProgressBar.StripeProgressBar.SingleStripe.SINGLE_STRIPE_CURRENT;
+import static com.vkyoungcn.smartdevices.yomemory.stripeProgressBar.StripeProgressBar.SingleStripe.SINGLE_STRIPE_EMPTY;
+import static com.vkyoungcn.smartdevices.yomemory.stripeProgressBar.StripeProgressBar.SingleStripe.SINGLE_STRIPE_UN_CORRECT;
 
 /*
- * 作者1：杨胜@中国海洋大学图书馆
+ * 作者1：杨胜@中国海洋大学
  * 作者2：杨镇时@中国海洋大学
  * author：Victor Young @Ocean University of China
  * email: yangsheng@ouc.edu.cn
- *
  * 条纹状进度条，根据对应卡片的正误情况显示相应颜色。当前页显示白色稍长的（竖）线。
  * */
 public class StripeProgressBar extends View {
@@ -38,8 +38,9 @@ public class StripeProgressBar extends View {
     float unitSize;//最终使用大尺寸还是小尺寸，使用一个全局变量保持。
     private boolean unitSizeDone =false;//只计算一次即可。
 
-    private ArrayList<Integer> emptyCards;//从0起,存的是卡片序列（字串列表序列）的索引。
     private ArrayList<Integer> wrongCards;//从0起。
+    private ArrayList<Integer> emptyCards;//从0起,存的是卡片序列（字串列表序列）的索引。
+    //空白卡片需要按反序，先填满，再删除非空的。才符合逻辑
 
     private SingleStripe[] stripeSections;
     private Paint paintCorrect;
@@ -48,7 +49,6 @@ public class StripeProgressBar extends View {
     private Paint paintCurrentOutLine;
     private Paint somethingWrongPaint;
     private Paint paintNumber;
-    private Paint paint;//用于onDraw中逐块绘制时选取不同画笔。
 
     private int sizeChangedHeight;//是控件onSizeChanged后获得的尺寸之高度，也是传给onDraw进行线段绘制的canvas-Y坐标(单行时)
     private int sizeChangedWidth;
@@ -77,7 +77,30 @@ public class StripeProgressBar extends View {
     private int colorCurrentOutLine;
     private int colorNumbers;
 
+    //声明一个内部类，便于描述各节颜色状态。
+    public class SingleStripe{
+        public static final int SINGLE_STRIPE_CORRECT = 5201;
+        public static final int SINGLE_STRIPE_UN_CORRECT = 5202;
+        public static final int SINGLE_STRIPE_EMPTY = 5203;
+        public static final int SINGLE_STRIPE_CURRENT = 5204;
 
+        private int state = SINGLE_STRIPE_EMPTY ;//默认
+
+        public SingleStripe() {
+        }
+
+        public SingleStripe(int state) {
+            this.state = state;
+        }
+
+        public int getState() {
+            return state;
+        }
+
+        public void setState(int state) {
+            this.state = state;
+        }
+    }
 
 
     public StripeProgressBar(Context context) {
@@ -154,12 +177,12 @@ public class StripeProgressBar extends View {
         paintCorrect = new Paint();
         paintCorrect.setColor(colorCorrect);
         paintCorrect.setStrokeWidth(strokeWidth);
-        paintCorrect.setStyle(Paint.Style.STROKE);
+        paintCorrect.setStyle(Paint.Style.FILL);
 
         paintWrong = new Paint();
         paintWrong.setColor(colorWrong);
         paintWrong.setStrokeWidth(strokeWidth);
-        paintWrong.setStyle(Paint.Style.STROKE);
+        paintWrong.setStyle(Paint.Style.FILL);
 
         paintEmpty = new Paint();
         paintEmpty.setColor(colorEmpty);
@@ -286,12 +309,11 @@ public class StripeProgressBar extends View {
             float toYPerUnit = toY;
             switch (stripe.getState()){
                 case SINGLE_STRIPE_CORRECT:
-                    paint = paintCorrect;
-                    canvas.drawRect(startXPerUnit,startYPerUnit,toXPerUnit,toYPerUnit,paintCurrentOutLine);
+                    //正确或错误的各色块右侧空余一点，整体看上去有所间隔。
+                    canvas.drawRect(startXPerUnit,startYPerUnit,toXPerUnit-2,toYPerUnit,paintCorrect);
                     break;
                 case SINGLE_STRIPE_UN_CORRECT:
-                    paint = paintWrong;
-                    canvas.drawRect(startXPerUnit,startYPerUnit,toXPerUnit,toYPerUnit,paintCurrentOutLine);
+                    canvas.drawRect(startXPerUnit,startYPerUnit,toXPerUnit-2,toYPerUnit,paintWrong);
                     break;
                 case SINGLE_STRIPE_EMPTY:
                 case SINGLE_STRIPE_CURRENT:
@@ -362,10 +384,15 @@ public class StripeProgressBar extends View {
 
 
 
-    public void setTargetCodes(ArrayList<String> targetCode) {
+    public void initNecessaryData(ArrayList<String> targetCode) {
         this.targetCodes = targetCode;
-//        Log.i(TAG, "setTargetCodes: targetCodes.size="+targetCodes.size());
-                initStripes();
+
+        //正误状态列表、空元素记录列表初始化
+        wrongCards = new ArrayList<>();
+        emptyCards = new ArrayList<>();
+
+        //        Log.i(TAG, "initNecessaryData: targetCodes.size="+targetCodes.size());
+        initStripes();
     }
 
     public void setCurrentCodes(ArrayList<String> currentCode) {
@@ -380,17 +407,13 @@ public class StripeProgressBar extends View {
         //获取一共有多少“节”
         totalSize = targetCodes.size();
 
-        //正误状态列表初始化
-        wrongCards = new ArrayList<>();
-        emptyCards = new ArrayList<>();
-
-
         stripeSections = new SingleStripe[totalSize];
         //此时各节都是空的才对。只需获取容量尺寸。各节设为空状态。
         for (int i =0;i<totalSize;i++){
             SingleStripe stripe = new SingleStripe();
-            stripe.setState(SingleStripe.SINGLE_STRIPE_EMPTY);
+            stripe.setState(SINGLE_STRIPE_EMPTY);
             stripeSections[i] = stripe;
+            emptyCards.add(i);//全部索引存入（记录的是索引）
         }
 
         //调用invalidate开始绘制
@@ -456,20 +479,26 @@ public class StripeProgressBar extends View {
         //改动的条纹节进行重写
         if(currentCodes.get(changingPosition)!=null && !currentCodes.get(changingPosition).isEmpty()){
             //该项非NULL、非空，则可进行比较
+//            Log.i(TAG, "resetStripeAt: currentCodes.oldPosition is not Null.");
+//            Log.i(TAG, "resetStripeAt: oldPos="+changingPosition+"cCode:"+currentCodes.get(changingPosition)+",tCode:"+targetCodes.get(changingPosition)+"newPos="+currentPosition);
             if(currentCodes.get(changingPosition).equals(targetCodes.get(changingPosition))){
                 //比较后，值正确
                 stripeSections[changingPosition].setState(SINGLE_STRIPE_CORRECT);
+//                Log.i(TAG, "resetStripeAt: Correct");
             }else {
                 //值错误
-                stripeSections[changingPosition].setState(SingleStripe.SINGLE_STRIPE_UN_CORRECT);
+                stripeSections[changingPosition].setState(SINGLE_STRIPE_UN_CORRECT);
                 wrongCards.add(changingPosition);
+//                Log.i(TAG, "resetStripeAt: wrong");
             }
         }else {
             //该项空或NULL，未填
-            stripeSections[changingPosition].setState(SingleStripe.SINGLE_STRIPE_EMPTY);
+//            Log.i(TAG, "resetStripeAt Empty. oldPos="+changingPosition+"cCode:"+currentCodes.get(changingPosition)+",tCode:"+targetCodes.get(changingPosition)+"newPos="+currentPosition);
+
+            stripeSections[changingPosition].setState(SINGLE_STRIPE_EMPTY);
             emptyCards.add(changingPosition);
         }
-        stripeSections[currentPosition].setState(SingleStripe.SINGLE_STRIPE_CURRENT);
+        stripeSections[currentPosition].setState(SINGLE_STRIPE_CURRENT);
 
         invalidate();//数据更新后重绘控件。
     }

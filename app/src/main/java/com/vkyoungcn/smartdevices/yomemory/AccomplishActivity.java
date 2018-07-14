@@ -27,7 +27,12 @@ import java.util.Date;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_AND_CREATE_ORDER;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_AND_MERGE;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_GENERAL;
-
+/*
+ * 作者1：杨胜 @中国海洋大学
+ * 作者2：杨镇时 @中国海洋大学
+ * author：Victor Young @Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * */
 public class AccomplishActivity extends AppCompatActivity {
 
     public static final int DB_DONE_LG_ACA = 2801;

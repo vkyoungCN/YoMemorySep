@@ -10,7 +10,7 @@ import java.util.ArrayList;
 /*
 * 本类用于减轻RecyclerView的Adapter中，数据显示过程中的负担，提前将需要转换的数据计算出来，直接提供。
 * */
-public class RVGroup implements Parcelable{
+public class RVGroup implements Parcelable ,Cloneable{
     private static final String TAG = "RVGroup";
 
     private int id = 0;//DB列
@@ -25,6 +25,9 @@ public class RVGroup implements Parcelable{
 
     //以下一项是Item表提供给DBGroup的
     private short totalItemsNum= 0;//本组所属资源总量
+
+    public RVGroup() {
+    }
 
     public RVGroup(int id, String description, int mission_id, long settingUptimeInLong, long lastLearningTime, float RM_Amount, byte memoryStage, short totalItemsNum) {
         this.id = id;
@@ -148,7 +151,7 @@ public class RVGroup implements Parcelable{
     * 从而用于Rv-UI显示的变更。
     * 通过返回值告知调用方是否进行了实际的更新。
     * */
-    public boolean refreshRMA(){
+    public boolean needRmaRefresh(){
         float newRMA = getCurrentRMAmount();
         if(this.RM_Amount == newRMA){
             return false;//代表新旧值一致，无需更新
@@ -225,7 +228,8 @@ public class RVGroup implements Parcelable{
     @Override
     public Object clone() throws CloneNotSupportedException {
         //如果不包含引用成员，则浅复制即可
-        RVGroup rvGroup = null;
+        RVGroup rvGroup = new RVGroup();//这里指向new或者null都不出错。但是即使指向null，RvGroup也必须有空构造器
+        // 否则崩溃，空指针错误。同时RvGroup需要实现Cloneable.
         try {
             rvGroup = (RVGroup)super.clone();
         } catch (CloneNotSupportedException e) {

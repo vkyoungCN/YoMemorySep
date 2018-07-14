@@ -12,12 +12,16 @@ import android.view.View;
 import com.vkyoungcn.smartdevices.yomemory.R;
 
 import java.text.DecimalFormat;
-
 /*
-* 饼图
-* 暂时实现为一个只有两项数据(其中一是总数、另一是单项分数)的、参数既定的简单版。
-* 当然，数据是动态生成的。
-* */
+ * 作者1：杨胜 @中国海洋大学
+ * 作者2：杨镇时 @中国海洋大学
+ * author：Victor Young @Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ *
+ * 饼图
+ * 暂时实现为一个只有两项数据(其中一是总数、另一是单项分数)的、参数既定的简单版。
+ * 当然，数据是动态生成的。
+ **/
 public class PieChart extends View {
     private static final String TAG = "PieChart";
     private Context mContext;

@@ -124,12 +124,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="@string/random"
-                android:checked="true"/>
+                />
             <RadioButton
                 android:id="@+id/rb_order_groupCreateDfg"
                 android:padding="2dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:checked="true"
                 android:text="@string/Order"/>
         </RadioGroup>
 
@@ -175,41 +176,42 @@
 
     </LinearLayout>
 
-
+<!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/yo_light_green"
+        />
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:orientation="horizontal"
-        android:padding="4dp">
+        android:layout_marginTop="1dp"
+        >
 
         <TextView
             android:id="@+id/btn_cancel_createGroupDfg"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="48dp"
+            android:layout_height="match_parent"
             android:gravity="center"
-            android:layout_margin="4dp"
+            android:layout_margin="1dp"
             android:text="@string/cancel"
             android:textSize="16sp"
-            android:background="#55e5e5e5"
-
+            android:background="#efefef"
             />
 
         <TextView
             android:id="@+id/btn_ok_createGroupDfg"
             android:layout_width="0dp"
-            android:layout_weight="3"
-            android:layout_height="48dp"
+            android:layout_weight="2"
+            android:layout_height="match_parent"
             android:gravity="center"
-            android:layout_margin="4dp"
+            android:layout_margin="1dp"
             android:text="@string/add_new_group"
             android:textSize="16sp"
-            android:textColor="#212121"
-            android:background="#cc64dd17"
-
+            android:background="@color/yo_teal"
             />
-
-
     </LinearLayout>
 
 
