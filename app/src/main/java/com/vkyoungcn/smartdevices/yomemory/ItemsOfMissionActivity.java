@@ -35,8 +35,8 @@ import java.util.List;
  * 列表加载期间展示遮罩层，加载完毕后取消遮罩。
  * 对列表的CURD操作都会更新RV列表的显示。
  * */
-public class ItemsAndMissionDetailActivity extends AppCompatActivity {
-    private static final String TAG = "ItemsAndMissionDetailActivity";
+public class ItemsOfMissionActivity extends AppCompatActivity {
+    private static final String TAG = "ItemsOfMissionActivity";
 
     public static final int MESSAGE_ITEMS_DB_PRE_FETCHED =5011;
 
@@ -61,7 +61,7 @@ public class ItemsAndMissionDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_items_and_mission_detail_activiy);
+        setContentView(R.layout.activity_items_of_mission);
 
         TextView missionDetailName = (TextView) findViewById(R.id.tv_mission_detail_name);
         TextView missionDetailDescription = (TextView) findViewById(R.id.tv_mission_detail_description);
@@ -88,17 +88,17 @@ public class ItemsAndMissionDetailActivity extends AppCompatActivity {
 
 
     final static class ItemsOfMissionHandler extends Handler{
-        private final WeakReference<ItemsAndMissionDetailActivity> activityWeakReference;
+        private final WeakReference<ItemsOfMissionActivity> activityWeakReference;
 
-        private ItemsOfMissionHandler(ItemsAndMissionDetailActivity activity) {
+        private ItemsOfMissionHandler(ItemsOfMissionActivity activity) {
             this.activityWeakReference = new WeakReference<>(activity);
         }
 
         @Override
         public void handleMessage(Message msg) {
-            ItemsAndMissionDetailActivity itemsAndMissionDetailActivity = activityWeakReference.get();
-            if(itemsAndMissionDetailActivity!=null){
-                itemsAndMissionDetailActivity.handleMessage(msg);
+            ItemsOfMissionActivity itemsOfMissionActivity = activityWeakReference.get();
+            if(itemsOfMissionActivity !=null){
+                itemsOfMissionActivity.handleMessage(msg);
             }
         }
     }

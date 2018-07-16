@@ -143,10 +143,10 @@
                 android:layout_width="0dp"
                 android:layout_weight="8"
                 android:layout_height="match_parent"
-                android:text="@string/str_default"
+                android:text="@string/str_app_config"
                 android:padding="8dp"
-                android:textSize="18sp"
                 android:gravity="center"
+                android:onClick="appConfiguration"
                 />
 
             <!--小横分割线-->

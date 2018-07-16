@@ -118,18 +118,19 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
 
                     break;
 
-               /* case R.id.rvLlt_overall_groupOfMission:
+                case R.id.rvLlt_overall_groupOfMission:
                     //转到详情页（详情页上可以进行编辑、也有学习按钮）
                     Toast.makeText(context, "转到详情页", Toast.LENGTH_SHORT).show();
 
                     //后页需要group_id、tableSuffix
                     Intent intentToGD = new Intent(context, GroupDetailActivity.class);
-                    intentToGD.putExtra("GroupId",groups.get(getAdapterPosition()).getId());
-                    intentToGD.putExtra("TableSuffix",tableSuffix);
+                    intentToGD.putExtra("GROUP",groups.get(getAdapterPosition()));
+                    Log.i(TAG, "onClick: clickd group.ms:"+groups.get(getAdapterPosition()).getMemoryStage());
+                    intentToGD.putExtra("TABLE_SUFFIX",tableSuffix);
 
                     context.startActivity(intentToGD);
 
-                    break;*/
+                    break;
 
             }
         }

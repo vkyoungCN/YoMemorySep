@@ -21,12 +21,14 @@ public class RvMission implements Parcelable {
     private int starType = 1;//星标类型，默认1（对应蓝色？）。
 
     private int startResourceId = 0;//用于Rv快速显示，从startType量计算转换得来。
+    private int headerColorId = 0;
     private float donePercentage = 0;//用于Rv快速显示，需计算得来。
 
+    public RvMission() {
+    }
+
     //完全构造器
-
-
-    public RvMission(int id, String name, String simpleDescription, String detailDescription, String tableItem_suffix, int starType, int startResourceId, float donePercentage) {
+    public RvMission(int id, String name, String simpleDescription, String detailDescription, String tableItem_suffix, int starType, int startResourceId, int headerColorId, float donePercentage) {
         this.id = id;
         this.name = name;
         this.simpleDescription = simpleDescription;
@@ -34,6 +36,7 @@ public class RvMission implements Parcelable {
         this.tableItem_suffix = tableItem_suffix;
         this.starType = starType;
         this.startResourceId = startResourceId;
+        this.headerColorId = headerColorId;
         this.donePercentage = donePercentage;
     }
 
@@ -50,15 +53,19 @@ public class RvMission implements Parcelable {
         switch (starType){
             case 0:
                 this.startResourceId = R.drawable.star_gray;
+                this.headerColorId = 0;
                 break;
             case 1:
                 this.startResourceId = R.drawable.star_blue;
+                this.headerColorId = R.color.mission_card_blue;
                 break;
             case 2:
                 this.startResourceId = R.drawable.star_red;
+                this.headerColorId = R.color.mission_card_red;
                 break;
             default:
                 this.startResourceId = R.drawable.star_blue;
+                this.headerColorId = R.color.mission_card_blue;
         }
         this.startResourceId = startResourceId;
 
@@ -136,6 +143,14 @@ public class RvMission implements Parcelable {
         this.donePercentage = donePercentage;
     }
 
+    public int getHeaderColorId() {
+        return headerColorId;
+    }
+
+    public void setHeaderColorId(int headerColorId) {
+        this.headerColorId = headerColorId;
+    }
+
     /*
      * 以下是Parcelable要求的内容
      * */
@@ -152,6 +167,7 @@ public class RvMission implements Parcelable {
         parcel.writeString(tableItem_suffix);
         parcel.writeInt(starType);
         parcel.writeInt(startResourceId);
+        parcel.writeInt(headerColorId);
         parcel.writeString(detailDescription);//如果增加了新字段而在此未增加的话，该字段无法通过intent、bundle等传递。类本身能传，但相应字段得null。
         parcel.writeFloat(donePercentage);
     }
@@ -175,6 +191,7 @@ public class RvMission implements Parcelable {
         tableItem_suffix = in.readString();
         starType = in.readInt();
         startResourceId = in.readInt();
+        headerColorId = in.readInt();
         detailDescription = in.readString();
         donePercentage = in.readFloat();
     }

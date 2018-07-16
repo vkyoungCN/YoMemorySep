@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.customUI.PieChart;
 import com.vkyoungcn.smartdevices.yomemory.fragments.FastLearnDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.LearningAddInOrderDiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.FastRePickDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMission;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
@@ -22,6 +22,12 @@ import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 import static com.vkyoungcn.smartdevices.yomemory.LogoPageActivity.YO_MEMORY_SP;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.FastLearnDiaFragment.DEFAULT_MANNER_ORDER;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.FastLearnDiaFragment.DEFAULT_MANNER_RANDOM;
+import static com.vkyoungcn.smartdevices.yomemory.fragments.FastLearnDiaFragment.DEFAULT_MANNER_UNDEFINED_L;
+import static com.vkyoungcn.smartdevices.yomemory.fragments.FastRePickDiaFragment.DEFAULT_MANNER_MS;
+import static com.vkyoungcn.smartdevices.yomemory.fragments.FastRePickDiaFragment.DEFAULT_MANNER_RMA;
+import static com.vkyoungcn.smartdevices.yomemory.fragments.FastRePickDiaFragment.DEFAULT_MANNER_TT;
+import static com.vkyoungcn.smartdevices.yomemory.fragments.FastRePickDiaFragment.DEFAULT_MANNER_UNDEFINED;
+
 /*
 * 作者1：杨胜 @中国海洋大学
 * 作者2：杨镇时 @中国海洋大学
@@ -45,8 +51,12 @@ public class MissionDetailsActivity extends AppCompatActivity implements OnGener
     private YoMemoryDbHelper memoryDbHelper = YoMemoryDbHelper.getInstance(this);
 
     private SharedPreferences sharedPreferences;
-    private boolean noMoreTipBox;
+    private SharedPreferences.Editor editor;
+    private boolean noMoreL_TipBox;
+    private boolean noMoreR_TipBox;
     private boolean isFastLearnUseOrder;
+    private int fastRePickManner;
+    private int totalGroupsNum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,20 +87,22 @@ public class MissionDetailsActivity extends AppCompatActivity implements OnGener
 
         pc_pieChart.setData(totalItemsNum,totalLearnedItemsNum);
 
-        int totalGroupsNum = memoryDbHelper.getGroupsNumOfMission(mission.getId());
+        totalGroupsNum = memoryDbHelper.getGroupsNumOfMission(mission.getId());
         tv_AllGroupsNum.setText(String.format(getResources().getString(R.string.holder_total_groupNum),totalGroupsNum));
+
+        sharedPreferences = getSharedPreferences(YO_MEMORY_SP, MODE_PRIVATE);
 
 
     }
 
     public void toAllItemsDetails(View view){
-        Intent intentToItems = new Intent(this,ItemsAndMissionDetailActivity.class);
+        Intent intentToItems = new Intent(this,ItemsOfMissionActivity.class);
         intentToItems.putExtra("MISSION",mission);
         this.startActivity(intentToItems);
     }
 
     public void toAllGroupsDetails(View view){
-        Intent intentToGroups = new Intent(this,GroupsAndMissionDetailActivity.class);
+        Intent intentToGroups = new Intent(this,GroupsOfMissionActivity.class);
         intentToGroups.putExtra("MISSION",mission);
         this.startActivity(intentToGroups);
     }
@@ -105,17 +117,14 @@ public class MissionDetailsActivity extends AppCompatActivity implements OnGener
     * 按钮：取消、确定
     * 结果——开始“边学边建”
     * */
-    public void learnNow(View view){
+    public void fastLearn(View view){
         //先检测sp，是否设置了“不再提示”
         //检测sp，默认的开始方式是随机还是顺序（如无，则按顺序开始）
-        sharedPreferences = getSharedPreferences(YO_MEMORY_SP, MODE_PRIVATE);
-        noMoreTipBox = sharedPreferences.getBoolean("NO_MORE_TIPS", false);
+        noMoreL_TipBox = sharedPreferences.getBoolean("NO_MORE_TIPS", false);
         isFastLearnUseOrder = sharedPreferences.getBoolean("IS_ORDER",true);
-//        Log.i(TAG, "learnNow: is sp order? ="+isFastLearnUseOrder);
-//        Log.i(TAG, "learnNow: is noMoreBox = "+noMoreTipBox);
 
         Toast.makeText(this, "MissionDetail页快速学习按钮", Toast.LENGTH_SHORT).show();
-        if(!noMoreTipBox) {
+        if(!noMoreL_TipBox) {
          //并未设置“不再显示对话框”
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
             Fragment prev = getFragmentManager().findFragmentByTag("FAST_LEARN");
@@ -142,39 +151,111 @@ public class MissionDetailsActivity extends AppCompatActivity implements OnGener
         }
     }
 
+    public void fastRePick(View view){
+        //检测sp中关于目标Dfg的特别设置
+        noMoreR_TipBox = sharedPreferences.getBoolean("NO_MORE_R_TIPS", false);
+        fastRePickManner = sharedPreferences.getInt("FAST_R_MANNER",DEFAULT_MANNER_TT);
+        if(!noMoreR_TipBox) {
+            //未设置不显示对话框
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            Fragment prev = getFragmentManager().findFragmentByTag("FAST_RE_PICK");
+
+            if (prev != null) {
+                Toast.makeText(this, "Old DialogFg still there, removing first...", Toast.LENGTH_SHORT).show();
+                transaction.remove(prev);
+            }
+            DialogFragment dfg = FastRePickDiaFragment.newInstance(fastRePickManner);
+            dfg.show(transaction, "FAST_RE_PICK");
+        }else {
+            //直接根据默认设置开始
+
+
+        }
+    }
+
     @Override
     public void onButtonClickingDfgInteraction(int dfgType, Bundle data) {
-       if(data!=null){
-           //对传出的全局设置进行修改。
-           SharedPreferences.Editor editor = sharedPreferences.edit();
-           //（一）默认方式
-           int defaultManner = data.getInt("DEFAULT_MANNER_SETTINGS");
-           if(defaultManner == DEFAULT_MANNER_RANDOM){
-               editor.putBoolean("IS_ORDER", false);
-           }else if(defaultManner == DEFAULT_MANNER_ORDER){
-               //还有可能之前已经设随机为默认，然后又改为顺序默认。
-               editor.putBoolean("IS_ORDER",true);
-           }//另一种是未设置，则不做更改即可
+        //目前只有两种DFG发回本回调。
+        int learningType = LEARNING_AND_CREATE_ORDER;//默认值
+        editor = sharedPreferences.edit();
+        Intent intentToPFL = new Intent(this, PrepareForLearningActivity.class);
+        intentToPFL.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        intentToPFL.putExtra("TABLE_SUFFIX", mission.getTableItem_suffix());//通用数据
 
-           //（二）是否继续显示对话框
-           noMoreTipBox = data.getBoolean("NO_MORE_BOX",false);
-           if(noMoreTipBox){
-               editor.putBoolean("NO_MORE_TIPS",true);
-           }/*else {
+        switch (dfgType) {
+            case FAST_LEARN:
+            if (data != null) {
+                boolean useOrder = data.getBoolean("IS_ORDER");
+                if(!useOrder){
+                    learningType = LEARNING_AND_CREATE_RANDOM;
+                }
+                //对传出的全局设置进行修改。
+                //（一）默认方式
+                int defaultManner = data.getInt("DEFAULT_MANNER_SETTINGS");
+                if (defaultManner == DEFAULT_MANNER_ORDER){
+                    editor.putBoolean("IS_ORDER", true);
+                }else if(defaultManner == DEFAULT_MANNER_RANDOM){
+                    editor.putBoolean("IS_ORDER", false);
+                }
+
+                //（二）是否继续显示对话框
+                noMoreL_TipBox = data.getBoolean("NO_MORE_BOX", false);
+                if (noMoreL_TipBox) {
+                    editor.putBoolean("NO_MORE_TIPS", true);
+                }/*else {
                editor.putBoolean("NO_MORE_TIPS",false);
                //【从“不开启”到“开启”的改变则应在其他页面处理，如设置界面。】
            }*/
-           editor.apply();
-       }
+                editor.apply();
+            }
 
-        //主要任务：跳转到学习准备页（该页负责根据学习类型进行数据准备）
-        Intent intentToPFL = new Intent(this,PrepareForLearningActivity.class);
-        intentToPFL.putExtra("LEARNING_TYPE",dfgType);
-        intentToPFL.putExtra("TABLE_SUFFIX",mission.getTableItem_suffix());
-        intentToPFL.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-        this.startActivity(intentToPFL);
+            //主要任务：跳转到学习准备页（该页负责根据学习类型进行数据准备）
+            intentToPFL.putExtra("LEARNING_TYPE", learningType);
+            intentToPFL.putExtra("MISSION_ID",mission.getId());//LC特别数据
+            this.startActivity(intentToPFL);
 
+            break;
+
+            case FAST_RE_PICK:
+                if(totalGroupsNum ==0){
+                    Toast.makeText(this, "尚无分组建立，无法执行复习。", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                learningType = LEARNING_GENERAL_NO_GID;//快速复习只对应一种模式LG（但是没有GID传递）
+
+                if (data != null) {
+                    //对传出的全局设置进行修改。
+                    //（一）默认方式（快速复习）
+                    int defaultRpManner = data.getInt("DEFAULT_MANNER_R_SETTINGS");
+                    if (defaultRpManner != DEFAULT_MANNER_UNDEFINED) {
+                        editor.putInt("FAST_R_MANNER", defaultRpManner);
+                    } //另一种是未设置，则不做更改即可
+
+                    //（二）是否继续显示对话框（快速复习）
+                    noMoreL_TipBox = data.getBoolean("NO_MORE_BOX", false);
+                    if (noMoreL_TipBox) {
+                        editor.putBoolean("NO_MORE_R_TIPS", true);
+                    }/*else {
+                        editor.putBoolean("NO_MORE_TIPS",false);//【从“不开启”到“开启”的改变则应在其他页面处理，如设置界面。】
+                    }*/
+                    editor.apply();
+
+                    intentToPFL.putExtra("PRIORITY_SETTING",defaultRpManner);//LGN的特别数据，要在if内设置
+
+                }
+
+                //主要任务：跳转到学习准备页（该页负责根据学习类型进行数据准备）
+                intentToPFL.putExtra("LEARNING_TYPE", learningType);
+                intentToPFL.putExtra("MISSION_ID",mission.getId());
+                this.startActivity(intentToPFL);
+
+                break;
+        }
 
 
     }
+
+
+
 }

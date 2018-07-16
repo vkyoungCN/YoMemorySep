@@ -99,7 +99,7 @@
     <string name="star_symbol">☆</string>
     <string name="one_hour_extra">1小时内多次复习</string>
     <string name="zero">0</string>
-    <string name="alpha_testing_string">（工程测试α-0.5.0）</string>
+    <string name="alpha_testing_string">（工程测试α-0.7.5）</string>
     <string name="fragmentGroupStart">碎+</string>
     <string name="fragmentGroupsList">碎列</string>
     <string name="fragmentGroupRe">碎×</string>
@@ -141,9 +141,9 @@
     <string name="str_MemoryStage">记忆级别</string>
     <string name="str_RMAmount">记忆存量</string>
     <string name="str_timeLeft">预计XX天XX小时xx分钟后，记忆存量衰减至最低阈限，请在此前完成复习。</string>
-    <string name="sharp_x_id">#xx</string>
+    <string name="hs_sharp_x_id">id:%1$d</string>
     <string name="sharp_xx_description">xxxxxxx分组描述xxxxxx</string>
-    <string name="sharp_x_num">（xx）</string>
+    <string name="hs_sharp_x_num">（%1$d）</string>
     <string name="str_groupSetTime">建组时间</string>
     <string name="str_sharp_time">####-##-## ##:##</string>
     <string name="str_groupLastLearningTime">最近复习时间</string>
@@ -226,8 +226,8 @@
     <string name="str_MS_brk">(ms)</string>
     <string name="str_RMA_brk">(rma)</string>
     <string name="groupId_Num">组号%1$d，容量%2$d</string>
-    <string name="RMA_info">记\n忆\n存\n量</string>
-    <string name="MS_info">记\n忆\n等\n级</string>
+    <string name="RMA_info">记忆存量</string>
+    <string name="MS_info">记忆等级</string>
     <string name="divide">%1$d个单词未完成，分拆为新组</string>
     <string name="learningType">学习类型：%1$s</string>
     <string name="hold_on_a_moment_2">正在努力地处理数据，马上呈现…</string>
@@ -315,6 +315,54 @@
     <string name="re_pick">复习</string>
     <string name="confirm_delete">确认删除</string>
     <string name="confirm_delete_2">点击确认后将删除分组！</string>
+    <string name="more_logs">日志</string>
+    <string name="hs_re_pick_time_1">请在%1$d天%2$d小时%3$d分钟内完成复习</string>
+    <string name="hs_re_pick_time_2">请在%1$d小时%2$d分钟内完成复习</string>
+    <string name="hs_re_pick_time_3">请在%1$d分钟内完成复习</string>
+    <string name="learn_as_soon">新建组，请尽快学习！</string>
+    <string name="overTime_learn_as_soon">已超时，请尽快复习。</string>
+    <string name="str_app_config">程序设置</string>
+    <string name="configuration">程序设置</string>
+    <string name="fast_learn_configuration">快速学习设置项</string>
+    <string name="random_or_order_2">取词方式</string>
+    <string name="is_show_fastLearnBox">是否显示对话框</string>
+    <string name="show_1">显示对话框</string>
+    <string name="ms_first">MS优先</string>
+    <string name="rma_first">RMA优先</string>
+    <string name="tt_first">智能优先</string>
+    <string name="commit_when_confirm_2">（点击确定时设置会被保存）</string>
+    <string name="tip_fastRePick_ms">*MS优先：优先复习MS值较低的分组</string>
+    <string name="tip_fastRePick_rma">*RMA优先：优先复习RMA值较低的分组</string>
+    <string name="tip_fastRePick_tt">*智能优先：由系统选择最需要及时复习的分组</string>
+    <string name="hs_clock_down">自动选择：%1$d</string>
+    <string name="group_report">分组报告</string>
+    <string name="group_info_ac">此分组共%1$d个单词,完成%2$d个，未完成%3$d个</string>
+    <string name="wrong_info_ac">完成的词汇中，1$d个正确，%2$d个错误</string>
+    <string name="wrong_info_ac_1">完成的词汇中，全部正确</string>
+    <string name="group_dvd_ac">未完成单词从原分组脱离，形成新分组：\n%1$s</string>
+    <string name="status_changes">状态变化</string>
+    <string name="rma_change">记忆存量变化</string>
+    <string name="right">→</string>
+    <string name="ms_change">记忆等级变化</string>
+    <string name="ms_up">记忆升级！</string>
+    <string name="ms_keep">记忆保持</string>
+    <string name="merge_info_ac">选定词汇共有%1$d个，其中%2$d个完成</string>
+    <string name="unmerge_ac">*未完成部分不作处理</string>
+    <string name="merge_changes">选定分组的合并情况如下</string>
+    <string name="source_group_name">来源组</string>
+    <string name="index">序号</string>
+    <string name="source_group_size">原容量</string>
+    <string name="merge_size">并入量</string>
+    <string name="result_1">处理</string>
+    <string name="lc_info_ac">共完成%1$d个词汇</string>
+    <string name="created">新建分组</string>
+    <string name="created_1">新分组#%1$s#生成</string>
+    <string name="saving_1">--=正在写入数据，请不要强行退出=--</string>
+    <string name="saving_done">数据保存完成</string>
+    <string name="down_ward">﹀</string>
+    <string name="horizontal_bar">--</string>
+    <string name="reason_for_ms_1">*开始复习的时间太晚</string>
+    <string name="done_nothing">一个都没完成哦。</string>
 
 
 </resources>

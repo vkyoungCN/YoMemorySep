@@ -15,9 +15,12 @@
 
         <!--第一行-->
         <LinearLayout
+            android:id="@+id/llt_header_rvAM"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:background="#bbdefb"
+            >
 
             <ImageView
                 android:id="@+id/starAtStart"

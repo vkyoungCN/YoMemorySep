@@ -734,7 +734,6 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     * 但是时间区间下限的记录则需要使用有效复习中的最大时间记录。
     * */
     private long getLastLearningTimeInLong(int groupId){
-//        Log.i(TAG, "getLastLearningTimeInLong: be.");
         String selectLastTimeQuery = "SELECT "+YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG+
                 " FROM "+YoMemoryContract.LearningLogs.TABLE_NAME+" WHERE "+
                 YoMemoryContract.LearningLogs.COLUMN_GROUP_ID+" = "+groupId+" ORDER BY "+
@@ -747,6 +746,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         if(cursor.moveToFirst()){//降序之下只取第一行即可。不使用LIMIT。
             resultLong = cursor.getLong(0);//毕竟只有1列的结果。【但是不知道是否从0起】
         }
+//        Log.i(TAG, "getLastLearningTimeInLong: result LastLT="+resultLong);
 
         try {
             cursor.close();
@@ -800,6 +800,8 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         if(cursor.moveToFirst()){
             resultNumber = (byte) cursor.getInt(0);
         }
+//                Log.i(TAG, "getEffectiveLearningTime: result MS="+resultNumber);
+
         try {
             cursor.close();
         } catch (Exception e) {
@@ -891,7 +893,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         }
         mSQLiteDatabase.setTransactionSuccessful();
         mSQLiteDatabase.endTransaction();
-
+//        Log.i(TAG, "getGroupById: group.ms="+group.getEffectiveRePickingTimes()+", group.llt="+group.getLastLearningTime());
         closeDB();
         return group;
     }
@@ -904,14 +906,24 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     * 而Items表与group表之间的外键没有特殊约束，因而需要手动处理所属items的归属。
     * 本方法主要适用于合并式学习之后对“被吞噬”分组的删除；其余普通的删除应使用……方法。
     * */
-    public void deleteGroupsAndLogs(ArrayList<Integer> groupIds){
+    public void deleteJustGroups(ArrayList<Integer> groupIds){
         getWritableDatabaseIfClosedOrNull();
-        for (int i : groupIds) {
-            String deleteSingleGroupSql = "DELETE FROM "+ YoMemoryContract.Group.TABLE_NAME+" WHERE "+
-                    YoMemoryContract.Group._ID+" = "+i;
-            mSQLiteDatabase.execSQL(deleteSingleGroupSql);
 
+        StringBuilder sbr = new StringBuilder();
+        sbr.append("( ");
+
+        for (int i :groupIds) {
+            sbr.append(i);
+            sbr.append(", ");
         }
+
+        sbr.deleteCharAt(sbr.length()-2);
+        sbr.append(")");
+
+        String deleteSingleGroupSql = "DELETE FROM "+ YoMemoryContract.Group.TABLE_NAME+" WHERE "+
+                YoMemoryContract.Group._ID+" IN "+sbr.toString();
+
+        mSQLiteDatabase.execSQL(deleteSingleGroupSql);
         closeDB();
     }
 
@@ -1126,7 +1138,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
             contentValues.put(YoMemoryContract.ItemBasic.COLUMN_PRIORITY,singleItem.getPriority());
             contentValues.put(YoMemoryContract.ItemBasic.COLUMN_FAILED_SPELLING_TIMES,singleItem.getFailedSpelling_times());
 
-            rowsAffected = mSQLiteDatabase.update(YoMemoryContract.ItemBasic.TABLE_NAME+tableSuffix,contentValues,
+            rowsAffected+= mSQLiteDatabase.update(YoMemoryContract.ItemBasic.TABLE_NAME+tableSuffix,contentValues,
                     YoMemoryContract.ItemBasic._ID+" = ?",new String[]{String.valueOf(singleItem.getId())});
         }
 
@@ -1148,7 +1160,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
             contentValues.put(YoMemoryContract.ItemBasic.COLUMN_PRIORITY,singleItem.getPriority());
             contentValues.put(YoMemoryContract.ItemBasic.COLUMN_FAILED_SPELLING_TIMES,singleItem.getFailedSpelling_times());
 
-            rowsAffected = mSQLiteDatabase.update(YoMemoryContract.ItemBasic.TABLE_NAME+tableSuffix,contentValues,
+            rowsAffected += mSQLiteDatabase.update(YoMemoryContract.ItemBasic.TABLE_NAME+tableSuffix,contentValues,
                     YoMemoryContract.ItemBasic._ID+" = ?",new String[]{String.valueOf(singleItem.getId())});
         }
 
@@ -1163,7 +1175,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
      * 修改的内容是：已抽取、已学习、gid、优先级、错次。
      * 其中将两个布尔值直接置true。
      * */
-    public int updateItemsPdnWithDoubleTrue(String tableSuffix, ArrayList<SingleItem> items){
+    public int updateItemsPdgWithDoubleTrue(String tableSuffix, ArrayList<SingleItem> items){
         int rowsAffected = 0;
         getWritableDatabaseIfClosedOrNull();
 

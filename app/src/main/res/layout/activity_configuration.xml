@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ConfigurationActivity"
+    android:orientation="vertical"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:background="#e0e0e0"
+        android:text="@string/configuration"
+        android:gravity="center"
+        android:textSize="16sp"
+        />
+    <!--分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#bdbdbd"
+        />
+
+    <!--分区1-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:background="#efefef"
+        android:text="@string/fast_learn_configuration"
+        android:gravity="start|center_vertical"
+        />
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#e0e0e0"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical"
+        >
+        <!--快速学习设置行1-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:orientation="horizontal">
+            <!--横分割线-->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#efefef"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/random_or_order_2"
+                android:padding="4dp"
+                android:gravity="center"
+                android:layout_gravity="center"/>
+
+            <!--横分割线-->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#efefef"
+                />
+
+            <RadioGroup
+                android:id="@+id/rg_fastLearnManner_C"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="2dp"
+                >
+
+                <RadioButton
+                    android:id="@+id/rb_random_C"
+                    android:padding="2dp"
+                    android:layout_width="72dp"
+                    android:layout_height="match_parent"
+                    android:text="@string/random"
+                    android:checked="true"
+                    />
+                <RadioButton
+                    android:id="@+id/rb_order_C"
+                    android:padding="2dp"
+                    android:layout_width="72dp"
+                    android:layout_height="match_parent"
+                    android:checked="true"
+                    android:text="@string/Order"/>
+
+
+
+            </RadioGroup>
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#efefefef"
+                />
+
+
+        </LinearLayout>
+        <!--横分割线-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#efefef"
+            />
+        <!--快速学习设置行2-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:orientation="horizontal">
+            <!--横分割线-->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#efefef"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/is_show_fastLearnBox"
+                android:padding="4dp"
+                android:gravity="center"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#efefef"
+                />
+
+            <CheckBox
+                android:id="@+id/ckb_showTipBox_C"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="2dp"
+                android:text="@string/show_1"
+                android:textColor="@android:color/holo_orange_dark"
+                />
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#efefefef"
+                />
+
+
+        </LinearLayout>
+        <!--横分割线-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#efefef"
+            />
+
+    </LinearLayout>
+
+
+
+
+</LinearLayout>

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.vkyoungcn.smartdevices.yomemory.GroupsAndMissionDetailActivity"
+    tools:context="com.vkyoungcn.smartdevices.yomemory.GroupsOfMissionActivity"
     android:orientation="vertical">
 
 
@@ -277,13 +277,24 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="bottom|end"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="24dp"
             android:layout_marginEnd="12dp"
             android:onClick="fabMainClick"
             android:scaleType="centerCrop"
             android:src="@drawable/more_2"
             app:backgroundTint="@color/litePB_color_index" />
 
+        <TextView
+            android:id="@+id/fabTv_IAMD"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/click_and_more_2"
+            android:layout_gravity="end|bottom"
+            android:layout_marginEnd="12dp"
+            android:textSize="12sp"
+            android:textColor="#424242"
+            android:layout_marginBottom="8dp"
+            />
 
     </FrameLayout>
 

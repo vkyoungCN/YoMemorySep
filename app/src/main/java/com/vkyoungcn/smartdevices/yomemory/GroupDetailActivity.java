@@ -6,8 +6,10 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,18 +32,19 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 /*
- * 作者1：杨胜@中国海洋大学图馆
+ * 作者1：杨胜@中国海洋大学
  * 作者2：杨镇时@中国海洋大学
  * author：Victor Young @Ocean University of China
  * email: yangsheng@ouc.edu.cn
 * */
-public class GroupDetailActivity extends Activity implements OnGeneralDfgInteraction {
-//    private static final String TAG = "GroupDetailActivity";
+public class GroupDetailActivity extends AppCompatActivity implements OnGeneralDfgInteraction {
+    private static final String TAG = "GroupDetailActivity";
     private RVGroup rvGroup;
     private YoMemoryDbHelper memoryDbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_detail);
 
@@ -54,72 +57,82 @@ public class GroupDetailActivity extends Activity implements OnGeneralDfgInterac
         TextView group_RMA = (TextView) findViewById(R.id.tv_rma_GD);
         TextView remainTime = (TextView) findViewById(R.id.tv_remainTime_GD);
 
-        ImageView moreLogsBtn = findViewById(R.id.ivBtn_allLogs_GD);
+        TextView moreLogsBtn = findViewById(R.id.ivBtn_allLogs_GD);
 
         RecyclerView rv_itemsOfGroup = (RecyclerView)findViewById(R.id.rv_itemsOfGroup_GD);
 
-        int groupIdFromIntent = getIntent().getIntExtra("GroupId",0);
-        String tableSuffix = getIntent().getStringExtra("TableSuffix");
+        rvGroup = getIntent().getParcelableExtra("GROUP");
+//        Log.i(TAG, "onCreate: get rvg from intent,-.ms="+rvGroup.getMemoryStage());
+        String tableSuffix = getIntent().getStringExtra("TABLE_SUFFIX");
 
-        memoryDbHelper = YoMemoryDbHelper.getInstance(getApplicationContext());
 
-        //从DB获取本group，如果在Intent传的话需要序列化，也是较大开销。
-        DBGroup dbGroup = memoryDbHelper.getGroupById(groupIdFromIntent,tableSuffix);
-        rvGroup = new RVGroup(dbGroup);
+//        DBGroup dbGroup = memoryDbHelper.getGroupById(group,tableSuffix);
 
-        //从DB获取本组所属的items
-        ArrayList<SingleItem> items = memoryDbHelper.getItemsByGroupId(groupIdFromIntent,tableSuffix);
+        if (this.rvGroup !=null) {
+            //从DB获取本组所属的items
+            memoryDbHelper = YoMemoryDbHelper.getInstance(getApplicationContext());
+            ArrayList<SingleItem> items = memoryDbHelper.getItemsByGroupId(this.rvGroup.getId(),tableSuffix);
 
-        if (rvGroup !=null) {
             //将group的信息填充到UI
-            groupId.setText(String.valueOf(rvGroup.getId()));
-            groupDescription.setText(rvGroup.getDescription());
-            groupSubNum.setText(String.valueOf(items.size()));
+            groupId.setText(String.format(getResources().getString(R.string.hs_sharp_x_id), this.rvGroup.getId()));
+            groupDescription.setText(this.rvGroup.getDescription());
+            groupSubNum.setText(String.format(getResources().getString(R.string.hs_sharp_x_num),items.size()));
 
-            Date settingUpTimeDate = new Date(rvGroup.getSettingUptimeInLong());
-            Date lastLearningTimeDate = new Date(rvGroup.getLastLearningTime());
+            Date settingUpTimeDate = new Date(this.rvGroup.getSettingUptimeInLong());
+            Date lastLearningTimeDate = new Date(this.rvGroup.getLastLearningTime());
             SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String settingUpTimeStr = sdFormat.format(settingUpTimeDate);
             String lastLearningTimeStr = sdFormat.format(lastLearningTimeDate);
-
+            if(rvGroup.getLastLearningTime() ==0){
+                lastLearningTimeStr = "（尚无复习记录）";
+            }
             settingUpTime.setText(settingUpTimeStr);
-
-            group_MS.setText(String.valueOf(rvGroup.getMemoryStage()));
-            group_RMA.setText(String.valueOf(rvGroup.getRM_Amount()));
-
             lastLearnTime.setText(lastLearningTimeStr);
 
-            int remainingMinutes = RVGroup.minutesTillFarThreshold(rvGroup.getMemoryStage());
+            group_MS.setText(String.valueOf(this.rvGroup.getMemoryStage()));
+            group_RMA.setText(String.valueOf(this.rvGroup.getRM_Amount()));
+
+
+            int remainingMinutes = RVGroup.minutesTillFarThreshold(rvGroup.getMemoryStage(),rvGroup.getRM_Amount());
+
             remainTime.setText(formatFromMinutes(remainingMinutes));
 
             moreLogsBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     //展开显示全部的日志记录，初定DFG模式
-                    showLogs(rvGroup.getId());
+                    showLogs(GroupDetailActivity.this.rvGroup.getId());
                 }
             });
 
+            //Rv配置：LM、适配器
+            rv_itemsOfGroup.setLayoutManager(new LinearLayoutManager(this));
+            RecyclerView.Adapter adapter = new ItemsOfMissionRvAdapter(items,this);
+            rv_itemsOfGroup.setAdapter(adapter);
+
+        }else {
+            return;
         }
-
-
-        //Rv配置：LM、适配器
-        rv_itemsOfGroup.setLayoutManager(new LinearLayoutManager(this));
-        RecyclerView.Adapter adapter = new ItemsOfMissionRvAdapter(items,this);
-        rv_itemsOfGroup.setAdapter(adapter);
-
     }
 
     private String formatFromMinutes(int minutes){
+        if(minutes == -1){
+            //错误状态：新建组（值=-1）
+            return getResources().getString(R.string.learn_as_soon);
+        }else if(minutes == -2){
+            //错误状态，已超时
+            return getResources().getString(R.string.overTime_learn_as_soon);
+
+        }
         int days = minutes/(60*24);
         int hours = (minutes%(60*24))/60;
         int min = (minutes%60);
         if(days!=0) {
-            return "请在" + days + "天" + hours + "小时" + min + "分钟内完成复习";
+            return String.format(getResources().getString(R.string.hs_re_pick_time_1),days,hours,min);
         }else if(hours!=0){
-            return "请在"+ hours + "小时" + min + "分钟内完成复习";
+            return String.format(getResources().getString(R.string.hs_re_pick_time_2),hours,min);
         }else {
-            return "请在"+ min + "分钟内完成复习";
+            return String.format(getResources().getString(R.string.hs_re_pick_time_3),min);
         }
     }
 
@@ -174,7 +187,7 @@ public class GroupDetailActivity extends Activity implements OnGeneralDfgInterac
     @Override
     public void onButtonClickingDfgInteraction(int dfgType, Bundle data) {
         if(dfgType == JUMP_TO_GROUP_LIST_THIS_FRAG) {
-            Intent intentToGroupListActivity = new Intent(this, GroupsAndMissionDetailActivity.class);
+            Intent intentToGroupListActivity = new Intent(this, GroupsOfMissionActivity.class);
 
             intentToGroupListActivity.putExtra("GROUP_ID_TO_JUMP",data.getInt("GROUP_ID_TO_JUMP") );
             this.startActivity(intentToGroupListActivity);

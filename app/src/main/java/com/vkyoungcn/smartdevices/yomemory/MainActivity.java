@@ -3,6 +3,7 @@ package com.vkyoungcn.smartdevices.yomemory;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
@@ -164,8 +165,10 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
     //当RV-Adp中点击了星标后，会调用此回调方法，通知新的星标类型。
     //在本页退出时，应当存入DB。
     @Override
-    public void changeRvStar(int position,int newStartType) {
+    public void changeRvStar(int position) {
             allMissionRvAdapter.notifyItemChanged(position);
+
+            starClickedPositions.remove((Integer)position);//先删再提交，避免重复。
             starClickedPositions.add(position);//这些位置上发生过点击，应该提交到DB更新
         // （其新值应已在adapter中设置好了，毕竟是引用类型）
         //点击最后不一定改变了值，但是判断逻辑估计较复杂，从略、只要点击了就全存。
@@ -232,6 +235,17 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
         }
         DialogFragment dfg = GiveExplanationDiaFragment.newInstance();
         dfg.show(transaction, "GIVE_EXPLANATION");
+
+    }
+
+    public void appConfiguration(View view){
+        //各全局设置量
+        //①快速学习的设置：对话框是否显示、快速学习选项
+        //去往专用设置页
+        Intent intent = new Intent(this,ConfigurationActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+        this.startActivity(intent);
 
     }
 

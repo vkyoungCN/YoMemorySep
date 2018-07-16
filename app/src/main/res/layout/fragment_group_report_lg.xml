@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+    <!--标题栏-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:background="#efefef"
+        android:gravity="center"
+        android:text="@string/group_report"
+        android:textSize="16sp" />
+    <!--空词信息·全完成、部分完成-->
+    <TextView
+        android:id="@+id/tv_groupInfo_fg_AC"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:gravity="center_vertical"
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp"
+        android:text="@string/group_info_ac" />
+    <!--分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#e0e0e0" />
+    <!--拆分信息·如未拆分则text留空即可-->
+    <TextView
+        android:id="@+id/tv_groupDvd_fg_AC"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp"
+        android:text="@string/group_dvd_ac" />
+    <!--分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#e0e0e0" />
+    <!--错词信息·全对、部分对-->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/tv_wrongInfo_fgLG_AC"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
+            android:text="@string/wrong_info_ac" />
+
+        <!--分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefef"
+            android:layout_gravity="end"
+            android:layout_marginEnd="43dp"
+            />
+        <!--向下展开的按键-->
+        <TextView
+            android:id="@+id/tvBtn_wrongWordsLG_fg"
+            android:layout_width="42dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:paddingTop="12dp"
+            android:gravity="center"
+            android:text="@string/down_ward"
+            />
+
+    </FrameLayout>
+
+
+    <!--分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#e0e0e0" />
+
+
+    <!--新旧状态组件群-->
+    <!--群内顶部标题-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:background="#efefef"
+        android:gravity="center"
+        android:text="@string/status_changes" />
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#efefef" />
+
+    <!--此llt负责划分群内左右空间-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <!--左侧，RMA状态组件群-->
+        <LinearLayout
+            android:id="@+id/llt_rmaStatus_fg_AC"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!--群内顶部标题-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:gravity="center"
+                android:text="@string/rma_change" />
+            <!--横分割线-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#efefef" />
+
+            <!--内部子左右栏控制llt-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_RmaChangeOld_fg_AC"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/sharp_x2_default"
+                    android:textColor="#dd2c00"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tv_RmaChange_fg_AC"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/right"
+                    android:textColor="#dd2c00"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tv_RmaChangeNew_fg_AC"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/sharp_x2_default"
+                    android:textColor="#dd2c00"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+            <!--横分割线-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#efefef" />
+            <!--单侧底部信息栏-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="28dp"
+                android:background="#f5f5f5"
+                android:gravity="center"
+                android:textColor="@color/yo_orange" />
+        </LinearLayout>
+
+        <!--中间竖分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#e0e0e0" />
+
+        <!--右侧，MS状态组件群-->
+        <LinearLayout
+            android:id="@+id/llt_msStatus_fg_AC"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!--群内顶部标题-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:gravity="center"
+                android:text="@string/ms_change" />
+            <!--横分割线-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#efefef" />
+
+            <!--内部子左右栏控制llt-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_msChangeOld_fg_AC"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/sharp_x2_default"
+                    android:textColor="#dd2c00"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/right"
+                    android:textColor="#dd2c00"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tv_msChangeNew_fg_AC"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/sharp_x2_default"
+                    android:textColor="#dd2c00"
+                    android:textSize="20sp" />
+            </LinearLayout>
+            <!--横分割线-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#efefef" />
+            <!--单侧底部信息栏-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="28dp"
+                android:background="#f5f5f5"
+                android:gravity="center"
+                android:text="@string/ms_up"
+                android:textColor="@color/yo_orange" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#bdbdbd" />
+    <TextView
+        android:id="@+id/tv_msReason_fg"
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:gravity="center_vertical"
+        android:layout_marginStart="16dp"
+        android:textSize="12sp"
+        android:text="@string/reason_for_ms_1" />
+</LinearLayout>

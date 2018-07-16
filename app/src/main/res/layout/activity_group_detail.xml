@@ -7,109 +7,87 @@
     tools:context=".GroupDetailActivity"
     android:orientation="vertical">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:background="#efefef"
+        android:text="@string/group_detail"
+        android:gravity="center"
+        android:textSize="16sp"
+        />
+    <!--分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#e0e0e0"
+        />
+
     <!--上部（顶部区）-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="36dp"
         android:orientation="horizontal"
+        android:background="#f5f5f5"
 
         >
         <!--列1：id-->
         <TextView
             android:id="@+id/tv_id_GD"
-            android:padding="2dp"
+            android:layout_margin="1dp"
             android:gravity="center"
             android:layout_width="60dp"
             android:layout_height="match_parent"
-            android:background="#efefef"
-            android:text="@string/sharp_x_id"
+            android:text="@string/hs_sharp_x_id"
             android:ellipsize="end"
             android:lines="1"
             />
+        <!--竖分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#ffffff"
+            />
 
-        <!--分隔空间-->
-        <Space
-            android:layout_width="2dp"
-            android:layout_height="match_parent" />
         <!--列2：描述-->
         <TextView
             android:id="@+id/tv_description_GD"
-            android:padding="2dp"
+            android:layout_margin="1dp"
             android:gravity="center"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:background="#efefef"
             android:text="@string/sharp_xx_description"
             android:ellipsize="end"
             android:lines="1"
             />
-
-        <!--分隔空间-->
-        <Space
-            android:layout_width="2dp"
-            android:layout_height="match_parent" />
-        <!--列3：组内资源数量-->
-        <TextView
-            android:id="@+id/tv_subNum_GD"
-            android:padding="2dp"
-            android:gravity="center"
-            android:layout_width="60dp"
-            android:layout_height="match_parent"
-            android:background="#efefef"
-            android:text="@string/sharp_x_num"
-            android:ellipsize="end"
-            android:lines="1"
-            />
-
-    </LinearLayout>
-
-    <!--横向分隔空间-->
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="1dp" />
-    <!--上部第2行-->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#efefef"
-        android:orientation="horizontal">
-        <!--题头3-->
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:gravity="center"
-            android:lines="1"
-            android:text="@string/str_groupSetTime"/>
-        <!--竖向小分割线-->
+        <!--竖分割线-->
         <TextView
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="#ffffff"/>
-        <!--值文本3-->
+            android:background="#ffffff"
+            />
+
+        <!--列3：组内资源数量-->
         <TextView
-            android:id="@+id/tv_setupTime_GD"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:padding="4dp"
-            android:lines="1"
+            android:id="@+id/tv_subNum_GD"
+            android:layout_margin="1dp"
             android:gravity="center"
-            android:text="@string/str_sharp_time"/>
-
-
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:text="@string/hs_sharp_x_num"
+            android:ellipsize="end"
+            android:lines="1"
+            />
     </LinearLayout>
+
     <!--横向分隔空间-->
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="2dp" />
 
-
+    <!--横向分隔空间-->
     <!--中部区域(上)：记忆信息。分左右两栏：1/2行合并，且只占据左侧；右侧待定 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
         android:orientation="horizontal"
         android:baselineAligned="false">
 
@@ -119,13 +97,15 @@
             android:layout_weight="2"
             android:layout_height="wrap_content"
             android:background="#efefef"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            >
 
             <!--中部第一行-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                >
                 <!--题头1-->
                 <TextView
                     android:layout_width="100dp"
@@ -226,17 +206,51 @@
 
 
     </LinearLayout>
-    <!--横向全屏分割线-->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#ffffff"/>
 
-    <!--中部第3行-->
+
+    <!--上部时间1行-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="#efefef"
+        android:layout_height="42dp"
+        android:background="#f5f5f5"
+        android:layout_marginTop="1dp"
+        android:orientation="horizontal">
+        <!--题头3-->
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:lines="1"
+            android:padding="4dp"
+            android:text="@string/str_groupSetTime" />
+        <!--竖向小分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#ffffff" />
+        <!--值文本3-->
+        <TextView
+            android:id="@+id/tv_setupTime_GD"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:lines="1"
+            android:padding="4dp"
+            android:text="@string/str_sharp_time" />
+
+
+    </LinearLayout>
+  <!--  &lt;!&ndash;横向分隔空间&ndash;&gt;
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />-->
+    <!--时间2行-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:background="#f5f5f5"
+        android:layout_marginTop="1dp"
         android:orientation="horizontal">
         <!--题头3-->
         <TextView
@@ -263,52 +277,63 @@
             android:gravity="center"
             android:text="@string/str_sharp_time"/>
 
-        <!--按钮：本组的所有学习记录-->
-        <ImageView
-            android:id="@+id/ivBtn_allLogs_GD"
-            android:layout_width="36dp"
+        <!--分割线-->
+        <TextView
+            android:layout_width="2dp"
             android:layout_height="match_parent"
-            android:paddingTop="8dp"
-            android:background="#f5f5f5"
-            android:src="@drawable/three_points"
+            android:background="@color/yo_light_green"
+            />
+        <!--按钮：本组所有学习日志-->
+        <TextView
+            android:id="@+id/ivBtn_allLogs_GD"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:layout_margin="2dp"
+            android:background="#e0e0e0"
+            android:gravity="center"
+            android:text="@string/more_logs"
             />
 
 
 
     </LinearLayout>
-    <!--横向分隔空间-->
-    <Space
+
+    <!--横向全屏分割线-->
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="2dp" />
+        android:layout_height="1dp"
+        android:background="#ffffff"/>
+
 
 
     <!--Rv部分上部的条纹分割线、题头，与Rv独立并列-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
         android:orientation="vertical">
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="4dp"
             android:src="@drawable/slash_bars_red"
             android:scaleType="centerCrop"/>
+
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="28dp"
-            android:textSize="20sp"
+            android:layout_height="32dp"
             android:gravity="center"
             android:text="@string/resource_list"
-            />
+            android:textSize="18sp" />
         <!--横向分割线-->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#ff666666"
+            android:background="#bdbdbd"
             />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="36dp"
+            android:layout_height="28dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             >
@@ -323,8 +348,8 @@
             <!--分割线 -->
             <TextView
                 android:layout_width="1dp"
-                android:layout_height="36dp"
-                android:background="#cce0e0e0"
+                android:layout_height="match_parent"
+                android:background="#efefef"
                 />
 
             <!--列2：资源名-->
@@ -339,8 +364,8 @@
             <!--分割线 -->
             <TextView
                 android:layout_width="1dp"
-                android:layout_height="36dp"
-                android:background="#cce0e0e0"
+                android:layout_height="match_parent"
+                android:background="#efefef"
                 />
 
 
@@ -353,7 +378,12 @@
                 android:layout_height="match_parent"
                 android:text="@string/phonetic"
                 />
-
+            <!--分割线 -->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#efefef"
+                />
             <!--列4：释义-->
             <TextView
                 android:padding="2dp"

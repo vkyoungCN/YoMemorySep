@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!--需要修改，现在的LM也生成新分组。-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:text="@string/bar_x2_default"
+        />
+
+    <!--域标题栏-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:background="#efefef"
+        android:gravity="center"
+        android:text="@string/group_report"
+        android:textSize="16sp" />
+    <!--空词信息·全完成、部分完成-->
+    <TextView
+        android:id="@+id/tv_groupInfo_fgLM_AC"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:gravity="center_vertical"
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp"
+        android:text="@string/merge_info_ac" />
+    <!--分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#e0e0e0" />
+    <!--拆分信息·如未拆分则text留空即可-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:gravity="center"
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp"
+        android:textSize="12sp"
+        android:text="@string/unmerge_ac" />
+    <!--分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#e0e0e0" />
+    <!--错词信息·全对、部分对-->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:orientation="horizontal">
+
+
+
+        <TextView
+            android:id="@+id/tv_wrongInfo_fgLM_AC"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
+            android:text="@string/wrong_info_ac" />
+
+        <!--分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefef"
+            android:layout_gravity="end"
+            android:layout_marginEnd="43dp"
+            />
+        <!--向下展开的按键-->
+        <TextView
+            android:id="@+id/tvBtn_wrongWords_fgLM"
+            android:layout_width="42dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:paddingTop="12dp"
+            android:gravity="center"
+            android:text="@string/down_ward"
+            />
+
+    </FrameLayout>
+
+    <!--分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#e0e0e0" />
+
+
+    <!--新旧状态组件群-->
+    <!--群内顶部标题-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:background="#efefef"
+        android:gravity="center"
+        android:text="@string/merge_changes" />
+    <!--rv区域题头-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:orientation="horizontal"
+        >
+
+        <!--序号-->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="@string/index"
+            android:gravity="center"
+            />
+        <!--分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefef" />
+
+        <!--来源组-->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="match_parent"
+            android:text="@string/source_group_name"
+            android:gravity="center"
+            />
+        <!--分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefef" />
+
+        <!--原容量-->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="@string/source_group_size"
+            android:gravity="center"
+            />
+        <!--分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefef" />
+        <!--并入量-->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="@string/merge_size"
+            android:gravity="center"
+            />
+        <!--分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefef" />
+        <!--处理-->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="match_parent"
+            android:text="@string/result_1"
+            android:gravity="center"
+            />
+
+
+
+    </LinearLayout>
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#efefef" />
+
+    <!--源碎片改变列表-->
+    <LinearLayout
+        android:id="@+id/llt_oldFrags_ACA"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <!--横分割线-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#efefef" />
+        <!--源分组（碎片）的改变状态（合并（主）、合并（删）、拆（合并）、拆（无变化）、无变化）-->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_oldFragsChange_ACA"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+
+            />
+    </LinearLayout>
+
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#efefef" />
+
+</LinearLayout>

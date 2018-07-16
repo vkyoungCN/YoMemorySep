@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.vkyoungcn.smartdevices.yomemory.ItemsAndMissionDetailActivity"
+    tools:context="com.vkyoungcn.smartdevices.yomemory.ItemsOfMissionActivity"
     android:orientation="vertical">
 
     <!--页面上部，横向llt-->

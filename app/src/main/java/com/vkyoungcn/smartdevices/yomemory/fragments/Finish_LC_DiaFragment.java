@@ -3,7 +3,6 @@ package com.vkyoungcn.smartdevices.yomemory.fragments;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.widget.Space;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,42 +12,44 @@ import com.vkyoungcn.smartdevices.yomemory.R;
 
 
 /*
-* 本DFG对应合并学习模式下的手动结束情形：
+
+* 本DFG对应是"创建式"学习下的手动结束情形：
 * （首先显示还剩余多少时间，可以返回查看）
-* 需要传入：总量、未完成量。（若只传未完成量，则无法分辨是否是“一个也没写”的极端情况）
-* ①提示总量、未完成量，提示会拆分；（or全部完成、or全部未完成（隐藏确认键））
-* ②有未正确的，提示将记录错误一次；
+* ①提示已完成量（创建该容量的分组），不提示未完成量；
+* ②已填写词中的未正确数量，提示将记录错误一次；
 * ③如果没有上述情况任一，则提示正确（？），也可返回查看。
 *
 * 确然后的跳转操作还是由Activity负责，所以不需要持有gid。
+*
 * 三种不同学习模式的手动结束DFG使用同一布局文件。
 * */
-public class HandyFinishLmDiaFragment extends DialogFragment implements View.OnClickListener {
-    private static final String TAG = "HandyFinishLmDiaFragment";
+public class Finish_LC_DiaFragment extends DialogFragment implements View.OnClickListener {
+    private static final String TAG = "Finish_LC_DiaFragment";
 
-    private int totalAmount;
+
     private int finishAmount;
     private int wrongAmount;
     private int restSeconds;
+    private int restMinutes;
 
     private TextView tvWrongInfo;
-    private TextView tvEmptyInfo;
+    private TextView tvFinishInfo;
     private TextView tvRestTimeInfo;
     private TextView btn_Confirm;
 
     private OnGeneralDfgInteraction mListener;
 
-    public HandyFinishLmDiaFragment() {
+    public Finish_LC_DiaFragment() {
         // Required empty public constructor
     }
 
-    public static HandyFinishLmDiaFragment newInstance(int totalAmount, int finishAmount, int wrongAmount, int restSeconds) {
-        HandyFinishLmDiaFragment fragment = new HandyFinishLmDiaFragment();
+    public static Finish_LC_DiaFragment newInstance(int finishAmount, int wrongAmount, int restMinutes, int restSeconds) {
+        Finish_LC_DiaFragment fragment = new Finish_LC_DiaFragment();
         Bundle args = new Bundle();
-        args.putInt("TOTAL_AMOUNT",totalAmount);
         args.putInt("WRONG_AMOUNT",wrongAmount);
         args.putInt("FINISH_AMOUNT",finishAmount);
         args.putInt("REST_SECONDS",restSeconds);
+        args.putInt("REST_MINUTES",restMinutes);
         fragment.setArguments(args);
         return fragment;
     }
@@ -57,10 +58,10 @@ public class HandyFinishLmDiaFragment extends DialogFragment implements View.OnC
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            this.totalAmount = getArguments().getInt("TOTAL_AMOUNT");
             this.wrongAmount = getArguments().getInt("WRONG_AMOUNT");
             this.finishAmount = getArguments().getInt("FINISH_AMOUNT");
             this.restSeconds = getArguments().getInt("REST_SECONDS");
+            this.restMinutes = getArguments().getInt("REST_MINUTES");
         }
     }
 
@@ -68,17 +69,17 @@ public class HandyFinishLmDiaFragment extends DialogFragment implements View.OnC
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.dfg_learning_handy_finish, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_group_report_lc, container, false);
         rootView.findViewById(R.id.tvBtn_back_dfgLHFinish).setOnClickListener(this);
         rootView.findViewById(R.id.tvBtn_giveUp_dfgLHFinish).setOnClickListener(this);
-        btn_Confirm = rootView.findViewById(R.id.tvBtn_confirm_dfgLHFinish);
-        btn_Confirm.setOnClickListener(this);
         TextView space = rootView.findViewById(R.id.space_64);
 
-        tvWrongInfo = rootView.findViewById(R.id.tv_wrong_dfgLHFinish);
-        tvEmptyInfo = rootView.findViewById(R.id.tv_empty_dfgLHFinish);
-        tvRestTimeInfo = rootView.findViewById(R.id.tv_restTime_dfgLHFinish);
+        btn_Confirm = rootView.findViewById(R.id.tvBtn_confirm_dfgLHFinish);
+        btn_Confirm.setOnClickListener(this);
 
+        tvWrongInfo = rootView.findViewById(R.id.tv_wrong_dfgLHFinish);
+        tvFinishInfo = rootView.findViewById(R.id.tv_empty_dfgLHFinish);
+        tvRestTimeInfo = rootView.findViewById(R.id.tv_restTime_dfgLHFinish);
 
         if(wrongAmount==0 ){
             tvWrongInfo.setText(getResources().getString(R.string.wrong_amount_equals_zero));
@@ -87,18 +88,21 @@ public class HandyFinishLmDiaFragment extends DialogFragment implements View.OnC
             tvWrongInfo.setText(String.format(getResources().getString(R.string.wrong_amount_some),wrongAmount));
         }
 
-        if(finishAmount == 0){
-            //一个没写
-            tvEmptyInfo.setText(getResources().getString(R.string.finish_amount_equals_zero_LG));
+        if(finishAmount ==0){
+            tvFinishInfo.setText(getResources().getString(R.string.finish_amount_equals_zero_LC));
             tvWrongInfo.setVisibility(View.GONE);//一个没写当然没错误，但也绝不是“全对”。不予显示。
-            space.setVisibility(View.VISIBLE);//替代性地，在时间tv下方，按钮组上方显示一个大空间以撑开整体
+            space.setVisibility(View.VISIBLE);//替代性地，在时间tv下方，按钮组上方显示一个大空间以撑开整体。
             btn_Confirm.setVisibility(View.GONE);//此时不建组，确认键无意义。不予显示。
         }else {
-                tvEmptyInfo.setText(String.format(getResources().getString(R.string.finish_amount_some_LM), totalAmount, finishAmount));
-                //总量%1$d个，完成的%2$d个单词会合并到一个分组
+            tvFinishInfo.setText(String.format(getResources().getString(R.string.finish_amount_some_LC), finishAmount));
         }
 
-        tvRestTimeInfo.setText(String.format(getResources().getString(R.string.rest_min_and_sec),restSeconds/60,restSeconds%60));
+        if(restMinutes==0&&restSeconds==0){
+            //已到时间（可能是timeUp触发的结束）
+            tvRestTimeInfo.setText(getResources().getString(R.string.time_up1));
+        }else {
+            tvRestTimeInfo.setText(String.format(getResources().getString(R.string.rest_min_and_sec), restMinutes, restSeconds));
+        }
 
         return rootView;
 

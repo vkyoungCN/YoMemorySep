@@ -163,7 +163,7 @@
         </LinearLayout>
 
         <!--页脚的自定义UI（进度条）-->
-        <com.vkyoungcn.smartdevices.yomemory.stripeProgressBar.StripeProgressBar
+        <com.vkyoungcn.smartdevices.yomemory.customUI.StripeProgressBar
             android:id="@+id/stripeProgressBar_LearningActivity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

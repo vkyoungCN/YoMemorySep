@@ -10,9 +10,6 @@ import android.widget.TextView;
 
 import com.vkyoungcn.smartdevices.yomemory.R;
 
-import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_AND_CREATE_ORDER;
-import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_AND_CREATE_RANDOM;
-
 
 /*
 * 本DFG对应普通学习模式下的手动结束情形：
@@ -25,13 +22,14 @@ import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteract
 * 确然后的跳转操作还是由Activity负责，所以不需要持有gid。
 * 三种不同学习模式的手动结束DFG使用同一布局文件。
 * */
-public class HandyFinishLgDiaFragment extends DialogFragment implements View.OnClickListener {
-    private static final String TAG = "HandyFinishLgDiaFragment";
+public class Finish_LG_DiaFragment extends DialogFragment implements View.OnClickListener {
+    private static final String TAG = "Finish_LG_DiaFragment";
 
     private int totalAmount;
     private int emptyAmount;
     private int wrongAmount;
     private int restSeconds;
+    private int restMinutes;
 
     private TextView tvWrongInfo;
     private TextView tvEmptyInfo;
@@ -40,17 +38,18 @@ public class HandyFinishLgDiaFragment extends DialogFragment implements View.OnC
 
     private OnGeneralDfgInteraction mListener;
 
-    public HandyFinishLgDiaFragment() {
+    public Finish_LG_DiaFragment() {
         // Required empty public constructor
     }
 
-    public static HandyFinishLgDiaFragment newInstance(int totalAmount,int emptyAmount, int wrongAmount, int restSeconds) {
-        HandyFinishLgDiaFragment fragment = new HandyFinishLgDiaFragment();
+    public static Finish_LG_DiaFragment newInstance(int totalAmount, int emptyAmount, int wrongAmount, int restMinutes, int restSeconds) {
+        Finish_LG_DiaFragment fragment = new Finish_LG_DiaFragment();
         Bundle args = new Bundle();
         args.putInt("TOTAL_AMOUNT",totalAmount);
         args.putInt("WRONG_AMOUNT",wrongAmount);
         args.putInt("EMPTY_AMOUNT",emptyAmount);
         args.putInt("REST_SECONDS",restSeconds);
+        args.putInt("REST_MINUTES",restMinutes);
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,6 +62,7 @@ public class HandyFinishLgDiaFragment extends DialogFragment implements View.OnC
             this.wrongAmount = getArguments().getInt("WRONG_AMOUNT");
             this.emptyAmount = getArguments().getInt("EMPTY_AMOUNT");
             this.restSeconds = getArguments().getInt("REST_SECONDS");
+            this.restMinutes = getArguments().getInt("REST_MINUTES");
         }
     }
 
@@ -70,7 +70,7 @@ public class HandyFinishLgDiaFragment extends DialogFragment implements View.OnC
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.dfg_learning_handy_finish, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_group_report_lg, container, false);
         rootView.findViewById(R.id.tvBtn_back_dfgLHFinish).setOnClickListener(this);
         rootView.findViewById(R.id.tvBtn_giveUp_dfgLHFinish).setOnClickListener(this);
         btn_Confirm = rootView.findViewById(R.id.tvBtn_confirm_dfgLHFinish);
@@ -100,8 +100,12 @@ public class HandyFinishLgDiaFragment extends DialogFragment implements View.OnC
                 //总量%1$d个，未完成的%2$d个单词会被拆分到新分组
         }
 
-        tvRestTimeInfo.setText(String.format(getResources().getString(R.string.rest_min_and_sec),restSeconds/60,restSeconds%60));
-
+        if(restMinutes==0&&restSeconds==0){
+            //已到时间（可能是timeUp触发的结束）
+            tvRestTimeInfo.setText(getResources().getString(R.string.time_up1));
+        }else {
+            tvRestTimeInfo.setText(String.format(getResources().getString(R.string.rest_min_and_sec), restMinutes, restSeconds));
+        }
         return rootView;
 
 

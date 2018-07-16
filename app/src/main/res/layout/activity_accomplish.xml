@@ -24,12 +24,11 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="36dp"
+        android:layout_height="32dp"
         android:background="#efefef"
-        android:text="@string/report_1"
-        android:textSize="16sp"
         android:gravity="center"
-        />
+        android:text="@string/report_1"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/tv_startTime_ACA"
@@ -39,7 +38,7 @@
         android:paddingEnd="24dp"
         android:paddingStart="24dp"
         android:text="@string/learning_stating_time" />
-    <!--短横分割线-->
+    <!--横分割线-->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -49,35 +48,45 @@
     <TextView
         android:id="@+id/tv_usedUpTime_ACA"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
+        android:layout_height="28dp"
         android:gravity="center"
         android:paddingEnd="24dp"
         android:paddingStart="24dp"
         android:text="@string/learning_usd_up_time" />
-    <!--短横分割线-->
+    <!--横分割线-->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#efefef"
         />
 
-    <TextView
-        android:id="@+id/tv_finishTime_ACA"
-        android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:gravity="center"
-        android:paddingEnd="24dp"
-        android:paddingStart="24dp"
-        android:text="@string/learning_finish_time" />
 
-    <!--第二区域标题栏-->
+    <!--横分割线-->
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#efefef"
+        />
+    <TextView
+        android:id="@+id/tv_learningType_ACA"
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:gravity="center_vertical"
+        android:paddingEnd="18dp"
+        android:paddingStart="18dp"
+        android:textColor="@color/yo_orange"
+        android:text="@string/learningType"
+        />
+
+    <!--中部标签：DB处理中-->
+    <TextView
+        android:id="@+id/tv_saving_AC"
         android:layout_width="match_parent"
         android:layout_height="36dp"
-        android:background="#efefef"
+        android:background="#f5f5f5"
         android:gravity="center"
-        android:text="@string/group_change_info"
-        android:textSize="16sp" />
+        android:text="@string/saving_1"
+        />
     <!--横分割线-->
     <TextView
         android:layout_width="match_parent"
@@ -85,20 +94,20 @@
         android:background="#cccccc"
         />
 
-    <TextView
-        android:id="@+id/tv_learningtype_ACA"
+    <!--用于放置fg的flt-->
+    <FrameLayout
+        android:id="@+id/flt_fragment_AC"
         android:layout_width="match_parent"
-        android:layout_height="24dp"
-        android:gravity="center"
-        android:background="#efefef"
-        android:text="@string/learningType"
-        />
+        android:layout_height="match_parent"
+        >
+    </FrameLayout>
+
     <!--新旧状态组件群-->
-    <LinearLayout
+    <!--<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="140dp"
         android:orientation="horizontal">
-        <!--左侧，新状态组件群-->
+        &lt;!&ndash;左侧，新状态组件群&ndash;&gt;
         <LinearLayout
             android:id="@+id/llt_newStatus_ACA"
             android:layout_width="0dp"
@@ -106,18 +115,18 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <!--群内顶部标题-->
+            &lt;!&ndash;群内顶部标题&ndash;&gt;
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="24dp"
                 android:gravity="center"
                 android:text="@string/newStatus" />
-            <!--横分割线-->
+            &lt;!&ndash;横分割线&ndash;&gt;
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#efefef" />
-            <!--分组信息-->
+            &lt;!&ndash;分组信息&ndash;&gt;
             <TextView
                 android:id="@+id/tv_groupNewInfo_ACA"
                 android:layout_width="match_parent"
@@ -129,7 +138,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
-                <!--MS标题-->
+                &lt;!&ndash;MS标题&ndash;&gt;
                 <TextView
                     android:layout_width="24dp"
                     android:layout_height="match_parent"
@@ -166,12 +175,12 @@
         </LinearLayout>
 
 
-        <!--竖分割线-->
+        &lt;!&ndash;竖分割线&ndash;&gt;
         <TextView
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:background="#efefef" />
-        <!--右侧，旧状态组件群-->
+        &lt;!&ndash;右侧，旧状态组件群&ndash;&gt;
         <LinearLayout
             android:id="@+id/llt_oldStatus_ACA"
             android:layout_width="0dp"
@@ -180,18 +189,18 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <!--群内顶部标题-->
+            &lt;!&ndash;群内顶部标题&ndash;&gt;
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="24dp"
                 android:gravity="center"
                 android:text="@string/oldStatus" />
-            <!--横分割线-->
+            &lt;!&ndash;横分割线&ndash;&gt;
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#efefef" />
-            <!--分组信息-->
+            &lt;!&ndash;分组信息&ndash;&gt;
             <TextView
                 android:id="@+id/tv_groupOldInfo_ACA"
                 android:layout_width="match_parent"
@@ -203,7 +212,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
-                <!--MS标题-->
+                &lt;!&ndash;MS标题&ndash;&gt;
                 <TextView
                     android:layout_width="24dp"
                     android:layout_height="match_parent"
@@ -235,20 +244,20 @@
                     android:textSize="22sp" />
 
             </LinearLayout>
-            <!--新·MS·MS数字-->
-            <!--群内中央小分割线（竖）-->
+            &lt;!&ndash;新·MS·MS数字&ndash;&gt;
+            &lt;!&ndash;群内中央小分割线（竖）&ndash;&gt;
 
-            <!--新·MS·RMA数字-->
-            <!--横分割线-->
-            <!--新·MS·MS底标题-->
-            <!--新·MS·RMA底标题-->
+            &lt;!&ndash;新·MS·RMA数字&ndash;&gt;
+            &lt;!&ndash;横分割线&ndash;&gt;
+            &lt;!&ndash;新·MS·MS底标题&ndash;&gt;
+            &lt;!&ndash;新·MS·RMA底标题&ndash;&gt;
 
-            <!--群内底部信息栏-->
+            &lt;!&ndash;群内底部信息栏&ndash;&gt;
 
         </LinearLayout>
 
 
-        <!--源碎片改变列表-->
+        &lt;!&ndash;源碎片改变列表&ndash;&gt;
         <LinearLayout
             android:id="@+id/llt_oldFrags_ACA"
             android:layout_width="0dp"
@@ -262,12 +271,12 @@
                 android:layout_height="24dp"
                 android:gravity="center"
                 android:text="@string/frags_change" />
-            <!--横分割线-->
+            &lt;!&ndash;横分割线&ndash;&gt;
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#efefef" />
-            <!--源分组（碎片）的改变状态（合并（主）、合并（删）、拆（合并）、拆（无变化）、无变化）-->
+            &lt;!&ndash;源分组（碎片）的改变状态（合并（主）、合并（删）、拆（合并）、拆（无变化）、无变化）&ndash;&gt;
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_oldFragsChange_ACA"
                 android:layout_width="match_parent"
@@ -277,44 +286,6 @@
         </LinearLayout>
 
 
-    </LinearLayout>
-    <!--横分割线-->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#efefef"
-        />
-    <!--横分割线-->
-
-
-    <!--分隔空间-->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="24dp"
-        />
-    <TextView
-        android:id="@+id/tv_groupDvdInfo_ACA"
-        android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:gravity="center"
-        android:text="@string/divide"
-        android:background="#efefef"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        />
-    <!--分割线-->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#cccccc"
-        />
-    <TextView
-        android:id="@+id/tv_itemErrInfo_ACA"
-        android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:background="#efefef"
-        android:text="@string/items_err_add_1"
-        android:gravity="center"
-        />
+    </LinearLayout>-->
 
 </LinearLayout>

@@ -12,6 +12,10 @@
     <color name="yo_red">#dd2c00</color>
     <color name="yo_teal">#1de9b6</color>
 
+    <color name="mission_card_blue">#bbdefb</color>
+    <color name="mission_card_red">#ffccbc</color>
+
+
 
     <color name="bottomLine_default_color">#aeea00</color>
     <color name="bottomLine_nonCorrect_color">#eef44336</color>

@@ -18,14 +18,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.adapters.LearningViewPrAdapter;
-import com.vkyoungcn.smartdevices.yomemory.fragments.HandyFinishLcDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.HandyFinishLgDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.HandyFinishLmDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.LearningTimeUpDiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.Finish_LC_DiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.Finish_LG_DiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.Finish_LM_DiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
-import com.vkyoungcn.smartdevices.yomemory.stripeProgressBar.StripeProgressBar;
+import com.vkyoungcn.smartdevices.yomemory.customUI.StripeProgressBar;
 import com.vkyoungcn.smartdevices.yomemory.validatingEditor.ValidatingEditor;
 
 import java.lang.ref.WeakReference;
@@ -74,6 +73,10 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
     private ArrayList<SingleItem> items;//Intent传入。数据源
     private ArrayList<String> targetCodes = new ArrayList<>();//用于条纹进度条。
 
+    //（手动）结束时的剩余时间，自动结束时设0即可
+    int restMinutes =0;
+    int restSeconds = 0;
+
     private int groupId;//Intent传入。（仅LG模式下）
     private int missionId;//Intent传入。（仅LCO/LCR模式下）仅在最后（完成页）创建新组时使用
     private ArrayList<Integer> gIdsForMerge;//Intent传来，仅在合并学习时有此数据。
@@ -83,7 +86,18 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
     private String veCacheString = "";//记录正在输入的VE的内容，在滑动卡片时存入list并置空。
     // (该字串在回调监听中设置，设计为VE每增删一个有效字符本字串被改写一次，但上下限与VE同不会越界修改)
     private ArrayList<Byte> restChances;
-//    private ArrayList<Integer> itemIds;//需要先把items的id列表传给进度条中的EmptyCard列表，然后随进度再把非空的删除。
+
+    //学习完成时，生成空、错的位置索引d列表，传递给结束页
+    ArrayList<Integer> emptyPositions = new ArrayList<>();
+    ArrayList<Integer> wrongPositions =  new ArrayList<>();
+
+    //用于学习完成时，各数据量计算（跨方法，所以用全局）
+    int totalAmount =0;
+    int emptyAmount = 0;
+    int wrongAmount =0;
+    int finishAmount =0;
+
+    //    private ArrayList<Integer> itemIds;//需要先把items的id列表传给进度条中的EmptyCard列表，然后随进度再把非空的删除。
 
 //    private boolean autoSliding = true;//（在VE填写正确时）自动向后滑动的设置开关。
 
@@ -262,13 +276,18 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
 
 
                 if(!isFabShowing){
-                    if(learningType!=LEARNING_GENERAL||position==items.size()-1) {
+                    /*if(learningType!=LEARNING_GENERAL||position==items.size()-1) {
                         // 普通模式下滑到最后一张时将结束按钮显示出来。 【回滑不应隐藏】
                         //其他模式下，第二页开始显示结束按钮；
                         tv_finish.setVisibility(View.VISIBLE);
                         fab_finish.setVisibility(View.VISIBLE);
                         isFabShowing = true;
-                    }
+                    }*/
+
+                    //所有模式下，第二页开始显示结束按钮；
+                    tv_finish.setVisibility(View.VISIBLE);
+                    fab_finish.setVisibility(View.VISIBLE);
+                    isFabShowing = true;
                 }
             }
         });
@@ -308,7 +327,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
 
         @Override
         public void run() {
-            while(!isTimeUp&&!finishByHand){//时间未到
+            while(!isTimeUp){//时间未到(&&!finishByHand取消，手动改不停表)
                 try {
 //                    for (int i = 0; i < 60&&!learningFinishedCorrectly; i++) {//这样才能在学习完成而分钟数未到的情况下终止计时。
                     //先把秒数减完一圈（为了使“从dfg返回恢复”时的计时逻辑正确）
@@ -384,36 +403,10 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
              * 以上四者，在TimeUp情形下取消返回选项。
              * */
                 case MESSAGE_TIME_UP:
-                timingThread.interrupt();//显式结束计时线程。
-                    //调用进度条UI方法判断完成情况，然后弹出对应DFG
-                    finishTimeMillis = System.currentTimeMillis();
-                    popUpTimeEndingDiaFragment();
-
+                    timeUpFinish();//具体逻辑皆在该方法内
                 break;
 
         }
-    }
-
-    /*
-    * 时间到了之后，弹出DFG。
-    * ①未完成（未滑动到最后）就到时间了
-    * ②滑动到最后，但是没有全部正确。（虽然即使正确也不会停止计时，但在计时结束后，直接跳转了结束页，不会弹出DFG）
-    *  滑动到最后，又向前回滑，但并非全对——无影响，按②处理。
-    *【现在的是否完成，是以是否填对全部VE为标志的。】
-    * 其他情况
-    * ①滑动到最后，全部正确，但是又向回滑动——【暂定强行跳转结束页（可能不太友好）】
-    * */
-    private void popUpTimeEndingDiaFragment(){
-        FragmentTransaction transaction = (getFragmentManager().beginTransaction());
-        Fragment prev = (getFragmentManager().findFragmentByTag("Time_up"));
-
-        if (prev != null) {
-//            Log.i(TAG, "inside Dialog(), inside if prev!=null branch");
-            Toast.makeText(this, "Old Dfg still there, removing...", Toast.LENGTH_SHORT).show();
-            transaction.remove(prev);
-        }
-        DialogFragment dfg = LearningTimeUpDiaFragment.newInstance(spb_bar.getEmptyPositions(),spb_bar.getWrongPositions());
-        dfg.show(transaction,"Time_up");
     }
 
 
@@ -422,52 +415,67 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
 
         switch (dfgType){
             case LEARNING_FINISH_DFG_CONFIRM:
-            case LEARNING_TIME_UP_DFG_CONFIRM:
-                //准备Intent，存入部分数据
+                //确认。
+                // 要跳转到结束页，根据完成情况（并结合learningType）进行DB处理
+                //
+                // 空的：
+                // LG下：已学的维持原组，（原组的Logs正常+1处理），未学的要成立新组（items的gid统一变更为新组），
+                // 新组的成立时间是current，但旧复习记录保留不删（所以成立时间晚于学习时间，无所谓）
+                //
+                // LC下：空的无所谓
+                // LM下：已完成的合并到主组（items改gid，【Nw：原分组/原分组Log记录保留】），部分完成的来源组拆分（同lg）
+                // 未进行到的组不处理； 如果完成数量连主组容量都未达到则类同LG,拆分。
+                //
+                // 错误的（首先错误的肯定是在已完成部分）
+                // 由于数据源是引用形式，所以估计其错误记录数已随卡片翻阅中的操作一并更改，直接随items新状态存入db
+                //
+                // logs记录：按开始时间处理较为容易（结束时间涉及精准度问题，中间需计算且也不是特别有道理；
+                // 既然都没特别充分的道理，就按简单且精确的来吧）
+
+                //准备Intent
                 Intent intentToAccomplishActivity = new Intent(this,AccomplishActivity.class);
                 intentToAccomplishActivity.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+                //存入通用数据
                 intentToAccomplishActivity.putExtra("LEARNING_TYPE",learningType);
                 intentToAccomplishActivity.putExtra("TABLE_NAME_SUFFIX",tableNameSuffix);
+                intentToAccomplishActivity.putParcelableArrayListExtra("ITEMS",items);
+
+                intentToAccomplishActivity.putIntegerArrayListExtra("EMPTY_ITEMS_POSITIONS",emptyPositions);
+                intentToAccomplishActivity.putIntegerArrayListExtra("WRONG_ITEMS_POSITIONS", wrongPositions);
+
+                intentToAccomplishActivity.putExtra("START_TIME",startingTimeMillis);
+//                intentToAccomplishActivity.putExtra("FINISH_TIME",finishTimeMillis);
+                intentToAccomplishActivity.putExtra("REST_MINUTES",restMinutes);
+                intentToAccomplishActivity.putExtra("REST_SECONDS",restSeconds);
+
+                //各状态下的不同数据
                 if(learningType == LEARNING_GENERAL){
                     intentToAccomplishActivity.putExtra("GROUP_ID",groupId);
                 }else if(learningType == LEARNING_AND_MERGE){
                     intentToAccomplishActivity.putExtra("GROUP_ID_FOR_MERGE",gIdsForMerge);
-                }else {
-                    //在剩余两种模式是LCO/LCR时有效。如果增加了其他新模式，则本逻辑必须修改。
+                }else if(learningType == LEARNING_AND_CREATE_ORDER || learningType == LEARNING_AND_CREATE_RANDOM) {
                     intentToAccomplishActivity.putExtra("MISSION_ID",missionId);
                 }
 
-                intentToAccomplishActivity.putExtra("START_TIME",startingTimeMillis);
-                intentToAccomplishActivity.putExtra("FINISH_TIME",finishTimeMillis);
-
-                //将空、错的位置转换成id列表，传递给结束页进行结束操作。
-                ArrayList<Integer> emptyPositions = spb_bar.getEmptyPositions();
-                ArrayList<Integer> errPositions = spb_bar.getWrongPositions();
-
-                intentToAccomplishActivity.putIntegerArrayListExtra("EMPTY_ITEMS_POSITIONS",emptyPositions);
-                intentToAccomplishActivity.putIntegerArrayListExtra("WRONG_ITEMS_POSITIONS",errPositions);
-                intentToAccomplishActivity.putParcelableArrayListExtra("ITEMS",items);
 
                 this.startActivity(intentToAccomplishActivity);
-
                 this.finish();
-
                 break;
 
             case LEARNING_FINISH_DFG_BACK:
                 //恢复计时，设置时间tv的正确值
                 llt_timeCount.setVisibility(View.VISIBLE);
 
-                tv_timeRestMin.setText(String.valueOf(timeRestInSec/60));
-                tv_timeRestScd.setText(String.valueOf(timeRestInSec%60));
-                timeCount = (int)timeRestInSec/60;
-                timeInSecond = (int)timeRestInSec%60;
+                tv_timeRestMin.setText(String.valueOf(restMinutes));
+                tv_timeRestScd.setText(String.valueOf(restSeconds));
+                timeCount = restMinutes;
+                timeInSecond = restSeconds;
                 isFirstLoop = true;
 
                 break;
 
             case LEARNING_FINISH_DFG_GIVE_UP:
-            case LEARNING_TIME_UP_DFG_GIVE_UP:
                 //直接放弃。
                 this.finish();
 
@@ -486,6 +494,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
         //此时已填入正确单词，（如果允许自动滑动则）自动向下一页滑动。
         if(AutoSliding) {
             viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
+            //
         }
     }
 
@@ -511,26 +520,29 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
      * 以上四者，在TimeUp情形下取消返回选项。
      * */
     public void handyFinish(View view){
-        //结束fab对应的方法，用于弹出DFG。
-        //【注意，由于目前设计的进度条更新、缓存字串列表更新都是在滑动页面时更新；所以需要在本方法中增加一次更新，
-        // 用于校正当前页面已作出的改动】
+        //点击“结束”键（fab）后，的方法
+        // ①判断当前正误、空的情况，
+        // ②弹出DFG；
+        // ③根据DFG中的选择向通用DFG接口（本Act实现）发回信息。
 
-//        timingThread.interrupt();//无效
-//        finishByHand = true;//标记变量也无效，计时一样在跑。（后来在某一时刻又停止了，干脆不停表了）
-// 【按照逻辑，计时也不该停止，否则就是无限暂停bug】
-        llt_timeCount.setVisibility(View.GONE);//控件隐藏
+        //任务0，停表【但是interrupt()和标记变量置否都无效，计时仍然再跑（而后又在某一时刻停止了）】所以决定不停表
+        // 不停表也能避免无限暂停bug
 
-        finishTimeMillis = System.currentTimeMillis();
+
+        llt_timeCount.setVisibility(View.GONE);//计时控件隐藏
+
+        //记录“剩余”时间。倒计时算法的精度不足，和System.currentTimeMillis有偏差，为统一，折中用替代方案
+        restMinutes = Integer.valueOf(tv_timeRestMin.getText().toString());
+        restSeconds = Integer.valueOf(tv_timeRestScd.getText().toString());
+        //timeRestInSec = 3600-(System.currentTimeMillis()-startingTimeMillis)/1000;//但是这样得到的数据和倒计时略有差别
+
         //先将当前页的缓存字串存入缓存字串列表
         veFillings.set(currentPagePosition, veCacheString);
-        //部分更新spb，并重绘
-//        spb_bar.handyCurrentReFresh(currentPagePosition);
+
+        prepareLearningRecords();
 
 
-        //记录所剩时间
-        timeRestInSec = 3600-(System.currentTimeMillis()-startingTimeMillis)/1000;//但是这样得到的数据和倒计时略有差别
-
-        //根据情况弹出对应dfg
+        //根据情况弹出dfg
         FragmentTransaction transaction = (getFragmentManager().beginTransaction());
         Fragment prev = (getFragmentManager().findFragmentByTag("HANDY_FINISH"));
 
@@ -538,26 +550,91 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
             Toast.makeText(this, "Old Dfg still there, removing...", Toast.LENGTH_SHORT).show();
             transaction.remove(prev);
         }
-        int totalAmount =items.size();
-        int emptyAmount = spb_bar.getEmptyPositions().size();
-        int finishAmount = totalAmount-emptyAmount;
-        int wrongAmount = spb_bar.getWrongPositions().size();
+
         switch (learningType){
             case LEARNING_AND_CREATE_ORDER:
             case LEARNING_AND_CREATE_RANDOM:
-                DialogFragment dfgLC = HandyFinishLcDiaFragment.newInstance(finishAmount,wrongAmount,(int)timeRestInSec);
+                DialogFragment dfgLC = Finish_LC_DiaFragment.newInstance(finishAmount,wrongAmount,restMinutes,restSeconds);
                 dfgLC.show(transaction,"HANDY_FINISH");
                 break;
             case LEARNING_GENERAL:
-                DialogFragment dfgLG = HandyFinishLgDiaFragment.newInstance(totalAmount,emptyAmount,wrongAmount,(int)timeRestInSec);
+                DialogFragment dfgLG = Finish_LG_DiaFragment.newInstance(totalAmount,emptyAmount,wrongAmount,restMinutes,restSeconds);
                 dfgLG.show(transaction,"HANDY_FINISH");
                 break;
             case LEARNING_AND_MERGE:
-                DialogFragment dfg = HandyFinishLmDiaFragment.newInstance(totalAmount,finishAmount,wrongAmount,(int)timeRestInSec);
+                DialogFragment dfg = Finish_LM_DiaFragment.newInstance(totalAmount,finishAmount,wrongAmount,restMinutes,restSeconds);
                 dfg.show(transaction,"HANDY_FINISH");
                 break;
         }
 
+    }
+
+    public void timeUpFinish(){
+        //点击“结束”键（fab）后，的方法
+        // ①判断当前正误、空的情况，
+        // ②弹出DFG；
+        // ③根据DFG中的选择向通用DFG接口（本Act实现）发回信息。
+
+        //任务0，停表(虽然似乎无效，至少不能立即停表，但仍要停止。)
+        isTimeUp = true;
+        timingThread.interrupt();
+        //计时控件隐藏
+        llt_timeCount.setVisibility(View.GONE);
+
+        //已到时，无需记录“剩余”时间。
+        restMinutes =0;
+        restSeconds = 0;
+
+        //当前页的缓存字串也要存入缓存字串列表
+        veFillings.set(currentPagePosition, veCacheString);
+
+        prepareLearningRecords();
+
+        //根据情况弹出dfg
+        FragmentTransaction transaction = (getFragmentManager().beginTransaction());
+        Fragment prev = (getFragmentManager().findFragmentByTag("TIME_UP_FINISH"));
+
+        if (prev != null) {
+            Toast.makeText(this, "Old Dfg still there, removing...", Toast.LENGTH_SHORT).show();
+            transaction.remove(prev);
+        }
+
+        switch (learningType){
+            case LEARNING_AND_CREATE_ORDER:
+            case LEARNING_AND_CREATE_RANDOM:
+                DialogFragment dfgLC = Finish_LC_DiaFragment.newInstance(finishAmount,wrongAmount,restMinutes,restSeconds);
+                dfgLC.show(transaction,"TIME_UP_FINISH");
+                break;
+            case LEARNING_GENERAL:
+                DialogFragment dfgLG = Finish_LG_DiaFragment.newInstance(totalAmount,emptyAmount,wrongAmount,restMinutes,restSeconds);
+                dfgLG.show(transaction,"TIME_UP_FINISH");
+                break;
+            case LEARNING_AND_MERGE:
+                DialogFragment dfg = Finish_LM_DiaFragment.newInstance(totalAmount,finishAmount,wrongAmount,restMinutes,restSeconds);
+                dfg.show(transaction,"TIME_UP_FINISH");
+                break;
+        }
+
+    }
+
+
+    private void prepareLearningRecords(){
+        //准备统计信息：总数、空、完成、错误的数量
+        totalAmount =items.size();
+        emptyAmount = 0;
+        wrongAmount =0;
+        finishAmount = totalAmount-emptyAmount;
+
+        //对“填写记录”列表逐项判断,计数并记录索引列表。
+        for (int i =0; i<totalAmount;i++){
+            if(veFillings.get(i).isEmpty()){
+                emptyAmount++;
+                emptyPositions.add(i);//注意，添加的是索引位置不是id。
+            }else if(!veFillings.get(i).equals(items.get(i).getName())){
+                wrongAmount++;//注意，这个“错误数量”不包括空数量。是已填部分的错误数量。
+                wrongPositions.add(i);
+            }
+        }//旧版的统计职能由spb兼顾，现改由本Activity负责（职能划分更清晰，且不必强制spb的最后更新了）
     }
 
 

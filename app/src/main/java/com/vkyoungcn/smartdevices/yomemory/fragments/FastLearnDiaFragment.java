@@ -13,9 +13,6 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.vkyoungcn.smartdevices.yomemory.R;
-import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
-
-import java.util.ArrayList;
 
 /*
 * 涉及到的Sp操作返回Activity后处理，发送数据过去
@@ -28,7 +25,7 @@ public class FastLearnDiaFragment extends DialogFragment implements View.OnClick
     private static final String TAG = "LearningAddInOrderDiaFragment";
     public static final int DEFAULT_MANNER_ORDER = 1201;
     public static final int DEFAULT_MANNER_RANDOM = 1202;
-    public static final int DEFAULT_MANNER_UNDEFINED = 1203;
+    public static final int DEFAULT_MANNER_UNDEFINED_L = 1203;
 
     private OnGeneralDfgInteraction mListener;
 
@@ -38,7 +35,7 @@ public class FastLearnDiaFragment extends DialogFragment implements View.OnClick
     private CheckBox ckb_NoMoreTip;
     private RadioGroup rgp_orderOrRandom;
     private RadioButton rbn_random;
-    private int defaultManner = DEFAULT_MANNER_UNDEFINED;//用于装载顺序或随机的默认设置
+    private int defaultManner = DEFAULT_MANNER_UNDEFINED_L;//用于装载顺序或随机的默认设置
     private boolean isNoMoreBox =false;
 
     public FastLearnDiaFragment() {
@@ -119,11 +116,12 @@ public class FastLearnDiaFragment extends DialogFragment implements View.OnClick
                 data.putBoolean("NO_MORE_BOX",isNoMoreBox);
                 if(rBtnId == R.id.rb_order_dfgFl) {
                     //选择了顺序
-                    mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_AND_CREATE_ORDER, data);
+                    data.putBoolean("IS_ORDER",true);
                 }else{
                     //选择了随机
-                    mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_AND_CREATE_ORDER, data);
+                    data.putBoolean("IS_ORDER",false);
                 }
+                mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.FAST_LEARN, data);
                 this.dismiss();//如果没有dismiss则从目标Activity返回后该dfg会还在。
                 break;
 
@@ -149,7 +147,7 @@ public class FastLearnDiaFragment extends DialogFragment implements View.OnClick
                         defaultManner = DEFAULT_MANNER_RANDOM;
                     }
                 }else {
-                    defaultManner = DEFAULT_MANNER_UNDEFINED;
+                    defaultManner = DEFAULT_MANNER_UNDEFINED_L;
                 }
                 break;
             case R.id.ckb_noMoreTipBox_dfgFL:

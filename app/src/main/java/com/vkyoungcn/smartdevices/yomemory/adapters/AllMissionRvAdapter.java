@@ -3,15 +3,15 @@ package com.vkyoungcn.smartdevices.yomemory.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.vkyoungcn.smartdevices.yomemory.ItemsAndMissionDetailActivity;
 import com.vkyoungcn.smartdevices.yomemory.MainActivity;
 import com.vkyoungcn.smartdevices.yomemory.MissionDetailsActivity;
 import com.vkyoungcn.smartdevices.yomemory.R;
@@ -37,6 +37,7 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
         private final ImageView star;
         private final TextView simpleDetail;
         private final LiteProgress litePB;
+        private final LinearLayout llt_header;
 
 //        private final TextView groupsOfThis;//跳到任务详情与所属分组页
         private final TextView tv_toMissionDetails;//跳到任务详情与所属资源页
@@ -54,6 +55,7 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
             simpleDetail = itemView.findViewById(R.id.tv_sDetail_rvAllMission);
             star = itemView.findViewById(R.id.starAtStart);
             litePB = itemView.findViewById(R.id.litePB_RvAM);
+            llt_header = itemView.findViewById(R.id.llt_header_rvAM);
 
             title.setOnClickListener(this);//点击名称区域后，下方llt展开显示
 //            groupsOfThis.setOnClickListener(this);
@@ -76,6 +78,10 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
 
         public LiteProgress getLitePB() {
             return litePB;
+        }
+
+        public LinearLayout getLlt_header() {
+            return llt_header;
         }
 
         @Override
@@ -112,17 +118,20 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
                             case 0:
                                 missions.get(position).setStarType(0);
                                 missions.get(position).setStartResourceId(R.drawable.star_gray);
+                                missions.get(position).setHeaderColorId(0);
                                 break;
                             case 1:
                                 missions.get(position).setStarType(1);
                                 missions.get(position).setStartResourceId(R.drawable.star_blue);
+                                missions.get(position).setHeaderColorId(R.color.mission_card_blue);
                                 break;
                             case 2:
                                 missions.get(position).setStarType(2);
                                 missions.get(position).setStartResourceId(R.drawable.star_red);
+                                missions.get(position).setHeaderColorId(R.color.mission_card_red);
                                 break;
                         }
-                        ((MainActivity)context).changeRvStar(position,tempStarType%3);
+                        ((MainActivity)context).changeRvStar(position);
 
 
                 }
@@ -133,7 +142,7 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
     }
 
     public interface ChangeStar{
-        void changeRvStar(int position,int newStartType);
+        void changeRvStar(int position);
     }
 
 
@@ -155,6 +164,7 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
         RvMission mission = missions.get(position);
         holder.getTitle().setText(mission.getName());
         holder.getStar().setImageDrawable(context.getDrawable(mission.getStartResourceId()));
+        holder.getLlt_header().setBackgroundColor(ContextCompat.getColor(context,mission.getHeaderColorId()));
         holder.getSimpleDetail().setText(mission.getSimpleDescription());
         holder.getLitePB().setPercentage(mission.getDonePercentage());
 //        holder.getLitePB().setPercentage(0.9f);

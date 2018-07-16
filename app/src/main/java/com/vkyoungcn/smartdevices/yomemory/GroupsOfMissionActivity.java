@@ -52,9 +52,9 @@ import java.util.List;
  * 学习/复习完成或因超时而未能完成的，都会回到本页面；完成则更新RV列表的显示，
  * 失败则产生一条消息【待实现】。
  * */
-public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
+public class GroupsOfMissionActivity extends AppCompatActivity implements
         OnGeneralDfgInteraction {
-    private static final String TAG = "GroupsAndMissionDetailActivity";
+    private static final String TAG = "GroupsOfMissionActivity";
 
     public static final int MESSAGE_PRE_DB_FETCHED = 5011;
     public static final int MESSAGE_RE_FETCH_DONE = 5012;
@@ -91,7 +91,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.self = this;
-        setContentView(R.layout.activity_groups_and_mission_detail);
+        setContentView(R.layout.activity_groups_of_mission);
 
         TextView missionDetailName = (TextView) findViewById(R.id.tv_mission_detail_name_GMDA);
         TextView missionDetailDescription = (TextView) findViewById(R.id.tv_mission_detail_description_GMDA);
@@ -147,15 +147,15 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
 
 
     final static class GroupOfMissionHandler extends Handler {
-        private final WeakReference<GroupsAndMissionDetailActivity> activityWeakReference;
+        private final WeakReference<GroupsOfMissionActivity> activityWeakReference;
 
-        private GroupOfMissionHandler(GroupsAndMissionDetailActivity activity) {
+        private GroupOfMissionHandler(GroupsOfMissionActivity activity) {
             this.activityWeakReference = new WeakReference<>(activity);
         }
 
         @Override
         public void handleMessage(Message msg) {
-            GroupsAndMissionDetailActivity missionDetailActivity = activityWeakReference.get();
+            GroupsOfMissionActivity missionDetailActivity = activityWeakReference.get();
             if (missionDetailActivity != null) {
                 missionDetailActivity.handleMessage(msg);
             }
@@ -183,6 +183,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
             }
 
             rvGroups = ascOrderByMemoryStage(tempRVGroups);
+//            Log.i(TAG, "run: rvGroup.ms="+rvGroups.get(0).getMemoryStage());
 
             Message message = new Message();
             message.what = MESSAGE_PRE_DB_FETCHED;
@@ -533,7 +534,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
                        Toast.makeText(this, "抽取items数量0，顺序抽取失败", Toast.LENGTH_SHORT).show();
                        return;
                    }else {
-                       Toast.makeText(this, "抽取成功，数量："+itemIds.size(), Toast.LENGTH_SHORT).show();
+                       Toast.makeText(this, "顺序抽取成功，数量："+itemIds.size(), Toast.LENGTH_SHORT).show();
                    }
 
                     String firstItemName = memoryDbHelper.getSingleItemNameById((long)itemIds.get(0),tableItemSuffix);
@@ -555,7 +556,7 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
                        Toast.makeText(this, "抽取items数量0，随机抽取失败", Toast.LENGTH_SHORT).show();
                        return;
                    }else {
-                       Toast.makeText(this, "抽取成功，数量："+itemIds.size(), Toast.LENGTH_SHORT).show();
+                       Toast.makeText(this, "随机抽取成功，数量："+itemIds.size(), Toast.LENGTH_SHORT).show();
                    }
                     String firstItemName = memoryDbHelper.getSingleItemNameById((long)itemIds.get(0),tableItemSuffix);
 
@@ -573,10 +574,10 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
                 dbRwaGroup.setDescription(groupDescriptionStr);
                 dbRwaGroup.setMission_id(missionFromIntent.getId());
                 dbRwaGroup.setSettingUptimeInLong(System.currentTimeMillis());
-
+//                Log.i(TAG, "onButtonClickingDfgInteraction: DBGroup created:"+dbRwaGroup.toString());
                 //操作DB，生成
                 int gidCreated = memoryDbHelper.createGroup(dbRwaGroup,itemIds,tableItemSuffix);
-
+//                Log.i(TAG, "onButtonClickingDfgInteraction: group Db inserted, gid="+gidCreated);
                 //如果新增操作成功，通知adp变更。
                 if (gidCreated != 0) {
                     DBGroup dGroup = memoryDbHelper.getGroupById(gidCreated, tableItemSuffix);
@@ -588,12 +589,23 @@ public class GroupsAndMissionDetailActivity extends AppCompatActivity implements
                 } else {
                     Toast.makeText(self, "操作未能成功，returned gid="+gidCreated, Toast.LENGTH_SHORT).show();
                 }
+                fabPanelCollapse();
                 tv_groupAmount.setText(String.valueOf(rvGroups.size()));
                 break;
 
         }
     }
+
+
+    private void fabPanelCollapse(){
+        if(isFabPanelExtracted){
+            rltFabPanel.setVisibility(View.GONE);
+            isFabPanelExtracted = false;
+        }
+    }
 }
+
+
 
 
 

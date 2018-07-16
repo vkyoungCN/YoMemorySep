@@ -17,13 +17,14 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
-        <activity android:name=".GroupsAndMissionDetailActivity" />
-        <activity android:name=".ItemsAndMissionDetailActivity" />
+        <activity android:name=".GroupsOfMissionActivity" />
+        <activity android:name=".ItemsOfMissionActivity" />
         <activity android:name=".GroupDetailActivity" />
         <activity android:name=".LearningActivity" />
         <activity android:name=".AccomplishActivity" />
         <activity android:name=".PrepareForLearningActivity" />
-        <activity android:name=".MissionDetailsActivity"></activity>
+        <activity android:name=".MissionDetailsActivity" />
+        <activity android:name=".ConfigurationActivity"></activity>
     </application>
 
 </manifest>

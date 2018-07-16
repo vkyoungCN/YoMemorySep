@@ -66,6 +66,10 @@ public class RVGroup implements Parcelable ,Cloneable{
     private float getCurrentRMAmount(){
 //        Log.i(TAG, "getCurrentRMAmount: be.");
         //首先要获取要参与计算的m值，即实际有效的复习次数。直接使用之前已获得的数据。
+        if(memoryStage==0){
+            //新设组，尚未学习，其Rma直接设0
+            return 0.0f;
+        }
 
         //获取当前时间和最后一条Log之间的时间间隔(这个只需要值最大的一条即可，不必管什么有效不有效)
         long timeIntervalInLong = System.currentTimeMillis()-lastLearningTime;
@@ -76,7 +80,25 @@ public class RVGroup implements Parcelable ,Cloneable{
 
     }
 
-    private float baseCalculate(float alpha, float beta, int fakeNum, int realNum, int timeInterval){
+
+    public static float getRMAmount(byte memoryStage, long lastLearningTime){
+//        Log.i(TAG, "getCurrentRMAmount: be.");
+        //首先要获取要参与计算的m值，即实际有效的复习次数。直接使用之前已获得的数据。
+        if(memoryStage==0){
+            //新设组，尚未学习，其Rma直接设0
+            return 0.0f;
+        }
+
+        //获取当前时间和最后一条Log之间的时间间隔(这个只需要值最大的一条即可，不必管什么有效不有效)
+        long timeIntervalInLong = System.currentTimeMillis()-lastLearningTime;
+        int timeInterval = (int) (timeIntervalInLong/(1000*60));
+
+        //代入函数计算得记忆存量。
+        return baseCalculate(2.5f,2.05f,3,memoryStage,timeInterval);
+
+    }
+
+    public static float baseCalculate(float alpha, float beta, int fakeNum, int realNum, int timeInterval){
         double m1 = 100*(Math.pow((1+alpha),fakeNum))*(Math.pow((1+beta),realNum));//分子部分
         double m2 = timeInterval+(Math.pow((1+alpha),fakeNum))*(Math.pow((1+beta),realNum))-1;//分母部分
         double retainingMemory = m1/m2;
@@ -84,15 +106,17 @@ public class RVGroup implements Parcelable ,Cloneable{
         return rM_BD.setScale(1,BigDecimal.ROUND_HALF_UP).floatValue();
     }
 
+    public int getMinutesTillFarThreshold(){
+        return minutesTillFarThreshold(this.memoryStage,this.getRM_Amount());
+    }
 
     /*
     * （在指定MS下）衰减到某个指定的M值之前还剩多长时间
     * 在该时间内复习可以提升记忆等级MS，否则只是刷新记忆总量而已。
     * 该指定的M值，取决于当前所处的MS。
-    * （由于设计中原realNum是对应复习，后来将学习和复习统一化，则m应从0其，初学次对应的m是0，对应的MS
-    * 记忆等级也是0）
+    * 【分组新建后，无任何学习数据，此时的MS设计为=0，经过一次学习后，MS加到1；随后的复习继续提升。】
     * */
-    public static int minutesTillFarThreshold(byte memoryStage){
+    public static int minutesTillFarThreshold(byte memoryStage,float currentRma){
         float alpha = 2.5f;
         float beta =2.05f;
         int fakeNum = 3;
@@ -100,6 +124,7 @@ public class RVGroup implements Parcelable ,Cloneable{
         int target_RM ;
         switch (memoryStage){
             case 0:
+                return -1;//目前MS=0仍然对应新建组尚未学习状态，只需尽快学习，无时间限制。
             case 1:
                 target_RM =10;
                 break;
@@ -134,14 +159,16 @@ public class RVGroup implements Parcelable ,Cloneable{
                 target_RM = 99;
 
         }
-
+        if(currentRma<=target_RM){
+            return -2;//已经超时
+        }
         double block_1 = (Math.pow((1+alpha),fakeNum))*(Math.pow((1+beta),memoryStage));
         return (int)((100*block_1)/target_RM+1-block_1);
     }
 
 
-    public static int minutesBeforeShortThreshold(byte memoryStage){
-        return minutesTillFarThreshold(memoryStage)/5;//暂定为上限的1/5。
+    public static int minutesBeforeShortThreshold(byte memoryStage,float currentRma){
+        return minutesTillFarThreshold(memoryStage,currentRma)/5;//暂定为上限的1/5。
         //具体时间当然还需要结合上次有效的记录时间和本值进行计算……
     }
 
@@ -253,7 +280,7 @@ public class RVGroup implements Parcelable ,Cloneable{
         parcel.writeString(description);
         parcel.writeInt(mission_id);
         parcel.writeLong(settingUptimeInLong);
-        parcel.writeSerializable(lastLearningTime);
+        parcel.writeLong(lastLearningTime);
         parcel.writeByte(memoryStage);
         parcel.writeFloat(RM_Amount);
         parcel.writeInt(totalItemsNum);
