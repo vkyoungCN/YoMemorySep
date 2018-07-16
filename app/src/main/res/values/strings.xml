@@ -339,7 +339,7 @@
     <string name="group_info_ac">此分组共%1$d个单词,完成%2$d个，未完成%3$d个</string>
     <string name="wrong_info_ac">完成的词汇中，1$d个正确，%2$d个错误</string>
     <string name="wrong_info_ac_1">完成的词汇中，全部正确</string>
-    <string name="group_dvd_ac">未完成单词从原分组脱离，形成新分组：\n%1$s</string>
+    <string name="group_dvd_ac_1">未完成单词从原分组脱离，形成新分组：\n%1$s</string>
     <string name="status_changes">状态变化</string>
     <string name="rma_change">记忆存量变化</string>
     <string name="right">→</string>
@@ -348,7 +348,7 @@
     <string name="ms_keep">记忆保持</string>
     <string name="merge_info_ac">选定词汇共有%1$d个，其中%2$d个完成</string>
     <string name="unmerge_ac">*未完成部分不作处理</string>
-    <string name="merge_changes">选定分组的合并情况如下</string>
+    <string name="merge_changes">各来源分组合并情况</string>
     <string name="source_group_name">来源组</string>
     <string name="index">序号</string>
     <string name="source_group_size">原容量</string>
@@ -361,8 +361,11 @@
     <string name="saving_done">数据保存完成</string>
     <string name="down_ward">﹀</string>
     <string name="horizontal_bar">--</string>
-    <string name="reason_for_ms_1">*开始复习的时间太晚</string>
+    <string name="reason_ms_tooLate">*开始复习的时间太晚</string>
+    <string name="reason_ms_tooEarly">*开始复习的时间太晚</string>
     <string name="done_nothing">一个都没完成哦。</string>
+    <string name="hs_merge_part">完成部分生成分组：%1$s</string>
+    <string name="hs_wrong_items_names">错误的单词：%1$s</string>
 
 
 </resources>

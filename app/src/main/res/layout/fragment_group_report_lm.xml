@@ -4,13 +4,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <!--需要修改，现在的LM也生成新分组。-->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="500dp"
-        android:text="@string/bar_x2_default"
-        />
-
     <!--域标题栏-->
     <TextView
         android:layout_width="match_parent"
@@ -36,12 +29,12 @@
     <!--拆分信息·如未拆分则text留空即可-->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="28dp"
-        android:gravity="center"
+        android:layout_height="32dp"
+        android:gravity="center_vertical"
         android:paddingEnd="16dp"
         android:paddingStart="16dp"
-        android:textSize="12sp"
-        android:text="@string/unmerge_ac" />
+        android:textColor="@color/yo_orange"
+        android:text="@string/hs_merge_part" />
     <!--分割线-->
     <TextView
         android:layout_width="match_parent"

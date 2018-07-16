@@ -9,7 +9,7 @@
         android:layout_height="36dp"
         android:background="#efefef"
         android:gravity="center"
-        android:text="@string/group_report"
+        android:text="@string/report_1"
         android:textSize="16sp" />
     <!--空词信息·全完成、部分完成-->
     <TextView

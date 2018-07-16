@@ -70,7 +70,7 @@ public class Finish_LG_DiaFragment extends DialogFragment implements View.OnClic
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_group_report_lg, container, false);
+        View rootView = inflater.inflate(R.layout.dfg_learning_handy_finish, container, false);
         rootView.findViewById(R.id.tvBtn_back_dfgLHFinish).setOnClickListener(this);
         rootView.findViewById(R.id.tvBtn_giveUp_dfgLHFinish).setOnClickListener(this);
         btn_Confirm = rootView.findViewById(R.id.tvBtn_confirm_dfgLHFinish);

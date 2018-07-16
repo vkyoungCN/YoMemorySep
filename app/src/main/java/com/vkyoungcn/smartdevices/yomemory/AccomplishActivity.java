@@ -15,6 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.adapters.FragsInMergeRvAdapter;
+import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
+import com.vkyoungcn.smartdevices.yomemory.fragments.ReportGroupLG_Fragment;
 import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
@@ -69,22 +71,6 @@ public class AccomplishActivity extends AppCompatActivity {
 //    private TextView tv_finishTime;
     private TextView tv_learningType;
 
-    private LinearLayout llt_newStatus;
-    private LinearLayout llt_oldStatus;
-    private LinearLayout llt_oldFrags;
-    private RecyclerView rv_oldFragsMergeInfo;
-
-    private TextView tv_newGroupInfo;
-    private TextView tv_oldGroupInfo;
-
-    private TextView tv_newRma;
-    private TextView tv_newMs;
-    private TextView tv_oldRma;
-    private TextView tv_oldMs;
-
-    private TextView tv_dvdInfo;
-    private TextView tv_errInfo;
-
     private int learningType;
     private String tableSuffix = "";
     private long startTime = 0;
@@ -107,9 +93,19 @@ public class AccomplishActivity extends AppCompatActivity {
     private int newMs = 0;
     private int oldMs = 0;
 
+    private int totalNum=0;
+    private int doneNum=0;
+    private int emptyNum=0;
+    private int correctNum=0;
+    private int wrongNum=0;
 
-    private int usedUpTimeMins;
-    private int usedUpTimeSeconds;
+    private String newGroupStr="";
+    private String wrongNamesStr="";
+
+
+    private boolean isMsUp =false;
+    private boolean isTooLate = false;
+
 
     private ArrayList<Integer> emptyItemPositions;
     private ArrayList<Integer> wrongItemPositions;
@@ -136,7 +132,7 @@ public class AccomplishActivity extends AppCompatActivity {
         items = getIntent().getParcelableArrayListExtra("ITEMS");
 
         emptyItemPositions = getIntent().getIntegerArrayListExtra("EMPTY_ITEMS_POSITIONS");
-        wrongItemPositions = getIntent().getIntegerArrayListExtra("WRONG_ITEM_POSITIONS");
+        wrongItemPositions = getIntent().getIntegerArrayListExtra("WRONG_ITEMS_POSITIONS");
 
         startTime = getIntent().getLongExtra("START_TIME",0);
 //        finishTime = getIntent().getLongExtra("FINISH_TIME",0);
@@ -144,18 +140,6 @@ public class AccomplishActivity extends AppCompatActivity {
         restSeconds = getIntent().getIntExtra("REST_SECONDS",0);
 
         flt_mask = findViewById(R.id.flt_mask_ACA);
-        llt_newStatus = findViewById(R.id.llt_newStatus_ACA);
-        llt_oldStatus = findViewById(R.id.llt_oldStatus_ACA);
-        llt_oldFrags = findViewById(R.id.llt_oldFrags_ACA);
-        tv_newGroupInfo = findViewById(R.id.tv_groupNewInfo_ACA);
-        tv_oldGroupInfo = findViewById(R.id.tv_groupOldInfo_ACA);
-        tv_newRma = findViewById(R.id.tv_newRMA_ACA);
-        tv_newMs = findViewById(R.id.tv_newMS_ACA);
-        tv_oldRma = findViewById(R.id.tv_oldRMA_ACA);
-        tv_oldMs = findViewById(R.id.tv_oldMS_ACA);
-        tv_dvdInfo = findViewById(R.id.tv_groupDvdInfo_ACA);
-        tv_errInfo = findViewById(R.id.tv_itemErrInfo_ACA);
-
 
         flt_fragment = findViewById(R.id.flt_fragment_AC);
 
@@ -182,20 +166,11 @@ public class AccomplishActivity extends AppCompatActivity {
         if(emptyItemPositions.size()==items.size()){
             //一个都没完成，这时就别忙活了
             tv_saving.setText(R.string.done_nothing);
+            return;
         }
 
 
-        //中部区域根据不同的学习类型加载不同fg
-        FragmentTransaction transaction = (getFragmentManager().beginTransaction());
-        Fragment prev = (getFragmentManager().findFragmentByTag("REPORT_GROUP"));
-
-        if (prev != null) {
-            Toast.makeText(this, "Old Dfg still there, removing...", Toast.LENGTH_SHORT).show();
-            transaction.remove(prev);
-        }
-
-        Fragment fgLG = .newInstance(finishAmount,wrongAmount,restMinutes,restSeconds);
-        fgLG.show(transaction,"REPORT_GROUP");
+        //中部区域根据不同的学习类型加载不同fg(再消息处理方法中处理)
 
 
         String tempStr = "";
@@ -205,7 +180,6 @@ public class AccomplishActivity extends AppCompatActivity {
 
             new Thread(new GeneralAccomplishRunnable()).start();         // 用于LG模式下的DB与计算线程
             //fg的加载到消息处理方法完成。
-
 
         }else if(learningType == LEARNING_AND_MERGE){
             tempStr ="合并";
@@ -220,7 +194,6 @@ public class AccomplishActivity extends AppCompatActivity {
             missionId = getIntent().getIntExtra("MISSION_ID",0);
 
             new Thread(new CreatedAccomplishRunnable()).start();         // 用于LC模式下的DB与计算线程
-
         }
         tv_learningType.setText(String.format(getResources().getString(R.string.learningType),tempStr));
 
@@ -286,6 +259,7 @@ public class AccomplishActivity extends AppCompatActivity {
             memoryDbHelper = YoMemoryDbHelper.getInstance(getApplicationContext());
             group = memoryDbHelper.getGroupById(groupId,tableSuffix);//取到的group信息对应于学习活动前的分组信息
 
+
             //准备存入DB的系列操作
             //一、Logs。
             // 以下数据计算本次学习的时间有效与否
@@ -302,11 +276,17 @@ public class AccomplishActivity extends AppCompatActivity {
             if(minutesSinceLastLog<minutesShortThreshold){
                 newLearningLog.setEffective(false);
                 isTooNear = true;
+                isTooLate = false;
+                isMsUp =false;
             }else if(minutesSinceLastLog>minutesFarThreshold){
                 newLearningLog.setEffective(false);
                 isTooFar = true;
+                isMsUp =false;
+                isTooLate =true;
             }else {
                 newLearningLog.setEffective(true);
+                isMsUp = true;
+                isTooLate =false;
             }
 
             //【DB操作】：新Log记录提交到DB
@@ -322,11 +302,19 @@ public class AccomplishActivity extends AppCompatActivity {
 
             //Items的处理（DB处理、向fg发送）
             //将Items中有出错的词，其错误记录数+1
+            //修改错词
+            //将Items中有出错的词，其错误记录数+1
+            //并生成错误字串
+            StringBuilder sbdr = new StringBuilder();
             if(!wrongItemPositions.isEmpty()) {
                 for (int i : wrongItemPositions) {
                     items.get(i).failSpellingSelfAddOne();
+                    sbdr.append(items.get(i).getName());
+                    sbdr.append(", ");
                 }
+                sbdr.deleteCharAt(sbdr.length()-2);
             }
+            wrongNamesStr = sbdr.toString();
 
             //【以上，Log提交和items的错词记录数是统一处理的；其余的逻辑都需要按是否拆分区别处理。
             // item的gid、新组建立、新组日志拷贝
@@ -341,6 +329,9 @@ public class AccomplishActivity extends AppCompatActivity {
                 //生成新组的描述字串【暂时只需三项字段。其余字段在group建立后再生成】
                 String strForDescription = "拆分生成-"
                         +items.get(emptyItemPositions.get(0)).getName()+"等"+items.size()+"个";
+
+                newGroupStr=strForDescription;//还要给fg发送一套。
+
                 newGroupForSplitting.setDescription(strForDescription);
                 newGroupForSplitting.setMission_id(group.getMission_id());
                 newGroupForSplitting.setSettingUptimeInLong(System.currentTimeMillis());//以当前时间为所生成的拆分组设立时间
@@ -390,6 +381,12 @@ public class AccomplishActivity extends AppCompatActivity {
             //至此，LG模式下的DB处理已完成。后面是与主线程的通信（包括为fg准备数据）
             message.what = DB_DONE_LG_ACA;
 
+            totalNum=items.size();
+            emptyNum = emptyItemPositions.size();
+            wrongNum = wrongItemPositions.size();
+            doneNum = totalNum -emptyNum;
+            correctNum = doneNum - wrongNum;
+
             //准备需要向fg发送的信息，先通过全局变量传递到UI线程
             DBGroup groupNew = memoryDbHelper.getGroupById(groupId,tableSuffix);//虽是同一个gid，但此时其log、items(拆分时)均已得到更新；
             RVGroup groupRvNew = new RVGroup(groupNew);
@@ -422,6 +419,8 @@ public class AccomplishActivity extends AppCompatActivity {
             }
 
             String gDescription = notEmptyItems.get(0).getName()+"等"+notEmptyItems.size()+"个[合并创建]";
+            newGroupStr=gDescription;//还要给fg发送一套。
+
             //下面这个类只用于生成空的分组，不生成ms记录相关内容，可以留0。
             DBGroup groupToBeCreate = new DBGroup(0,gDescription,missionId,System.currentTimeMillis(),startTime,(byte) 0,(short) 0);
 
@@ -460,11 +459,19 @@ public class AccomplishActivity extends AppCompatActivity {
 
             //〇、提前进行items的错词处理【在LA需要保证逻辑上wrong和empty不能有交集】
             //将Items中有出错的词，其错误记录数+1【需要位于各分线程之前（因为需要在提交到DB之前准备好数据）】
+            //修改错词
+            //将Items中有出错的词，其错误记录数+1
+            //并生成错误字串
+            StringBuilder sbdr = new StringBuilder();
             if(!wrongItemPositions.isEmpty()) {
                 for (int i : wrongItemPositions) {
                     items.get(i).failSpellingSelfAddOne();
+                    sbdr.append(items.get(i).getName());
+                    sbdr.append(", ");
                 }
+                sbdr.deleteCharAt(sbdr.length()-2);
             }
+            wrongNamesStr = sbdr.toString();
 
             //items的gid修改
             //所有非空词的gid修改为
@@ -504,6 +511,13 @@ public class AccomplishActivity extends AppCompatActivity {
             Message messageForMergeDone = new Message();
             messageForMergeDone.what = DB_DONE_LM_ACA;
 
+            totalNum=items.size();
+            emptyNum = emptyItemPositions.size();
+            wrongNum = wrongItemPositions.size();
+            doneNum = totalNum -emptyNum;
+            correctNum = doneNum - wrongNum;
+
+
             //已经对数据完成了DB提交，现在准备为UI获取新版信息
             //由于LM模式下，开始时不传递group前来，因而不持有旧组logs信息，即使在“主组发生拆分”这种
             // 实际等同于LG的结果下，也无法计算旧RMA/MS数据。因而不对相关信息进行显示。
@@ -527,6 +541,8 @@ public class AccomplishActivity extends AppCompatActivity {
                 }//由于全空状态下在进新线程前就被if分支截去了，因而必然有一个非空位置
             }
             String gDescription = notEmptyItems.get(0).getName()+"等"+notEmptyItems.size()+"个[学习创建]";
+            newGroupStr=gDescription;//还要给fg发送一套。
+
             DBGroup groupToBeCreate = new DBGroup(0,gDescription,missionId,System.currentTimeMillis(),startTime,(byte) 0,(short) 0);
 
             //生成新组【DB操作】（但是只生成了group表的记录）
@@ -550,16 +566,31 @@ public class AccomplishActivity extends AppCompatActivity {
 
             //修改错词
             //将Items中有出错的词，其错误记录数+1
+            //并生成错误字串
+            StringBuilder sbdr = new StringBuilder();
             if(!wrongItemPositions.isEmpty()) {
                 for (int i : wrongItemPositions) {
-                    notEmptyItems.get(i).failSpellingSelfAddOne();
+                    items.get(i).failSpellingSelfAddOne();
+                    sbdr.append(items.get(i).getName());
+                    sbdr.append(", ");
                 }
+                sbdr.deleteCharAt(sbdr.length()-2);
             }
+            wrongNamesStr = sbdr.toString();
             memoryDbHelper.updateItemsPdgWithDoubleTrue(tableSuffix,notEmptyItems);
 
 
             Message messageForLC = new Message();
             messageForLC.what = DB_DONE_LC_ACA;
+
+            totalNum=items.size();
+            emptyNum = emptyItemPositions.size();
+            wrongNum = wrongItemPositions.size();
+            doneNum = totalNum -emptyNum;
+            correctNum = doneNum - wrongNum;
+
+
+
 
             DBGroup groupDbNew = memoryDbHelper.getGroupById(groupId,tableSuffix);
             RVGroup groupRVNew = new RVGroup(groupDbNew);
@@ -572,55 +603,48 @@ public class AccomplishActivity extends AppCompatActivity {
 
 
     void handleMessage(Message msg) {
+        //数据和DB存储已处理完成，可以加载fg部分
+        FragmentTransaction transaction = (getFragmentManager().beginTransaction());
+        Fragment prev = (getFragmentManager().findFragmentByTag("REPORT_GROUP"));
+
+        if (prev != null) {
+            Toast.makeText(this, "Old Dfg still there, removing...", Toast.LENGTH_SHORT).show();
+            transaction.remove(prev);
+        }
+
+        Bundle bundleForFG = new Bundle();
+        bundleForFG.putInt("TOTAL_NUM",totalNum);
+        bundleForFG.putInt("DONE_NUM",doneNum);
+        bundleForFG.putInt("EMPTY_NUM",emptyNum);
+        bundleForFG.putInt("CORRECT_NUM",correctNum);
+        bundleForFG.putInt("WRONG_NUM",wrongNum);
+
+        bundleForFG.putFloat("NEW_RMA",newRma);
+        bundleForFG.putFloat("OLD_RMA",oldRma);
+        bundleForFG.putInt("NEW_MS",newMs );
+        bundleForFG.putInt("OLD_MS",oldMs);
+
+        bundleForFG.putString("NEW_GROUP",newGroupStr);
+        bundleForFG.putString("WRONG_NAMES",wrongNamesStr);
+
+        bundleForFG.putBoolean("IS_MS_UP",isMsUp);
+        bundleForFG.putBoolean("IS_TOO_LATE",isTooLate);
+
         switch (msg.what){
             case DB_DONE_LG_ACA:
-                //确定是在LG模式下才会到达此处(且是未拆分)
-                flt_mask.setVisibility(View.GONE);//取消遮罩
+                Fragment fgLG = ReportGroupLG_Fragment.newInstance(bundleForFG);
+                transaction.add(R.id.flt_fragment_AC, fgLG, "REPORT_GROUP").commit();
 
-                tv_newGroupInfo.setText(String.format(getResources().getString(R.string.groupId_Num),msg.arg1,msg.arg2));
-                tv_oldGroupInfo.setText(String.format(getResources().getString(R.string.groupId_Num),groupId,group.getTotalItemNum()));//此时新旧其实一致
-
-                tv_newRma.setText(String.valueOf(msg.getData().getFloat("NEW_RMA")));//或者直接设为100？【待】
-                tv_newMs.setText(String.valueOf(msg.getData().getInt("NEW_MS")));
-                tv_oldRma.setText(String.valueOf(msg.getData().getFloat("OLD_RMA")));
-                tv_oldMs.setText(msg.getData().getInt("OLD_MS"));
-                if(msg.getData().getBoolean("IS_DIVIDED")){
-                    tv_dvdInfo.setText(getResources().getString(R.string.did_dvd));//设置为“未完成，产生了拆分”
-                }else {
-                    tv_dvdInfo.setText(getResources().getString(R.string.no_dvd));//设置为“全部完成，没有拆分”
-                }
                 break;
 
             case DB_DONE_LM_ACA:
-                //Lm模式下
-                flt_mask.setVisibility(View.GONE);//取消遮罩
-                tv_newGroupInfo.setText(String.format(getResources().getString(R.string.groupId_Num),msg.arg1,msg.arg2));
-
-                tv_newRma.setText(String.valueOf(msg.getData().getFloat("NEW_RMA")));//暂时直接设为100。（复习后直接刷新到100；本UI没有二次刷新功能，因而只显示完成时点的值）
-                tv_newMs.setText(String.valueOf(msg.getData().getInt("NEW_MS")));
-
-                tv_dvdInfo.setText(String.format(getResources().getString(R.string.sizeChanged),msg.getData().getInt("OLD_SIZE"),msg.getData().getInt("NEW_SIZE")));//设置为“未完成，产生了拆分”【其实拆分与否只有本句不同啊！？代码待合并修改】
-
-                //adapter的设置
-                FragsInMergeRvAdapter adapter = new FragsInMergeRvAdapter(gIdsForMerge,msg.getData().getIntegerArrayList("FG_SIZE"),msg.getData().getStringArrayList("FG_RESULT"));
-                rv_oldFragsMergeInfo.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                rv_oldFragsMergeInfo.setHasFixedSize(true);
-                rv_oldFragsMergeInfo.setAdapter(adapter);
+                Fragment fgLM = ReportGroupLG_Fragment.newInstance(bundleForFG);
+                transaction.add(R.id.flt_fragment_AC, fgLM, "REPORT_GROUP").commit();
 
                 break;
             case DB_DONE_LC_ACA:
-                //Lm模式下
-                flt_mask.setVisibility(View.GONE);//取消遮罩
-                tv_newGroupInfo.setText(String.format(getResources().getString(R.string.groupId_Num),msg.arg1,msg.arg2));
-
-                tv_newRma.setText(String.valueOf(msg.getData().getFloat("NEW_RMA")));//暂时直接设为100。（复习后直接刷新到100；本UI没有二次刷新功能，因而只显示完成时点的值）
-                tv_newMs.setText(String.valueOf(msg.getData().getInt("NEW_MS")));
-
-                if(learningType == LEARNING_AND_CREATE_ORDER) {
-                    tv_dvdInfo.setText(getResources().getString(R.string.create_order));
-                }else {
-                    tv_dvdInfo.setText(getResources().getString(R.string.create_random));
-                }
+                Fragment fgLC = ReportGroupLG_Fragment.newInstance(bundleForFG);
+                transaction.add(R.id.flt_fragment_AC, fgLC, "REPORT_GROUP").commit();
 
                 break;
         }
