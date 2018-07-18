@@ -32,12 +32,17 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 /*
- * 作者1：杨胜@中国海洋大学
- * 作者2：杨镇时@中国海洋大学
- * author：Victor Young @Ocean University of China
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
  * email: yangsheng@ouc.edu.cn
-* */
-public class GroupDetailActivity extends AppCompatActivity implements OnGeneralDfgInteraction {
+ * 2018.08.01
+ * */
+public class GroupDetailActivity extends AppCompatActivity implements OnGeneralDfgInteraction,Constants {
+//    本Activity是分组的详情。
+//    重在group信息的展示，包括所属item（以列表形式）展示。
+//    可以跳转到学习页对本组进行学习（LG模式）。
+//    如果本组容量过小，在用户同意时可以进行合并式学习（但不强制）。
     private static final String TAG = "GroupDetailActivity";
     private RVGroup rvGroup;
     private YoMemoryDbHelper memoryDbHelper;
@@ -61,9 +66,9 @@ public class GroupDetailActivity extends AppCompatActivity implements OnGeneralD
 
         RecyclerView rv_itemsOfGroup = (RecyclerView)findViewById(R.id.rv_itemsOfGroup_GD);
 
-        rvGroup = getIntent().getParcelableExtra("GROUP");
+        rvGroup = getIntent().getParcelableExtra(STR_GROUP);
 //        Log.i(TAG, "onCreate: get rvg from intent,-.ms="+rvGroup.getMemoryStage());
-        String tableSuffix = getIntent().getStringExtra("TABLE_SUFFIX");
+        String tableSuffix = getIntent().getStringExtra(STR_TABLE_SUFFIX);
 
 
 //        DBGroup dbGroup = memoryDbHelper.getGroupById(group,tableSuffix);
@@ -80,7 +85,7 @@ public class GroupDetailActivity extends AppCompatActivity implements OnGeneralD
 
             Date settingUpTimeDate = new Date(this.rvGroup.getSettingUptimeInLong());
             Date lastLearningTimeDate = new Date(this.rvGroup.getLastLearningTime());
-            SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat sdFormat = new SimpleDateFormat(STR_DATE_PATTEN_1);
             String settingUpTimeStr = sdFormat.format(settingUpTimeDate);
             String lastLearningTimeStr = sdFormat.format(lastLearningTimeDate);
             if(rvGroup.getLastLearningTime() ==0){
@@ -145,13 +150,13 @@ public class GroupDetailActivity extends AppCompatActivity implements OnGeneralD
         Collections.sort(learningLogs,new SortByTime());
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        Fragment prev = getFragmentManager().findFragmentByTag("SHOW_LOGS");
+        Fragment prev = getFragmentManager().findFragmentByTag(FG_STR_SHOW_LOGS);
 
         if(prev != null){
             transaction.remove(prev);
         }
         DialogFragment dialogFragment = LogsOfGroupDiaFragment.newInstance(learningLogs);
-        dialogFragment.show(transaction,"SHOW_LOGS");
+        dialogFragment.show(transaction,FG_STR_SHOW_LOGS);
     }
 
 
@@ -164,22 +169,22 @@ public class GroupDetailActivity extends AppCompatActivity implements OnGeneralD
         Toast.makeText(this, "准备弹确认对话框", Toast.LENGTH_SHORT).show();
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        Fragment prev_2 = getFragmentManager().findFragmentByTag("READY_TO_LEARN_GEL");
+        Fragment prev_2 = getFragmentManager().findFragmentByTag(FG_STR_READY_TO_LEARN_GEL);
 
         if (prev_2 != null) {
             transaction.remove(prev_2);
         }
-
+【待修改，是否采取合并式学习要由用户选择】
         if(rvGroup.getTotalItemsNum()<5){
             //4个（含）以内的，触发合并式学习；但无法轻易获取其他碎片组信息，决定只进行提示，不予开始。
             //可以弹出DFG，告知请从分组列表页点击本组，执行合并学习，询问是否跳转到分组列表页
             DialogFragment dfg = LessAndQuitDiaFragment.newInstance(rvGroup.getId());
-            dfg.show(transaction, "LESS_IN_GD_DIA");
+            dfg.show(transaction, FG_STR_LESS_IN_GD_DIA);
         }else {
             //正常容量正常学习。此时只需传递正常的分组id即可
             //【但是本activity接下来需要实现与该dfg的交互接口】
             DialogFragment dfg = LearningGelDiaFragment.newInstance(rvGroup);
-            dfg.show(transaction, "READY_TO_LEARN_GEL");
+            dfg.show(transaction, FG_STR_READY_TO_LEARN_GEL);
 
         }
     }
@@ -189,7 +194,7 @@ public class GroupDetailActivity extends AppCompatActivity implements OnGeneralD
         if(dfgType == JUMP_TO_GROUP_LIST_THIS_FRAG) {
             Intent intentToGroupListActivity = new Intent(this, GroupsOfMissionActivity.class);
 
-            intentToGroupListActivity.putExtra("GROUP_ID_TO_JUMP",data.getInt("GROUP_ID_TO_JUMP") );
+            intentToGroupListActivity.putExtra(STR_GROUP_ID_TO_JUMP,data.getInt(STR_GROUP_ID_TO_JUMP) );
             this.startActivity(intentToGroupListActivity);
         }
     }

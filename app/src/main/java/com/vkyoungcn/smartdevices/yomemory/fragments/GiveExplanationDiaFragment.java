@@ -13,9 +13,16 @@ import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+/*
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 @SuppressWarnings("all")
 public class GiveExplanationDiaFragment extends DialogFragment implements View.OnClickListener {
+//* 用于展示程序的使用说明（毕竟本程序是有一定学习曲线的，不是纯傻瓜应用）
     private static final String TAG = "GiveExplanationDiaFragment";
     private OnGeneralDfgInteraction mListener;
 

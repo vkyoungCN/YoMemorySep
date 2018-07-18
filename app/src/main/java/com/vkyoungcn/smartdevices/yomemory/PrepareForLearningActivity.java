@@ -28,13 +28,20 @@ import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteract
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_GENERAL_NO_GID;
 
 /*
-* 作者1：杨胜@中国海洋大学
-* 作者2：杨镇时@中国海洋大学
-* author：Victor Young @Ocean University of China
-* email: yangsheng@ouc.edu.cn
-* */
-public class PrepareForLearningActivity extends AppCompatActivity {
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
+public class PrepareForLearningActivity extends AppCompatActivity implements Constants {
+//    本页面在LearningActivity之前，为LA准备数据。
+//    接收各页面发起的学习请求，根据不同的学习种类（LearningType）来构造特定的数据集，
+//    然后传递给学习页。
+//    本页面结束后不能返回，是一过性页面。
     private static final String TAG = "PrepareForLearningActiv";
+
+    /* Intent数据 */
     private int learningType;//Intent传来
     private String tableNameSuffix;
     private int groupId;//Intent传来，边建边学没有此数据。
@@ -42,12 +49,14 @@ public class PrepareForLearningActivity extends AppCompatActivity {
     private int missionId;//仅在LC两种模式下使用。传递到最后页，生成新组时使用。//LGN模式下也使用，需要用它获取全部分组。
     private int prioritySetting = DEFAULT_MANNER_TT;//仅LGN模式使用
 
-    private Handler handler = new PrepareLearningDataHandler(this);
-    private YoMemoryDbHelper memoryDbHelper;
 
+    /* DB数据*/
+    private YoMemoryDbHelper memoryDbHelper;
     private ArrayList<SingleItem> items = new ArrayList<>();//用于装载实际拉取到的数据并向后传递。
 
-
+    /*线程*/
+    private Handler handler = new PrepareLearningDataHandler(this);
+    /* 预定义的线程消息常量*/
     public static final int MESSAGE_LG_DB_DATA_FETCHED = 5071;
     public static final int MESSAGE_LGN_DB_DATA_FETCHED = 5077;
     public static final int MESSAGE_LCO_DB_DATA_FETCHED = 5072;
@@ -61,14 +70,14 @@ public class PrepareForLearningActivity extends AppCompatActivity {
         setContentView(R.layout.activity_prepare_for_learning);
 
         memoryDbHelper = YoMemoryDbHelper.getInstance(this);
-        learningType = getIntent().getIntExtra("LEARNING_TYPE",0);//所有情形下都会传递本数据
-        tableNameSuffix = getIntent().getStringExtra("TABLE_SUFFIX");
+        learningType = getIntent().getIntExtra(STR_LEARNING_TYPE,0);//所有情形下都会传递本数据
+        tableNameSuffix = getIntent().getStringExtra(STR_TABLE_SUFFIX);
 
         switch (learningType){
             case LEARNING_GENERAL:
-                Bundle bundleForGeneral = getIntent().getBundleExtra("BUNDLE_FOR_GENERAL");
+                Bundle bundleForGeneral = getIntent().getBundleExtra(STR_BUNDLE_FOR_GENERAL);
                 if(bundleForGeneral!=null){
-                    groupId = bundleForGeneral.getInt("GROUP_ID_TO_LEARN",0);
+                    groupId = bundleForGeneral.getInt(STR_GROUP_ID_TO_LEARN,0);
                     //通用模式下额外传入的数据只有1个gid。
 
                     //下面为通用模式准备数据List<Item>。
@@ -80,10 +89,10 @@ public class PrepareForLearningActivity extends AppCompatActivity {
                 }
                 break;
             case LEARNING_GENERAL_NO_GID:
-                Log.i(TAG, "onCreate: LGN");
+//                Log.i(TAG, "onCreate: LGN");
                 if(getIntent()!=null){
-                    prioritySetting = getIntent().getIntExtra("PRIORITY_SETTING",DEFAULT_MANNER_TT);
-                    missionId = getIntent().getIntExtra("MISSION_ID",0);
+                    prioritySetting = getIntent().getIntExtra(STR_PRIORITY_SETTING,DEFAULT_MANNER_TT);
+                    missionId = getIntent().getIntExtra(STR_MISSION_ID,0);
 
                     //下面为通用模式准备数据List<Item>。
                     //①开启新线程：拉取数据；完成后发送消息
@@ -99,36 +108,30 @@ public class PrepareForLearningActivity extends AppCompatActivity {
                 break;
             case LEARNING_AND_CREATE_ORDER:
                 //边学边建模式下传入的额外数据
-                missionId = getIntent().getIntExtra("MISSION_ID",0);
+                missionId = getIntent().getIntExtra(STR_MISSION_ID,0);
                 //下面为创建模式准备数据List<Item>。
                 new Thread(new PrepareDataForLcOrderRunnable()).start();         // start thread
 
                 break;
             case LEARNING_AND_CREATE_RANDOM:
                 //边学边建模式下传入的额外数据
-                missionId = getIntent().getIntExtra("MISSION_ID",0);
+                missionId = getIntent().getIntExtra(STR_MISSION_ID,0);
                 //下面为创建模式准备数据List<Item>。
                 new Thread(new PrepareDataForLcRandomRunnable()).start();         // start thread
                 break;
 
             case LEARNING_AND_MERGE:
                 //合并模式下额外传入的数据是一个ArrayList。
-                Bundle bundleForMerge = getIntent().getBundleExtra("BUNDLE_FOR_MERGE");
+                Bundle bundleForMerge = getIntent().getBundleExtra(STR_BUNDLE_FOR_MERGE);
                 if(bundleForMerge!=null){
-                    gIdsForMerge = (ArrayList<Integer>) bundleForMerge.getSerializable("IDS_GROUPS_READY_TO_MERGE");
+                    gIdsForMerge = (ArrayList<Integer>) bundleForMerge.getSerializable(STR_IDS_GROUPS_READY_TO_MERGE);
                     //合并模式下额外传入的数据是一个ArrayList。
                 }
                 //下面为合并模式准备数据List<Item>。
                 new Thread(new PrepareDataForLMergeRunnable()).start();         // start thread
 
-
                 break;
-
         }
-
-
-
-
     }
 
 
@@ -139,7 +142,6 @@ public class PrepareForLearningActivity extends AppCompatActivity {
         private PrepareLearningDataHandler(PrepareForLearningActivity activity) {
             this.activityWeakReference = new WeakReference<>(activity);
         }
-
         @Override
         public void handleMessage(Message msg) {
             PrepareForLearningActivity prepareForLearningActivity = activityWeakReference.get();
@@ -149,16 +151,16 @@ public class PrepareForLearningActivity extends AppCompatActivity {
         }
     }
 
-    void handleMessage(Message message) {
 
+    void handleMessage(Message message) {
         switch (message.what){
             case MESSAGE_LG_DB_DATA_FETCHED:
                 //加载完数据后，准备向后传递，本Activity结束。
                 Intent intentToLearningActivity = new Intent(this,LearningActivity.class);
-                intentToLearningActivity.putExtra("LEARNING_TYPE",LEARNING_GENERAL);
-                intentToLearningActivity.putExtra("TABLE_NAME_SUFFIX",tableNameSuffix);
-                intentToLearningActivity.putExtra("GROUP_ID",groupId);
-                intentToLearningActivity.putParcelableArrayListExtra("ITEMS_FOR_LEARNING",items);
+                intentToLearningActivity.putExtra(STR_LEARNING_TYPE,LEARNING_GENERAL);
+                intentToLearningActivity.putExtra(STR_TABLE_NAME_SUFFIX,tableNameSuffix);
+                intentToLearningActivity.putExtra(STR_GROUP_ID,groupId);
+                intentToLearningActivity.putParcelableArrayListExtra(STR_ITEMS_FOR_LEARNING,items);
                 //Items采用统一的同一个关键字传递即可。
 
                 intentToLearningActivity.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);//要求不记录
@@ -170,10 +172,10 @@ public class PrepareForLearningActivity extends AppCompatActivity {
                 RVGroup rvGroup = (RVGroup) message.obj;
 
                 Intent intentToLearningActivity_LGN = new Intent(this,LearningActivity.class);
-                intentToLearningActivity_LGN.putExtra("LEARNING_TYPE",LEARNING_GENERAL);//可以使用LG。（N无所谓了）
-                intentToLearningActivity_LGN.putExtra("TABLE_NAME_SUFFIX",tableNameSuffix);
-                intentToLearningActivity_LGN.putExtra("GROUP_ID",rvGroup.getId());
-                intentToLearningActivity_LGN.putParcelableArrayListExtra("ITEMS_FOR_LEARNING",items);
+                intentToLearningActivity_LGN.putExtra(STR_LEARNING_TYPE,LEARNING_GENERAL);//可以使用LG。（N无所谓了）
+                intentToLearningActivity_LGN.putExtra(STR_TABLE_NAME_SUFFIX,tableNameSuffix);
+                intentToLearningActivity_LGN.putExtra(STR_GROUP_ID,rvGroup.getId());
+                intentToLearningActivity_LGN.putParcelableArrayListExtra(STR_ITEMS_FOR_LEARNING,items);
                 //Items采用统一的同一个关键字传递即可。
 //                Log.i(TAG, "handleMessage: LGN");
 
@@ -186,10 +188,10 @@ public class PrepareForLearningActivity extends AppCompatActivity {
                 //加载完数据后，准备向后传递，本Activity结束。
                 //边学边建模式下没有gid。
                 Intent intentToLearningActivity_LCO = new Intent(this,LearningActivity.class);
-                intentToLearningActivity_LCO.putExtra("LEARNING_TYPE",LEARNING_AND_CREATE_ORDER);
-                intentToLearningActivity_LCO.putExtra("TABLE_NAME_SUFFIX",tableNameSuffix);
-                intentToLearningActivity_LCO.putExtra("MISSION_ID",missionId);
-                intentToLearningActivity_LCO.putParcelableArrayListExtra("ITEMS_FOR_LEARNING",items);
+                intentToLearningActivity_LCO.putExtra(STR_LEARNING_TYPE,LEARNING_AND_CREATE_ORDER);
+                intentToLearningActivity_LCO.putExtra(STR_TABLE_NAME_SUFFIX,tableNameSuffix);
+                intentToLearningActivity_LCO.putExtra(STR_MISSION_ID,missionId);
+                intentToLearningActivity_LCO.putParcelableArrayListExtra(STR_ITEMS_FOR_LEARNING,items);
 //                Log.i(TAG, "handleMessage: items done,size="+items.size());
                 intentToLearningActivity_LCO.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);//要求不记录
                 this.startActivity(intentToLearningActivity_LCO);
@@ -198,10 +200,10 @@ public class PrepareForLearningActivity extends AppCompatActivity {
 
             case MESSAGE_LCR_DB_DATA_FETCHED:
                 Intent intentToLearningActivity_LCR = new Intent(this,LearningActivity.class);
-                intentToLearningActivity_LCR.putExtra("LEARNING_TYPE",LEARNING_AND_CREATE_ORDER);
-                intentToLearningActivity_LCR.putExtra("TABLE_NAME_SUFFIX",tableNameSuffix);
-                intentToLearningActivity_LCR.putExtra("MISSION_ID",missionId);
-                intentToLearningActivity_LCR.putParcelableArrayListExtra("ITEMS_FOR_LEARNING",items);
+                intentToLearningActivity_LCR.putExtra(STR_LEARNING_TYPE,LEARNING_AND_CREATE_ORDER);
+                intentToLearningActivity_LCR.putExtra(STR_TABLE_NAME_SUFFIX,tableNameSuffix);
+                intentToLearningActivity_LCR.putExtra(STR_MISSION_ID,missionId);
+                intentToLearningActivity_LCR.putParcelableArrayListExtra(STR_ITEMS_FOR_LEARNING,items);
 
                 intentToLearningActivity_LCR.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);//要求不记录
                 this.startActivity(intentToLearningActivity_LCR);
@@ -209,10 +211,10 @@ public class PrepareForLearningActivity extends AppCompatActivity {
                 break;
             case MESSAGE_LM_DB_DATA_FETCHED:
                 Intent intentToLearningActivity_LM = new Intent(this,LearningActivity.class);
-                intentToLearningActivity_LM.putExtra("LEARNING_TYPE",LEARNING_AND_MERGE);
-                intentToLearningActivity_LM.putExtra("TABLE_NAME_SUFFIX",tableNameSuffix);
-                intentToLearningActivity_LM.putParcelableArrayListExtra("ITEMS_FOR_LEARNING",items);
-                intentToLearningActivity_LM.putIntegerArrayListExtra("GIDS_FOR_MERGE",gIdsForMerge);
+                intentToLearningActivity_LM.putExtra(STR_LEARNING_TYPE,LEARNING_AND_MERGE);
+                intentToLearningActivity_LM.putExtra(STR_TABLE_NAME_SUFFIX,tableNameSuffix);
+                intentToLearningActivity_LM.putParcelableArrayListExtra(STR_ITEMS_FOR_LEARNING,items);
+                intentToLearningActivity_LM.putIntegerArrayListExtra(STR_GIDS_FOR_MERGE,gIdsForMerge);
 
                 intentToLearningActivity_LM.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);//要求不记录
                 this.startActivity(intentToLearningActivity_LM);
@@ -224,42 +226,41 @@ public class PrepareForLearningActivity extends AppCompatActivity {
     }
 
 
+    /* 为“普通学习”（LG）模式准备数据*/
     public class PrepareDataForGeneralLearningRunnable implements Runnable {
 //        private static final String TAG = "PrepareDataForGeneralLearningRunnable";
 
         @Override
         public void run() {
-            //从DB准备数据
-                items = memoryDbHelper.getItemsByGroupId(groupId, tableNameSuffix);
-            //【取消在Items列表数据的最后附加一条“伪数据”，用于伪完成页显示的设置，
-            // 目前所有页面功能定位可以一样，不需要尾页来承担特殊功能】
+            items = memoryDbHelper.getItemsByGroupId(groupId, tableNameSuffix);
 
             Message message = new Message();
             message.what = MESSAGE_LG_DB_DATA_FETCHED;
-
             handler.sendMessage(message);
         }
     }
 
+    /*
+    * 为未传递groupId过来的普通学习（LGN）准备数据
+    * “快速学习”功能会进入到此模式。
+    * （快速学习要求系统智能选定最应复习的分组，因而没有预先确定的ID）
+    * */
 
     public class PrepareDataForNoIdGeneralLearningRunnable implements Runnable {
 //        private static final String TAG = "PrepareDataForNoIdGeneralLearningRunnable";
 
         @Override
         public void run() {
-            //需要一个新方法，能够按指定条件对所有分组排序，只需返回其第前一（或者多缓存几项）项结果
-            Log.i(TAG, "run: LGN");
-
-            //从DB准备数据
             ArrayList<DBGroup> groups = memoryDbHelper.getAllGroupsByMissionId(missionId, tableNameSuffix);
-            //【取消在Items列表数据的最后附加一条“伪数据”，用于伪完成页显示的设置，
-            // 目前所有页面功能定位可以一样，不需要尾页来承担特殊功能】
+            //取到数据后，准备按各组的RMA或MS，或者由此二项数据计算的时间值来进行排序筛选（只取最前项即可）
+            //转换到RVGroup才能得到相关字段
             ArrayList<RVGroup> rvGroups = new ArrayList<>();
             for (DBGroup d : groups) {
                 rvGroups.add(new RVGroup(d));
             }
+            //按指定条件prioritySetting对rvGroups集合进行筛选，选择其最小项目
             RVGroup targetGroup = getMinRvGroupUseTerm(prioritySetting,rvGroups);
-
+            //获取选定分组的items
             items = memoryDbHelper.getItemsByGroupId(targetGroup.getId(),tableNameSuffix);
 
             Message message = new Message();
@@ -269,11 +270,13 @@ public class PrepareForLearningActivity extends AppCompatActivity {
             handler.sendMessage(message);
         }
     }
+
+
     /*
-    * 顺序方式从DB获取数据（暂定36个）
+    * 用于创建式学习（顺序）
+    * 从DB预拉取（暂定36个）items数据
     * */
     public class PrepareDataForLcOrderRunnable implements Runnable {
-//        private static final String TAG = "PrepareDataForGeneralLearningRunnable";
 
         @Override
         public void run() {
@@ -288,11 +291,10 @@ public class PrepareForLearningActivity extends AppCompatActivity {
     }
 
     /*
-     * 随机方式从DB获取数据（暂定36个）
+     * 用于创建式学习（随机）
+     * 从DB预拉取（暂定36个）items数据
      * */
     public class PrepareDataForLcRandomRunnable implements Runnable {
-//        private static final String TAG = "PrepareDataForLcRandomRunnable";
-
         @Override
         public void run() {
             //从DB准备数据
@@ -306,10 +308,11 @@ public class PrepareForLearningActivity extends AppCompatActivity {
     }
 
 
-
+    /* 为合并式学习准备数据
+    * 需要将作为合并源的各个分组id一并传给目标页
+    * （各个源分组需要先排序）
+    * */
     public class PrepareDataForLMergeRunnable implements Runnable {
-//        private static final String TAG = "PrepareDataForLMergeRunnable";
-
         @Override
         public void run() {
             //从DB准备数据
@@ -333,7 +336,8 @@ public class PrepareForLearningActivity extends AppCompatActivity {
     }
 
     /*
-    * 基于Group列表页的排序方法删减而来，只挑最小项是容易很多的。
+    * 按指定的条件（参数1），对传入的分组集合（参数2）进行筛选，选出最小项目并返回。
+    * 基于Group列表页的排序方法删减而来，只挑最小项。
     * */
     private RVGroup getMinRvGroupUseTerm(int term,ArrayList<RVGroup> rvGroups){
         RVGroup minRVGroup = rvGroups.get(0);//指针项，先指向第一项

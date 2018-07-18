@@ -1,12 +1,21 @@
 package com.vkyoungcn.smartdevices.yomemory.fragments;
 
 import android.os.Bundle;
-
+/*
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 public interface OnGeneralDfgInteraction {
+//* DialogFragment与调用方Activity之间交互（从DFG向ACT回送数据）的通用（自定义）接口
+//* 回调方法中传回两个数据：①本操作的类型（是下列定义的操作类型常量之一）；②本操作附带的数据（
+// 以Bundle形式发回。）
+
     int LEARNING_GENERAL = 2021;
     int LEARNING_GENERAL_NO_GID = 2029;//快速复习模式下特殊信号，通常的LG是提前准备好目标gid发送
     // 给LPA的，而快速复习可能需要根据timeThreshold筛选最需要复习的组，该工作需由LPA负责，因而暂无gid发送。
-
     int LEARNING_AND_CREATE_ORDER = 2022;
     int LEARNING_AND_CREATE_RANDOM = 2023;
     int LEARNING_AND_MERGE =2024;

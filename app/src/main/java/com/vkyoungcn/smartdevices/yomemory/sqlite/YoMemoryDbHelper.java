@@ -19,25 +19,30 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by VkYoung16 on 2018/3/26 0026.
- */
-
+/*
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 public class YoMemoryDbHelper extends SQLiteOpenHelper {
     private static final String TAG = "YoMemory-DbHelper";
+
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "YoMemory.db";
+
     private volatile static YoMemoryDbHelper sYoMemoryDbHelper = null;
-    private SQLiteDatabase mSQLiteDatabase = null;
+
+    //类内所有的DB操作均采用以下引用进行。通过同一的获取和关闭方法进行获取、关闭。
+    private SQLiteDatabase mSQLiteDatabase;
 
     private Context context = null;
-
     public static final String DEFAULT_ITEM_SUFFIX = "default13531";
 
-    /* 建表语句
-     * 初次运行时创建的表：Mission、Group、LearningLogs、Item_default13531；
-     * 各任务特有Items表在添加具体任务时创建；
-     * */
+    /* 建表语句*/
+    // 初次运行时创建的表：Mission、Group、LearningLogs、Item_default13531；
+    //任务表
     public static final String SQL_CREATE_MISSION =
             "CREATE TABLE " + YoMemoryContract.Mission.TABLE_NAME + " (" +
                     YoMemoryContract.Mission._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -47,7 +52,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
                     YoMemoryContract.Mission.COLUMN_DETAIL_DESCRIPTION + " TEXT, "+
                     YoMemoryContract.Mission.COLUMN_DESCRIPTION + " TEXT)";
 
-
+    //分组表
     public static final String SQL_CREATE_GROUP =
             "CREATE TABLE " + YoMemoryContract.Group.TABLE_NAME + " (" +
                     YoMemoryContract.Group._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -57,7 +62,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
                     "FOREIGN KEY("+YoMemoryContract.Group.COLUMN_MISSION_ID +") REFERENCES "+
                     YoMemoryContract.Mission.TABLE_NAME+"("+ YoMemoryContract.Mission._ID+") " +
                     "ON DELETE CASCADE)"; //外键采用级联删除
-
+    //日志表
     public static final String SQL_CREATE_LEARNING_LOGS =
             "CREATE TABLE " + YoMemoryContract.LearningLogs.TABLE_NAME + " (" +
                     YoMemoryContract.LearningLogs._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -71,8 +76,8 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
 
 
-    /*以下两种表需要根据具体的任务id创建，需动态生成建表语句*/
-    /* 根据任务设定的尾缀创建具体的任务项目表，所需语句*/
+    //Items表需根据具体的任务提供的tableNameSuffix创建。
+    // 现提供其建表语句的动态生成方法
     public String getSqlCreateItemWithSuffix(String suffix){
         return "CREATE TABLE " +
                 YoMemoryContract.ItemBasic.TABLE_NAME + suffix+" (" +
@@ -92,7 +97,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         //当Group表中删除分组时，需由程序负责所属Items的归属归零；DB似乎没有直接适用的外键约束规则。
     }
 
-
+    /* 删表语句*/
     private static final String SQL_DROP_MISSION =
             "DROP TABLE IF EXISTS " +  YoMemoryContract.Mission.TABLE_NAME;
     private static final String SQL_DROP_GROUP =
@@ -100,12 +105,12 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     private static final String SQL_DROP_LEARNING_LOGS =
             "DROP TABLE IF EXISTS " + YoMemoryContract.LearningLogs.TABLE_NAME;
 
-    /*各Items表的删除语句需动态生成*/
+    //各Items表删除语句的生成方法
     public String getSqlDropItemWithSuffix(String suffix){
         return "DROP TABLE IF EXISTS " +  YoMemoryContract.ItemBasic.TABLE_NAME + suffix;
     }
 
-
+    //构造器
     private YoMemoryDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
@@ -113,7 +118,9 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         getWritableDatabaseIfClosedOrNull();
     }
 
-    //DCL模式单例，因为静态内部类模式不支持传参
+
+    //DCL模式单例获取方法
+    // 因为静态内部类模式不支持传参故而采用DCL模式
     public static YoMemoryDbHelper getInstance(Context context){
         if(sYoMemoryDbHelper == null){
             synchronized (YoMemoryDbHelper.class){
@@ -125,12 +132,18 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         return sYoMemoryDbHelper;
     }
 
+    /* 必要的覆写方法 */
     @Override
     public void onCreate(SQLiteDatabase db) {
+        //根据API，本方法在初次使用数据库时（比如初次请求生成mSQLiteDatabase）自动调用
+        //此情景下，执行如下任务.
+
+        //建表
         db.execSQL(SQL_CREATE_MISSION);
         db.execSQL(SQL_CREATE_GROUP);
         db.execSQL(SQL_CREATE_LEARNING_LOGS);
-        //默认的Item表在以下方法中建立，随后导入初始数据。
+
+        //建立items基础资源表并导入默认items数据
         dataInitialization(db);
     }
 
@@ -246,7 +259,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
     }
 
-    /*CRUD部分需要时再写*/
+    /*CRUD部分*/
     public long createMission(Mission mission){
         long l;
 

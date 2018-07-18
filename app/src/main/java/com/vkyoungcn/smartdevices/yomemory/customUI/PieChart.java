@@ -13,20 +13,22 @@ import com.vkyoungcn.smartdevices.yomemory.R;
 
 import java.text.DecimalFormat;
 /*
- * 作者1：杨胜 @中国海洋大学
- * 作者2：杨镇时 @中国海洋大学
- * author：Victor Young @Ocean University of China
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
  * email: yangsheng@ouc.edu.cn
- *
- * 饼图
- * 暂时实现为一个只有两项数据(其中一是总数、另一是单项分数)的、参数既定的简单版。
- * 当然，数据是动态生成的。
+ * 2018.08.01
+ * */
+/*
+
  **/
 public class PieChart extends View {
-    private static final String TAG = "PieChart";
-    private Context mContext;
+// * 是一个饼图
+// * 暂时实现为一个只有两项数据(其中一是总数、另一是单项分支数量)的、参数既定的简单版本。
 
-//    private int donePercentage = 0;//按照这个数据绘制位置。
+//    private static final String TAG = "PieChart";
+
+//    private int donePercentage = 0;//按照这个数据绘制位置。（改为根据总量、实际量计算）
     private int totalAmount = 0;//分母（总数）部分
     private int fractionalAmount = 0;//分子部分
 
@@ -86,13 +88,11 @@ public class PieChart extends View {
 
     public PieChart(Context context) {
         super(context);
-        this.mContext = context;
         init(context,null,0);
     }
 
     public PieChart(Context context, AttributeSet attributeset) {
         super(context, attributeset);
-        mContext = context;
         //【实测系统调用的是这个】
         init(context,attributeset,0);
     }
@@ -100,7 +100,6 @@ public class PieChart extends View {
 
     public PieChart(Context context, AttributeSet attrs, int defStyledAttrs) {
         super(context, attrs, defStyledAttrs);
-        mContext = context;
 
         init(context,attrs,defStyledAttrs);
     }

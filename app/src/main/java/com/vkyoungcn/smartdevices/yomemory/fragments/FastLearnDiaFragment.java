@@ -12,17 +12,23 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.vkyoungcn.smartdevices.yomemory.Constants;
 import com.vkyoungcn.smartdevices.yomemory.R;
-
 /*
-* 涉及到的Sp操作返回Activity后处理，发送数据过去
-* 发回：①学习的类型（随机、顺序）；②是否设置了默认值、默认值如何；③是否取消提示框。
-*
-* 如果之前已选中过不再提示则根部不会进入到本dfg。如果选中过某默认值则应显示相应默认值。
-* */
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 @SuppressWarnings("all")
-public class FastLearnDiaFragment extends DialogFragment implements View.OnClickListener,CheckBox.OnCheckedChangeListener {
-    private static final String TAG = "LearningAddInOrderDiaFragment";
+public class FastLearnDiaFragment extends DialogFragment
+        implements View.OnClickListener,CheckBox.OnCheckedChangeListener,Constants {
+//* 涉及到的Sp操作返回Activity后处理，发送数据过去
+//* 发回：①学习的类型（随机、顺序）；②是否设置了默认值、默认值如何；③是否取消提示框。
+//*
+//* 如果之前已选中过不再提示则根部不会进入到本dfg。如果选中过某默认值则应显示相应默认值。
+    private static final String TAG = "LearningCreateOrderDiaFragment";
     public static final int DEFAULT_MANNER_ORDER = 1201;
     public static final int DEFAULT_MANNER_RANDOM = 1202;
     public static final int DEFAULT_MANNER_UNDEFINED_L = 1203;
@@ -46,7 +52,7 @@ public class FastLearnDiaFragment extends DialogFragment implements View.OnClick
     public static FastLearnDiaFragment newInstance(int defaultManner) {
         FastLearnDiaFragment fragment = new FastLearnDiaFragment();
         Bundle data = new Bundle();
-        data.putInt("DEFAULT_MANNER",defaultManner);
+        data.putInt(STR_DEFAULT_MANNER,defaultManner);
         fragment.setArguments(data);
 
         return fragment;
@@ -56,7 +62,7 @@ public class FastLearnDiaFragment extends DialogFragment implements View.OnClick
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
-            this.defaultManner = savedInstanceState.getInt("DEFAULT_MANNER");
+            this.defaultManner = savedInstanceState.getInt(STR_DEFAULT_MANNER);
         }
     }
 
@@ -112,14 +118,14 @@ public class FastLearnDiaFragment extends DialogFragment implements View.OnClick
                 //要根据选定的不同模式向调用方activity发回不同消息
                 int rBtnId = rgp_orderOrRandom.getCheckedRadioButtonId();
                 Bundle data = new Bundle();
-                data.putInt("DEFAULT_MANNER_SETTINGS",defaultManner);
-                data.putBoolean("NO_MORE_BOX",isNoMoreBox);
+                data.putInt(STR_DEFAULT_MANNER_SETTINGS,defaultManner);
+                data.putBoolean(STR_NO_MORE_BOX,isNoMoreBox);
                 if(rBtnId == R.id.rb_order_dfgFl) {
                     //选择了顺序
-                    data.putBoolean("IS_ORDER",true);
+                    data.putBoolean(STR_IS_ORDER,true);
                 }else{
                     //选择了随机
-                    data.putBoolean("IS_ORDER",false);
+                    data.putBoolean(STR_IS_ORDER,false);
                 }
                 mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.FAST_LEARN, data);
                 this.dismiss();//如果没有dismiss则从目标Activity返回后该dfg会还在。

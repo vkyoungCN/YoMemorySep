@@ -4,14 +4,22 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
-
 /*
-* 主要用于向数据库存记录（的最后与DB交互）时使用，以及从数据库取数据（最初从DB取出数据）时使用
-* 若要将数据应用到UI，需转化为Group类。
-* */
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 public class DBGroup implements Parcelable{
+//* “分组”对应的数据模型，
+//* 分组对应两种数据模型DBGroup和RVGroup，其中DB版对应数据库操作，RV版对应UI中的快速直接显示。
+//* 对应DB中的三张表：group表全体；部分字段从logs表、items表获取数据。
+//* 若要将数据应用到UI，需转化为RVGroup类。
     private static final String TAG = "DBGroup";
 
+    /* 字段 */
+    //group表
     private int id = 0;//DB列
     private String description="";//DB列。默认填入该组“起始-末尾”词汇
     private int mission_id=0;//v5新增。
@@ -20,17 +28,17 @@ public class DBGroup implements Parcelable{
     //以下两项由Logs表提供
     private long lastLearningTime = 0;//最新的学习记录（是否有效m皆可；RMA的计算不需要持有整个Logs列表）。
     private byte effectiveRePickingTimes = 0;//有效学习次数（*背后的设计原理：复习间隔过久时的新一次复习，只刷新记忆量，不抬升曲线，属“无效”复习，不增加有效次数）
-    //可直接对应为MS字段
+    //可直接对应为RVGroup类的MS字段
 
     //以下字段由Items表提供
-    //所含Items的数量，有两种方案①：因为只在显示时需要，考虑直接由RvGroup负责拉取。②出于职能清晰明确的考虑，由本类拉取。（暂定后者）
-    private short totalItemNum = 0;//本组下含多少项资源。用于Rv显示。
+    private short totalItemNum = 0;//本组下含多少项资源。
 
 
     //从DB读取数据时，需要先声明一个空的。
     public DBGroup() {
     }
 
+    //完全构造器
     public DBGroup(int id, String description, int mission_id, long settingUptimeInLong, long lastLearningTime, byte effectiveRePickingTimes, short totalItemNum) {
         this.id = id;
         this.description = description;
@@ -96,6 +104,8 @@ public class DBGroup implements Parcelable{
     public void setTotalItemNum(short totalItemNum) {
         this.totalItemNum = totalItemNum;
     }
+
+
 
     /*
      * 以下是Parcelable要求的内容

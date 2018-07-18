@@ -10,22 +10,29 @@ import android.widget.TextView;
 
 import com.vkyoungcn.smartdevices.yomemory.R;
 
+/*
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 @SuppressWarnings("all")
-public class LearningAddInOrderDiaFragment extends DialogFragment implements View.OnClickListener {
-    private static final String TAG = "LearningAddInOrderDiaFragment";
+public class LearningCreateOrderDiaFragment extends DialogFragment implements View.OnClickListener {
+//* 发起创建式学习（顺序）时弹出的确认对话框
+    private static final String TAG = "LearningCreateOrderDiaFragment";
 
     private OnGeneralDfgInteraction mListener;
-
     private TextView tvCancel;
     private TextView tvConfirm;
 
-    public LearningAddInOrderDiaFragment() {
+    public LearningCreateOrderDiaFragment() {
         // Required empty public constructor
     }
 
 
-    public static LearningAddInOrderDiaFragment newInstance() {
-        LearningAddInOrderDiaFragment fragment = new LearningAddInOrderDiaFragment();
+    public static LearningCreateOrderDiaFragment newInstance() {
+        LearningCreateOrderDiaFragment fragment = new LearningCreateOrderDiaFragment();
 
         return fragment;
     }

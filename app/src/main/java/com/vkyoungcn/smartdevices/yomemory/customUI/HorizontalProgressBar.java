@@ -11,17 +11,23 @@ import android.util.TypedValue;
 import android.view.View;
 
 import com.vkyoungcn.smartdevices.yomemory.R;
-
 /*
-* 双色进度条，根据即时传入的百分比（采用int数代表百分比的分子部分）即时刷新UI显示；
-* 浅绿色：已完成。浅灰色：未完成。
-* 原则上并不需要太精确；
-* 不对传入频率做要求。
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
+/*
+
 * */
 public class HorizontalProgressBar extends View {
-    private static final String TAG = "horizontalProgressBar";
-    private Context mContext;
+//* 双色进度条，根据即时传入的百分比（采用int数代表百分比的分子部分）即时刷新UI显示；
+//* 已完成和未完成采取不同颜色。
+//* 原则上并不需要太精确；
+//* 不需要实时持续更新。
 
+//    private static final String TAG = "horizontalProgressBar";
     private int donePercentage = 0;//按照这个数据绘制位置。
 
     int minDesiredWidth;
@@ -47,20 +53,18 @@ public class HorizontalProgressBar extends View {
     private int colorNumbers;
     private int colorSingleLine;
 
-    private int strokeWidth =4;
+    private int strokeWidth =4; //这里设置的单位是像素
     private int thinStrokeWidth = 2;
 
 
     //这个可能是程序默认需要的
     public HorizontalProgressBar(Context context) {
         super(context);
-        this.mContext = context;
         init(context,null,0);
     }
 
     public HorizontalProgressBar(Context context, AttributeSet attributeset) {
         super(context, attributeset);
-        mContext = context;
         //【实测系统调用的是这个】
         init(context,attributeset,0);
     }
@@ -68,7 +72,6 @@ public class HorizontalProgressBar extends View {
 
     public HorizontalProgressBar(Context context, AttributeSet attrs, int defStyledAttrs) {
         super(context, attrs, defStyledAttrs);
-        mContext = context;
 
         init(context,attrs,defStyledAttrs);
     }
@@ -83,7 +86,7 @@ public class HorizontalProgressBar extends View {
 
     private void initDefaultAttributes(Context context, AttributeSet attrs, int defStyledAttrs) {
         /*
-         * 获取我们的自定义属性
+         * 获取自定义属性
          *
          * 【注：在attr文件里声明了自定义属性后，还需要在布局文件中为各属性赋值。(如果不声明，则传入的数组内
          * 不包含该项的值，相应变量的值的初始也就无法完成。)
@@ -243,7 +246,7 @@ public class HorizontalProgressBar extends View {
         int fromY = sizeChangedHeight-bottomPadding-barHeight;
         int toX = sizeChangedWidth-endPadding;
         int toY = sizeChangedHeight-bottomPadding;
-        Log.i(TAG, "onDraw: toX="+toX+"fromX+doneW="+(fromX+doneWidth));
+//        Log.i(TAG, "onDraw: toX="+toX+"fromX+doneW="+(fromX+doneWidth));
         canvas.drawRect(fromX,fromY, fromX+doneWidth, toY,paintDone);
 
         //绘制标识线

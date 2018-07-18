@@ -12,14 +12,26 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import com.vkyoungcn.smartdevices.yomemory.Constants;
 import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.adapters.CkbsChoseGroupsRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
 
 import java.util.ArrayList;
-
+/*
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 @SuppressWarnings("all")
-public class LearningLessDiaFragment extends DialogFragment implements View.OnClickListener,CompoundButton.OnCheckedChangeListener {
+【两个合并式弹出的对话框合并为一个，功能改造，通用化】
+public class LearningLessDiaFragment extends DialogFragment
+        implements View.OnClickListener,CompoundButton.OnCheckedChangeListener,Constants {
+//* 发起合并式学习时弹出的确认对话框
+//* 该对话框兼具待合并组的筛选功能（①选定目标MS、限制容量；②根据①得出的待选组，选出要参与合并的待合并组）
+//* 选定的组发送回Activity并进一步后送发起学习
     private static final String TAG = "LearningLessDiaFragment";
 
     private OnGeneralDfgInteraction mListener;
@@ -50,7 +62,7 @@ public class LearningLessDiaFragment extends DialogFragment implements View.OnCl
     public static LearningLessDiaFragment newInstance(ArrayList<FragGroupForMerge> groupsForMerge) {
         LearningLessDiaFragment fragment = new LearningLessDiaFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList("GROUPS",groupsForMerge);
+        bundle.putParcelableArrayList(STR_GROUPS,groupsForMerge);
         fragment.setArguments(bundle);
 
         return fragment;
@@ -60,7 +72,7 @@ public class LearningLessDiaFragment extends DialogFragment implements View.OnCl
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            this.groups = (ArrayList<FragGroupForMerge>) savedInstanceState.getSerializable("GROUPS");
+            this.groups = (ArrayList<FragGroupForMerge>) savedInstanceState.getSerializable(STR_GROUPS);
         }
 
     }

@@ -8,12 +8,12 @@ import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import static com.vkyoungcn.smartdevices.yomemory.LogoPageActivity.YO_MEMORY_SP;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.FastLearnDiaFragment.DEFAULT_MANNER_ORDER;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.FastLearnDiaFragment.DEFAULT_MANNER_RANDOM;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.FastLearnDiaFragment.DEFAULT_MANNER_UNDEFINED_L;
 
-public class ConfigurationActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener,RadioGroup.OnCheckedChangeListener {
+public class ConfigurationActivity extends AppCompatActivity implements
+        CompoundButton.OnCheckedChangeListener,RadioGroup.OnCheckedChangeListener,Constants {
     private static final String TAG = "ConfigurationActivity";
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
@@ -30,11 +30,11 @@ public class ConfigurationActivity extends AppCompatActivity implements Compound
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configuration);
 
-        sharedPreferences = getSharedPreferences(YO_MEMORY_SP, MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(SP_STR_TITLE_YO_MEMORY, MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        boolean noMoreTipBox = sharedPreferences.getBoolean("NO_MORE_TIPS", false);
+        boolean noMoreTipBox = sharedPreferences.getBoolean(SP_STR_NO_MORE_TIPS, false);
         showMoreBox = !noMoreTipBox;
-        isFastLearnUseOrder = sharedPreferences.getBoolean("IS_ORDER",true);
+        isFastLearnUseOrder = sharedPreferences.getBoolean(STR_IS_ORDER,true);
 
         rgp_orderOrRandom = (RadioGroup) findViewById(R.id.rg_fastLearnManner_C);
         rbn_random = (RadioButton) findViewById(R.id.rb_random_C);
@@ -67,7 +67,7 @@ public class ConfigurationActivity extends AppCompatActivity implements Compound
                 }else {
                     showMoreBox =false;
                 }
-                editor.putBoolean("NO_MORE_TIPS",!showMoreBox);
+                editor.putBoolean(SP_STR_NO_MORE_TIPS,!showMoreBox);
                 editor.apply();
 
                 break;
@@ -81,7 +81,7 @@ public class ConfigurationActivity extends AppCompatActivity implements Compound
             case R.id.rb_random_C:
                 //选择了随机
                 defaultManner = DEFAULT_MANNER_RANDOM;
-                editor.putBoolean("IS_ORDER", false);
+                editor.putBoolean(STR_IS_ORDER, false);
 //                Log.i(TAG, "onCheckedChanged: btn_Random");
 
                 break;
@@ -89,7 +89,7 @@ public class ConfigurationActivity extends AppCompatActivity implements Compound
                     //选择了顺序
 //                    Log.i(TAG, "onCheckedChanged: btn_Order");
                     defaultManner = DEFAULT_MANNER_ORDER;
-                    editor.putBoolean("IS_ORDER", true);
+                    editor.putBoolean(STR_IS_ORDER, true);
                     break;
         }
         editor.apply();

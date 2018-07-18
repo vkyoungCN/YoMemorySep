@@ -16,16 +16,16 @@ import static com.vkyoungcn.smartdevices.yomemory.customUI.StripeProgressBar.Inn
 import static com.vkyoungcn.smartdevices.yomemory.customUI.StripeProgressBar.InnerStripe.SINGLE_STRIPE_CURRENT;
 import static com.vkyoungcn.smartdevices.yomemory.customUI.StripeProgressBar.InnerStripe.SINGLE_STRIPE_EMPTY;
 import static com.vkyoungcn.smartdevices.yomemory.customUI.StripeProgressBar.InnerStripe.SINGLE_STRIPE_UN_CORRECT;
-
 /*
- * 作者1：杨胜@中国海洋大学
- * 作者2：杨镇时@中国海洋大学
- * author：Victor Young @Ocean University of China
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
  * email: yangsheng@ouc.edu.cn
- * 条纹状进度条，根据对应卡片的正误情况显示相应颜色。当前页显示白色稍长的（竖）线。
+ * 2018.08.01
  * */
 public class StripeProgressBar extends View {
-    private static final String TAG = "StripeProgressBar";
+//* 条纹状进度条，根据对应卡片的正误情况显示相应颜色。当前页显示白色稍长的（竖）线。
+//    private static final String TAG = "StripeProgressBar";
     private static final int DEFAULT_LENGTH = 36;
     private Context mContext;
 

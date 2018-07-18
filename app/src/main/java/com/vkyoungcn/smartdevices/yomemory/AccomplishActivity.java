@@ -6,16 +6,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.vkyoungcn.smartdevices.yomemory.adapters.FragsInMergeRvAdapter;
-import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.fragments.ReportGroupLG_Fragment;
 import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
@@ -33,12 +27,13 @@ import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteract
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_AND_MERGE;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_GENERAL;
 /*
- * 作者1：杨胜 @中国海洋大学
- * 作者2：杨镇时 @中国海洋大学
- * author：Victor Young @Ocean University of China
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
  * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
  * */
-public class AccomplishActivity extends AppCompatActivity {
+public class AccomplishActivity extends AppCompatActivity implements Constants {
     //主要处理逻辑（业务）
     //
     // 空的：
@@ -55,14 +50,18 @@ public class AccomplishActivity extends AppCompatActivity {
     // logs记录：按开始时间处理较为容易（结束时间涉及精准度问题，中间需计算且也不是特别有道理；
     // 既然都没特别充分的道理，就按简单且精确的来吧）
 
+    public static final String UI_STR_LEARNING_TYPE_G = "普通";
+    public static final String UI_STR_LEARNING_TYPE_M = "合并";
+    public static final String UI_STR_LEARNING_TYPE_C = "创建";
+
     public static final int DB_DONE_LG_ACA = 2801;
     public static final int DB_DONE_LG_DVD_ACA = 2802;
     public static final int DB_DONE_LM_ACA = 2803;
     public static final int DB_DONE_LC_ACA = 2804;
 
-    public static final String FRAG_MERGE_PART = "部分吞噬";
-    public static final String FRAG_MERGED_FULL = "完全吞噬";
-    public static final String FRAG_MERGE_UN = "未受影响";
+    public static final String STR_FRAG_MERGE_PART = "部分吞噬";
+    public static final String STR_FRAG_MERGED_FULL = "完全吞噬";
+    public static final String STR_FRAG_MERGE_UN = "未受影响";
 
     private FrameLayout flt_fragment;
     private FrameLayout flt_mask;
@@ -127,17 +126,17 @@ public class AccomplishActivity extends AppCompatActivity {
         setContentView(R.layout.activity_accomplish);
 
         //从intent取部分数据
-        learningType = getIntent().getIntExtra("LEARNING_TYPE",0);
-        tableSuffix = getIntent().getStringExtra("TABLE_NAME_SUFFIX");
-        items = getIntent().getParcelableArrayListExtra("ITEMS");
+        learningType = getIntent().getIntExtra(STR_LEARNING_TYPE,0);
+        tableSuffix = getIntent().getStringExtra(STR_TABLE_NAME_SUFFIX);
+        items = getIntent().getParcelableArrayListExtra(STR_ITEMS);
 
-        emptyItemPositions = getIntent().getIntegerArrayListExtra("EMPTY_ITEMS_POSITIONS");
-        wrongItemPositions = getIntent().getIntegerArrayListExtra("WRONG_ITEMS_POSITIONS");
+        emptyItemPositions = getIntent().getIntegerArrayListExtra(STR_EMPTY_ITEMS_POSITIONS);
+        wrongItemPositions = getIntent().getIntegerArrayListExtra(STR_WRONG_ITEMS_POSITIONS);
 
-        startTime = getIntent().getLongExtra("START_TIME",0);
+        startTime = getIntent().getLongExtra(STR_START_TIME,0);
 //        finishTime = getIntent().getLongExtra("FINISH_TIME",0);
-        restMinutes = getIntent().getIntExtra("REST_MINUTES",0);
-        restSeconds = getIntent().getIntExtra("REST_SECONDS",0);
+        restMinutes = getIntent().getIntExtra(STR_REST_MINUTES,0);
+        restSeconds = getIntent().getIntExtra(STR_REST_SECONDS,0);
 
         flt_mask = findViewById(R.id.flt_mask_ACA);
 
@@ -150,7 +149,7 @@ public class AccomplishActivity extends AppCompatActivity {
         tv_saving = findViewById(R.id.tv_saving_AC);
 
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat(STR_DATE_PATTEN_1);
 
         tv_startTime.setText(String.format(getResources().getString(R.string.learning_starting_time_str),sdf.format(new Date(startTime))));
         //从剩余时间到已消耗时间的计算
@@ -175,14 +174,14 @@ public class AccomplishActivity extends AppCompatActivity {
 
         String tempStr = "";
         if(learningType == LEARNING_GENERAL){
-            tempStr="普通";
+            tempStr=UI_STR_LEARNING_TYPE_G;
             groupId = getIntent().getIntExtra("GROUP_ID",0);
 
             new Thread(new GeneralAccomplishRunnable()).start();         // 用于LG模式下的DB与计算线程
             //fg的加载到消息处理方法完成。
 
         }else if(learningType == LEARNING_AND_MERGE){
-            tempStr ="合并";
+            tempStr =UI_STR_LEARNING_TYPE_M;
             gIdsForMerge = getIntent().getIntegerArrayListExtra("GROUP_ID_FOR_MERGE");
 
 //            rv_oldFragsMergeInfo = (RecyclerView)findViewById(R.id.rv_oldFragsChange_ACA);
@@ -190,7 +189,7 @@ public class AccomplishActivity extends AppCompatActivity {
             //fg的加载到消息处理方法完成。
 
         }else if(learningType == LEARNING_AND_CREATE_RANDOM ||learningType == LEARNING_AND_CREATE_ORDER) {
-            tempStr = "创建";
+            tempStr = UI_STR_LEARNING_TYPE_C;
             missionId = getIntent().getIntExtra("MISSION_ID",0);
 
             new Thread(new CreatedAccomplishRunnable()).start();         // 用于LC模式下的DB与计算线程
@@ -497,13 +496,13 @@ public class AccomplishActivity extends AppCompatActivity {
             for(int i=0;i<gIdsForMerge.size();i++){
                 if(newFragsSizes.get(i)==0){
                     //该组已被完全吞噬
-                    oldFragsMergedResultStrings.set(i,FRAG_MERGED_FULL);
+                    oldFragsMergedResultStrings.set(i, STR_FRAG_MERGED_FULL);
                 }else if(newFragsSizes.get(i)<oldFragsSizes.get(i)){
                     //该位置上的来源分组被部分吞噬
-                    oldFragsMergedResultStrings.set(i,FRAG_MERGE_PART);
+                    oldFragsMergedResultStrings.set(i, STR_FRAG_MERGE_PART);
                 }else if(newFragsSizes.get(i).equals(oldFragsSizes.get(i))){
                     //该位置上的来源分组未被吞噬，保留原样
-                    oldFragsMergedResultStrings.set(i,FRAG_MERGE_UN);
+                    oldFragsMergedResultStrings.set(i, STR_FRAG_MERGE_UN);
                 }
             }
 

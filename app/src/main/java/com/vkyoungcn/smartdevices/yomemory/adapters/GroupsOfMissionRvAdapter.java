@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vkyoungcn.smartdevices.yomemory.Constants;
 import com.vkyoungcn.smartdevices.yomemory.GroupDetailActivity;
 import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.fragments.DeleteGroupDiaFragment;
@@ -25,13 +26,22 @@ import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 
 import java.util.ArrayList;
 import java.util.List;
-
-public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissionRvAdapter.ViewHolder> {
+/*
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
+public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissionRvAdapter.ViewHolder>
+        implements Constants {
+//* 是展示任务所属分组的RecyclerView所使用的适配器
+// 采用纵向列表形式。
     private static final String TAG = "GroupsOfMissionRvAdapter";
 
-    private List<RVGroup> groups = new ArrayList<>();
+    private List<RVGroup> groups;//数据源
     private Context context;
-    private String tableSuffix = "";//避免null。
+    private String tableSuffix;
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnLongClickListener{
         private final TextView tv_groupId;
@@ -77,8 +87,8 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
                     Toast.makeText(context, "准备弹确认对话框", Toast.LENGTH_SHORT).show();
 
                     FragmentTransaction transaction = ((Activity)context).getFragmentManager().beginTransaction();
-                    Fragment prev_1 = ((Activity)context).getFragmentManager().findFragmentByTag("READY_TO_LEARN_LESS");
-                    Fragment prev_2 = ((Activity)context).getFragmentManager().findFragmentByTag("READY_TO_LEARN_GEL");
+                    Fragment prev_1 = ((Activity)context).getFragmentManager().findFragmentByTag(FG_STR_READY_TO_LEARN_LESS);
+                    Fragment prev_2 = ((Activity)context).getFragmentManager().findFragmentByTag(FG_STR_READY_TO_LEARN_GEL);
 
                     if (prev_1 != null) {
                         transaction.remove(prev_1);
@@ -108,11 +118,11 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
 
                         //到合并学习的确认DFG。
                         DialogFragment dfg = LearningLessDiaFragment.newInstance(groupsListForChose);
-                        dfg.show(transaction, "READY_TO_LEARN_LESS");
+                        dfg.show(transaction, FG_STR_READY_TO_LEARN_LESS);
                     }else {
                         //正常容量正常学习。此时只需传递正常的分组id即可
                         DialogFragment dfg = LearningGelDiaFragment.newInstance(groups.get(getAdapterPosition()));
-                        dfg.show(transaction, "READY_TO_LEARN_GEL");
+                        dfg.show(transaction, FG_STR_READY_TO_LEARN_GEL);
 
                     }
 
@@ -124,9 +134,9 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
 
                     //后页需要group_id、tableSuffix
                     Intent intentToGD = new Intent(context, GroupDetailActivity.class);
-                    intentToGD.putExtra("GROUP",groups.get(getAdapterPosition()));
+                    intentToGD.putExtra(STR_GROUP,groups.get(getAdapterPosition()));
                     Log.i(TAG, "onClick: clickd group.ms:"+groups.get(getAdapterPosition()).getMemoryStage());
-                    intentToGD.putExtra("TABLE_SUFFIX",tableSuffix);
+                    intentToGD.putExtra(STR_TABLE_SUFFIX,tableSuffix);
 
                     context.startActivity(intentToGD);
 
@@ -141,14 +151,14 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
                 case R.id.rvLlt_overall_groupOfMission:
                     //弹出dfg确认删除
                     FragmentTransaction transaction = ((Activity)context).getFragmentManager().beginTransaction();
-                    Fragment prev =  ((Activity)context).getFragmentManager().findFragmentByTag("DELETE_GROUP");
+                    Fragment prev =  ((Activity)context).getFragmentManager().findFragmentByTag(FG_STR_DELETE_GROUP);
 
                     if (prev != null) {
                         Toast.makeText(context, "Old DialogFg still there, removing first...", Toast.LENGTH_SHORT).show();
                         transaction.remove(prev);
                     }
                     DialogFragment dfg = DeleteGroupDiaFragment.newInstance(getAdapterPosition());
-                    dfg.show(transaction, "DELETE_GROUP");
+                    dfg.show(transaction, FG_STR_DELETE_GROUP);
 
                     break;
             }

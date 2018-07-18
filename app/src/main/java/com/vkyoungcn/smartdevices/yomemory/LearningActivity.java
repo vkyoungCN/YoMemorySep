@@ -31,125 +31,130 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 /*
- *
- * 作者1：杨胜@中国海洋大学
- * 作者2：杨镇时@中国海洋大学
- * author：Victor Young @Ocean University of China
- * email: yangsheng@ouc.edu.cn
- *
- * 进入本Activity之前，经过一个预准备数据用的专用Activity，从该页面传来的数据有：
-* ①tableSuffix；②learningType；③ArrayList<SingleItems>主体数据；以及：
-* ④（仅LG）gid；⑤(仅LMerge)gids列表List。
-* 数据的获取和完结分别在前、后页面完成。本页只负责学习逻辑（和最小限度的确保前后逻辑完整的业务）。
-* 【新版取消了伪数据尾页，注意逻辑修改】
-*
-*  本页要实现的主要逻辑有：
-*  ①时间控制——限定在60分钟内完成单次学习任务。
-*      学习可以暂停（离开本页）但计时继续。
-*      到时间后根据已学/未学进行拆分。
-*      全部完成后计时并不停止，也不自动跳转完结（可以手动完结；
-*      且会提示请及时保存，以免程序被系统强制退出后丢失学习数据），待计时结束按统一逻辑处理。
-*  ②各Item的学习情况控制——
-*      a.完成状态：正确（已填完整且正确）/错误（有错或未完成）/未填写
-*      b.正面、反面与点击提示（且限次数，超过则本次学习置“记忆失败”）
-*      c.允许手动改变单项Item的标记记录
-*  ③滑动逻辑——可以自由前后滑动；
-*       *最后一页为附加的伪完成页（滑到该页时，下方结束按钮变大且改为鲜艳颜色）
-*       点击后如果存在错误VE，会弹出DFG提示并确认；如全对则跳转结束页。
-*  ④CardView学习逻辑
-*       初始显示状态：CardView正面（名称+音标+释义；附加标记等）
-*       点击翻面：（VE+音标+释义；附加标记等）。点击提示按钮会给出名称提示（记录次数），点击VE时消失；
-*       *当提示记次>3时，不可再提示，且给该item记“记忆失败”错误+1；（每次学习最多加1）
-*       b.允许自由前后滑动（滑出时记录VE状态（含所填的内容），滑回时恢复）
-*
-* 对于学习是否“能使MS提升”，由学习结束后的专用结束Activity根据学习时间进行判断、处理；
-* 而本页本着“不能不让学”的原则，无论时间区间如何，都可以开始学习。
+* 作者：杨胜 @中国海洋大学
+* 别名：杨镇时
+* author：Victor Young@ Ocean University of China
+* email: yangsheng@ouc.edu.cn
+* 2018.08.01
 * */
-public class LearningActivity extends AppCompatActivity implements OnGeneralDfgInteraction, ValidatingEditor.OnValidatingEditorInputListener {
-    private static final String TAG = "LearningActivity";
 
+public class LearningActivity extends AppCompatActivity
+        implements OnGeneralDfgInteraction, ValidatingEditor.OnValidatingEditorInputListener,Constants {
+    private static final String TAG = "LearningActivity";
+    /*
+     * 程序的“学习”环节所对应的页面。
+     *
+     * 进入本页面前，先经过了一个预先准备数据的PrepareForLearningActivity。
+     * 从该页面传来的数据有：
+     * ①tableSuffix；②learningType；③ArrayList<SingleItems>主体数据；以及：
+     * ④（仅LG）gid；⑤(仅LMerge)gids列表List。
+     * （数据的获取由前置页面负责，数据对DB的存入实际由结束页负责。本页只负责学习环节的逻辑（和为确保前后完整所需的逻辑）。
+     *
+     *  本页主要逻辑：
+     *  ①时间控制——限定在60分钟内完成单次学习任务。
+     *      学习可以暂停（离开本页）但计时继续；
+     *      LG模式下学习结束时，未学习的词汇将从原组拆分出，生成一个新组（复制原组之前的学习日志）；
+     *      全部完成后计时并不停止，也不自动跳转完结（提示“可以再翻阅一遍，或者点击finish”）可以手动完结；
+     *      且会提示“确认完成后，点击finish以便保存本次记录”。
+     *
+     *  ②各Item的学习情况控制——
+     *      a.三种状态：正确（已填完整且正确）/错误（已填写但有错）/未填写
+     *      b.正面、反面与点击提示（且限次数，超过则相应词条【翻到正面，且不可再向VE填写（待处理，要对VE取消焦点）】，
+     *      且对应词条记为错误状态。）
+     *      c.允许手动改变单项Item的优先级。【后期增加跨分组/按优先级选取词的强化记忆】
+     *  ③CardView学习逻辑
+     *       初始显示状态：CardView正面（名称+音标+释义；附加标记等）
+     *       点击翻面：（VE+音标+释义；附加标记等）。点击提示按钮会给出名称提示（记录次数），点击VE时消失；
+     *       *当提示记次>3时，不可再提示，且给该item记“记忆失败”错误+1；（每次学习最多加1）
+     *       b.允许自由前后滑动（滑出时记录VE状态（含所填的内容），滑回时恢复）
+     *  ④滑动逻辑——
+     *       可以自由前后滑动；
+     *       滑到第二页时，finish按钮出现，可以手动点击完结。
+     *  ⑤学习的开始——
+     *      “不能不让学”的原则，不论开始时的时间情况如何，都是可以开始学习的，但最后对于学习
+     *      是否“能使MS提升”，则由结束Activity根据学习时间进行判断、处理。
+     * */
+
+
+    /* 由Intent传入的数据 */
     private int learningType;//Intent传入。
     private String tableNameSuffix;//Intent传入。
     private ArrayList<SingleItem> items;//Intent传入。数据源
-    private ArrayList<String> targetCodes = new ArrayList<>();//用于条纹进度条。
+    private int groupId;//Intent传入。（LG模式）
+    private int missionId;//Intent传入。（LCO/LCR模式）完成页创建新组时使用
+    private ArrayList<Integer> gIdsForMerge;//Intent传来。（LM模式）
 
-    //（手动）结束时的剩余时间，自动结束时设0即可
-    int restMinutes =0;
-    int restSeconds = 0;
-
-    private int groupId;//Intent传入。（仅LG模式下）
-    private int missionId;//Intent传入。（仅LCO/LCR模式下）仅在最后（完成页）创建新组时使用
-    private ArrayList<Integer> gIdsForMerge;//Intent传来，仅在合并学习时有此数据。
-
-    private ArrayList<String> veFillings;//记录填写在VE内的信息，用于回滚时加载；以及条纹进度条当前状态的生成。
-    //【原方案还有一个布尔List用于记录各VE正误情况，今认为应少建高开销资源，直接在Activity中利用上一List对比。且实际状态有三，布尔不符】
-    private String veCacheString = "";//记录正在输入的VE的内容，在滑动卡片时存入list并置空。
-    // (该字串在回调监听中设置，设计为VE每增删一个有效字符本字串被改写一次，但上下限与VE同不会越界修改)
-    private ArrayList<Byte> restChances;
-
-    //学习完成时，生成空、错的位置索引d列表，传递给结束页
-    ArrayList<Integer> emptyPositions = new ArrayList<>();
-    ArrayList<Integer> wrongPositions =  new ArrayList<>();
-
-    //用于学习完成时，各数据量计算（跨方法，所以用全局）
-    int totalAmount =0;
-    int emptyAmount = 0;
-    int wrongAmount =0;
-    int finishAmount =0;
-
-    //    private ArrayList<Integer> itemIds;//需要先把items的id列表传给进度条中的EmptyCard列表，然后随进度再把非空的删除。
-
-//    private boolean autoSliding = true;//（在VE填写正确时）自动向后滑动的设置开关。
-
-    private Thread timingThread;//采用全局变量便于到时间后终结之。【如果已滑动到ending页则直接停止计时，避免最后timeUp消息的产生】
-
-    private int timeCount = 59;//for循环控制变量。执行60次for循环，即1h。（for循环包含60次1秒间隔的执行，一次完整的for=1min）
-    private boolean isTimeUp = false;//计时线程的控制变量【旧版采用timeCount兼任。存在-1:59问题】
-    private boolean finishByHand = false;
-    private long startingTimeMillis;//学习开始的时间。（需要在……时间内完成，否则拆分）【最后的时间区间计算可令开始时间大于下限，结束小于上限】
-    private long finishTimeMillis;//用于最后传递
-//    private int timePastInMinute = 60;//流逝分钟数【借用timeCount即可】
-    private int timeInSecond =59;//以秒计算的总流逝时间
-    private boolean shouldChangeMinForFirstSec = true;//UI中开始是60:00，当第一秒走过后，应变为59:59.
-
-    private boolean AutoSliding = true;//在填写了正确VE后，是否运行自动滑动。
-    private int currentPagePosition = 0;//从0起，用于跨方法使用当前卡片索引值。
-    private int oldPagePosition = 0;//由于三个监听方法都不能真正直接获取正确旧页码（滑动发起的页码），因而需要采取其他方法绕行。
-
-    private long timeRestInSec = 360;//当手动结束而又返回时使用。
-    private boolean isFirstLoop = true;//因为从DFG返回本LA时，继续计时，其秒数不一定是59开始，因而存在逻辑错误，需要单独跑一圈
-    // 跑掉秒数的余数，然后开始正常计时。统一起见，开头第一圈同样视为余数跑完。
-
-//    private boolean isTimeUp = false;//计时只在时间到或手动停止时停止。完成学习后并不停止计时（分属两项任务）。
-//    private boolean learningFinishedCorrectly = false;//本组学习完成。完成后置true，计时线程要检测之，避免完成后重新计时（因为代码顺序靠后BUG)
-//    private boolean learningFinishedWithWrong = false;
-    private Handler handler = new LearningActivityHandler(this);
-
-//    private int scrollablePage = 1;//目前可自由滑动的页数范围。只增不减。【现在无限制了】
-
-    private YoMemoryDbHelper memoryDbHelper;
-
+    /* 控件变量*/
     private ViewPager viewPager;//原是自定义的HalfScrollableVP
     private TextView tv_timeRestMin;
     private TextView tv_timeRestScd;
     private LinearLayout llt_timeCount;
-    private TextView totalMinutes;//应在xx分钟内完成，的数字部分。
-    private TextView tv_rollLabel;//上方滚动标语栏
     private TextView tv_currentPageNum;
     private TextView tv_totalPageNum;
     private TextView tv_finish;
     private StripeProgressBar spb_bar;
     private FloatingActionButton fab_finish;
-    private boolean isFabShowing = false;//用于避免每次滑到最后时都设一遍显示。
 
+    /* 控件附属变量*/
+    private boolean isFabShowing = false;//fab按钮是否处于显示状态，用于避免多次触发展开条件（滑到指定卡片）时都设一遍显示。
+    private int currentPagePosition = 0;//从0起，用于跨方法使用当前卡片索引值。
+    private int oldPagePosition = 0;//由于三个监听方法都不能真正直接获取正确旧页码（滑动发起的页码），因而采取了其他方法绕行。
     private int maxLearnedAmount = 0;//用于判断已滑动过了多少词。当向回滑动时，此数字不减小。
+    private boolean AutoSliding = true;//在填写了正确VE后，是否运行自动滑动。
 
-    public static final int RESULT_LEARNING_SUCCEEDED = 3020;
-    public static final int RESULT_LEARNING_FAILED = 3030;
+    /* 业务逻辑变量 */
+    private ArrayList<String> targetCodes = new ArrayList<>();//用于条纹进度条。
+    private ArrayList<String> veFillings;//记录填写在VE内的信息，用于回滚时加载；以及条纹进度条当前状态的生成。
+    private String veCacheString = "";//记录当前卡片VE所填写的内容（VE每改动一个字符，均会通过监听发送一遍当前ve中的完整字串）。卡片滑动时存入list并置空。
+    private ArrayList<Byte> restChances;//剩余提示次数（卡片在输入状态下不显示词条本身，可以点击提示临时显示）
 
+
+    /* 报告数据。（学习、存储完成后生成，传递给DFG或结束页）*/
+    ArrayList<Integer> emptyPositions = new ArrayList<>();//未填写词（空词）在items中的索引值（组成的list）
+    ArrayList<Integer> wrongPositions =  new ArrayList<>();//错词在items中的索引值
+
+    //以下4变量，虽可在使用时通过变量计算直接获取，但考虑到多个方法间的统一性，在此声明为全局变量。
+    int totalAmount =0;//items总共有多少各词（items.size()）
+    int emptyAmount = 0;//emptyPositions.size()
+    int wrongAmount =0;//wrongPositions.size()，是已填写词汇中的错误数量，不包括空词数量。
+    int finishAmount =0;//totalAmount-emptyAmount，是已填写数量。
+
+    private long startingTimeMillis;//学习开始的时间。
+
+    //（手动）结束时的剩余时间。自动结束时设0即可。
+    int restMinutes =0;
+    int restSeconds = 0;
+
+
+    /* 线程变量 */
+    private Handler handler = new LearningActivityHandler(this);
+    private Thread timingThread;//采用全局变量便于到时间后终结之。【如果已滑动到ending页则直接停止计时，避免最后timeUp消息的产生】
+
+    private int timeCount = 59;//for循环控制变量。执行60次for循环，即1h。（for循环包含60次1秒间隔的执行，一次完整的for=1min）
+    private int timeInSecond =59;//以秒计算的总流逝时间
+    private boolean isTimeUp = false;//计时线程的控制变量【旧版采用timeCount兼任。存在-1:59问题】
+    private boolean isFirstLoop = true;//因为从DFG返回本LA时，继续计时，其秒数不一定是59开始，因而存在逻辑错误，需要单独跑一圈
     public static final int MESSAGE_ONE_MINUTE_CHANGE =5102;
     public static final int MESSAGE_ONE_SECOND_CHANGE =5103;
     public static final int MESSAGE_TIME_UP = 5104;
+
+
+//    private ArrayList<Integer> itemIds;//需要先把items的id列表传给进度条中的EmptyCard列表，然后随进度再把非空的删除。
+//    private boolean autoSliding = true;//（在VE填写正确时）自动向后滑动的设置开关。
+//    private boolean finishByHand = false;
+//    private long finishTimeMillis;//用于最后传递
+//    private int timePastInMinute = 60;//流逝分钟数【借用timeCount即可】
+//    private boolean shouldChangeMinForFirstSec = true;//UI中开始是60:00，当第一秒走过后，应变为59:59.
+//    private long timeRestInSec = 360;//当手动结束而又返回时使用。
+//    跑掉秒数的余数，然后开始正常计时。统一起见，开头第一圈同样视为余数跑完。
+
+//    private boolean isTimeUp = false;//计时只在时间到或手动停止时停止。完成学习后并不停止计时（分属两项任务）。
+//    private boolean learningFinishedCorrectly = false;//本组学习完成。完成后置true，计时线程要检测之，避免完成后重新计时（因为代码顺序靠后BUG)
+//    private boolean learningFinishedWithWrong = false;
+
+//    private int scrollablePage = 1;//目前可自由滑动的页数范围。只增不减。【现在无限制了】
+//    private TextView tv_rollLabel;//上方滚动标语栏
+//    private YoMemoryDbHelper memoryDbHelper;
 
 
     @Override
@@ -158,18 +163,18 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
         setContentView(R.layout.activity_learning);
 
         //从Intent获取参数
-        learningType = getIntent().getIntExtra("LEARNING_TYPE",0);
-        tableNameSuffix = getIntent().getStringExtra("TABLE_NAME_SUFFIX");//各种learningType都有TableSuffix
-        items = getIntent().getParcelableArrayListExtra("ITEMS_FOR_LEARNING");//都有，主数据。
+        learningType = getIntent().getIntExtra(STR_LEARNING_TYPE,0);
+        tableNameSuffix = getIntent().getStringExtra(STR_TABLE_NAME_SUFFIX);//各种learningType都有TableSuffix
+        items = getIntent().getParcelableArrayListExtra(STR_ITEMS_FOR_LEARNING);//都有，主数据。
 
         //获取两种特别模式下特定的数据项【但是似乎用不到，或可直接传递到后续完成页】
         if(learningType==LEARNING_GENERAL){
-            groupId = getIntent().getIntExtra("GROUP_ID",0);
+            groupId = getIntent().getIntExtra(STR_GROUP_ID,0);
         }else if(learningType == LEARNING_AND_MERGE){
-            gIdsForMerge = getIntent().getIntegerArrayListExtra("GIDS_FOR_MERGE");
+            gIdsForMerge = getIntent().getIntegerArrayListExtra(STR_GROUP_ID_FOR_MERGE);
         }else{
             //在剩余两种模式是LCO/LCR时有效。如果增加了其他新模式，则本逻辑必须修改。
-            missionId = getIntent().getIntExtra("MISSION_ID",0);
+            missionId = getIntent().getIntExtra(STR_MISSION_ID,0);
         }
 
 
@@ -239,7 +244,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
                 oldPagePosition = currentPagePosition;
                 //据文档，本方法调用时，滑动已经完成。
                 currentPagePosition = position;//其他方法需使用
-                Log.i(TAG, "onPageSelected: currentPageIndex = "+currentPagePosition);
+//                Log.i(TAG, "onPageSelected: currentPageIndex = "+currentPagePosition);
 
                 //任务一：
                 //设置底端页码显示逻辑
@@ -437,25 +442,25 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
                 intentToAccomplishActivity.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
                 //存入通用数据
-                intentToAccomplishActivity.putExtra("LEARNING_TYPE",learningType);
-                intentToAccomplishActivity.putExtra("TABLE_NAME_SUFFIX",tableNameSuffix);
-                intentToAccomplishActivity.putParcelableArrayListExtra("ITEMS",items);
+                intentToAccomplishActivity.putExtra(STR_LEARNING_TYPE,learningType);
+                intentToAccomplishActivity.putExtra(STR_TABLE_NAME_SUFFIX,tableNameSuffix);
+                intentToAccomplishActivity.putParcelableArrayListExtra(STR_ITEMS,items);
 
-                intentToAccomplishActivity.putIntegerArrayListExtra("EMPTY_ITEMS_POSITIONS",emptyPositions);
-                intentToAccomplishActivity.putIntegerArrayListExtra("WRONG_ITEMS_POSITIONS", wrongPositions);
+                intentToAccomplishActivity.putIntegerArrayListExtra(STR_EMPTY_ITEMS_POSITIONS,emptyPositions);
+                intentToAccomplishActivity.putIntegerArrayListExtra(STR_WRONG_ITEMS_POSITIONS, wrongPositions);
 
-                intentToAccomplishActivity.putExtra("START_TIME",startingTimeMillis);
+                intentToAccomplishActivity.putExtra(STR_START_TIME,startingTimeMillis);
 //                intentToAccomplishActivity.putExtra("FINISH_TIME",finishTimeMillis);
-                intentToAccomplishActivity.putExtra("REST_MINUTES",restMinutes);
-                intentToAccomplishActivity.putExtra("REST_SECONDS",restSeconds);
+                intentToAccomplishActivity.putExtra(STR_REST_MINUTES,restMinutes);
+                intentToAccomplishActivity.putExtra(STR_REST_SECONDS,restSeconds);
 
                 //各状态下的不同数据
                 if(learningType == LEARNING_GENERAL){
-                    intentToAccomplishActivity.putExtra("GROUP_ID",groupId);
+                    intentToAccomplishActivity.putExtra(STR_GROUP_ID,groupId);
                 }else if(learningType == LEARNING_AND_MERGE){
-                    intentToAccomplishActivity.putExtra("GROUP_ID_FOR_MERGE",gIdsForMerge);
+                    intentToAccomplishActivity.putExtra(STR_GROUP_ID_FOR_MERGE,gIdsForMerge);
                 }else if(learningType == LEARNING_AND_CREATE_ORDER || learningType == LEARNING_AND_CREATE_RANDOM) {
-                    intentToAccomplishActivity.putExtra("MISSION_ID",missionId);
+                    intentToAccomplishActivity.putExtra(STR_MISSION_ID,missionId);
                 }
 
 
@@ -480,8 +485,6 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
                 this.finish();
 
                 break;
-
-
         }
     }
 
@@ -542,9 +545,9 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
         prepareLearningRecords();
 
 
-        //根据情况弹出dfg
+        //根据情况配置fg
         FragmentTransaction transaction = (getFragmentManager().beginTransaction());
-        Fragment prev = (getFragmentManager().findFragmentByTag("HANDY_FINISH"));
+        Fragment prev = (getFragmentManager().findFragmentByTag(FG_STR_HANDY_FINISH));
 
         if (prev != null) {
             Toast.makeText(this, "Old Dfg still there, removing...", Toast.LENGTH_SHORT).show();
@@ -555,15 +558,15 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
             case LEARNING_AND_CREATE_ORDER:
             case LEARNING_AND_CREATE_RANDOM:
                 DialogFragment dfgLC = Finish_LC_DiaFragment.newInstance(finishAmount,wrongAmount,restMinutes,restSeconds);
-                dfgLC.show(transaction,"HANDY_FINISH");
+                dfgLC.show(transaction,FG_STR_HANDY_FINISH);
                 break;
             case LEARNING_GENERAL:
                 DialogFragment dfgLG = Finish_LG_DiaFragment.newInstance(totalAmount,emptyAmount,wrongAmount,restMinutes,restSeconds);
-                dfgLG.show(transaction,"HANDY_FINISH");
+                dfgLG.show(transaction,FG_STR_HANDY_FINISH);
                 break;
             case LEARNING_AND_MERGE:
                 DialogFragment dfg = Finish_LM_DiaFragment.newInstance(totalAmount,finishAmount,wrongAmount,restMinutes,restSeconds);
-                dfg.show(transaction,"HANDY_FINISH");
+                dfg.show(transaction,FG_STR_HANDY_FINISH);
                 break;
         }
 
@@ -592,7 +595,7 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
 
         //根据情况弹出dfg
         FragmentTransaction transaction = (getFragmentManager().beginTransaction());
-        Fragment prev = (getFragmentManager().findFragmentByTag("TIME_UP_FINISH"));
+        Fragment prev = (getFragmentManager().findFragmentByTag(FG_STR_TIME_UP_FINISH));
 
         if (prev != null) {
             Toast.makeText(this, "Old Dfg still there, removing...", Toast.LENGTH_SHORT).show();
@@ -603,15 +606,15 @@ public class LearningActivity extends AppCompatActivity implements OnGeneralDfgI
             case LEARNING_AND_CREATE_ORDER:
             case LEARNING_AND_CREATE_RANDOM:
                 DialogFragment dfgLC = Finish_LC_DiaFragment.newInstance(finishAmount,wrongAmount,restMinutes,restSeconds);
-                dfgLC.show(transaction,"TIME_UP_FINISH");
+                dfgLC.show(transaction,FG_STR_TIME_UP_FINISH);
                 break;
             case LEARNING_GENERAL:
                 DialogFragment dfgLG = Finish_LG_DiaFragment.newInstance(totalAmount,emptyAmount,wrongAmount,restMinutes,restSeconds);
-                dfgLG.show(transaction,"TIME_UP_FINISH");
+                dfgLG.show(transaction,FG_STR_TIME_UP_FINISH);
                 break;
             case LEARNING_AND_MERGE:
                 DialogFragment dfg = Finish_LM_DiaFragment.newInstance(totalAmount,finishAmount,wrongAmount,restMinutes,restSeconds);
-                dfg.show(transaction,"TIME_UP_FINISH");
+                dfg.show(transaction,FG_STR_TIME_UP_FINISH);
                 break;
         }
 

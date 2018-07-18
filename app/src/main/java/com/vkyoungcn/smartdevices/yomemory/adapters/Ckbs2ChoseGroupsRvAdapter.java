@@ -1,6 +1,5 @@
 package com.vkyoungcn.smartdevices.yomemory.adapters;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +9,6 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.vkyoungcn.smartdevices.yomemory.R;
-import com.vkyoungcn.smartdevices.yomemory.fragments.LearningLessDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningMergeDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
 
@@ -18,15 +16,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
-*
-*
-* */
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 public class Ckbs2ChoseGroupsRvAdapter extends RecyclerView.Adapter<Ckbs2ChoseGroupsRvAdapter.ViewHolder> {
-
+//* 用于在【？开始合并学习前弹出的确认对话框中选定若干个源分组】
+//* 每条项目带有一个复选框（CheckBox），实现了全选和取消全选逻辑
+//
+// 。。
     //    private static final String TAG = "Ckbs2ChoseGroupsRvAdapter";
-    private List<FragGroupForMerge> groups;//传进来的数据
-    private LearningMergeDiaFragment dfg;//保持一个引用，以便改变dfg的UI（由DFG提供改变UI的公共方法）
-    private int howManyGroupsChecke = 0;//（除已移除的触发组外，已选中了多少个分组）用于判断是否是全选
+    private List<FragGroupForMerge> groups;//数据源
+    private LearningMergeDiaFragment dfg;//保持一个到对话框的引用，以便改变对话框的UI（由DFG提供改变UI的实际调用方法）
+    private int howManyGroupsChecke = 0;//（除已移除的触发组外，已选中了多少个分组）用于判断是否是全选（从而影响对话框中的全选ckb）
     private ArrayList<Integer> idsList = new ArrayList<>();//最终外传/回传的数据
 
     public class ViewHolder extends RecyclerView.ViewHolder implements CompoundButton.OnCheckedChangeListener {
@@ -106,10 +110,7 @@ public class Ckbs2ChoseGroupsRvAdapter extends RecyclerView.Adapter<Ckbs2ChoseGr
                 dfg.changeTotalChoseNumTvStr(false,groups.get(getAdapterPosition()).getTotalItemsNum());
 
             }
-
         }
-
-
     }
 
     public ArrayList<Integer> getIdsList() {

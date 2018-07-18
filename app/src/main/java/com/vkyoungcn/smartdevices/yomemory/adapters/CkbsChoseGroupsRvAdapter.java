@@ -17,14 +17,30 @@ import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 
 import java.util.ArrayList;
 import java.util.List;
-
 /*
-* 用于在分组列表中，“点击学习后，若判断该组容量小于5，则触发合并式学习”时弹出的同级碎片分组选择DFG下的Rv。
-* 与另一个用于碎片选择的dfg相比，本dfg的初始分组是既定的（但是该分组直接在dfg中显示，不传入本rv）；
-* 区别在于总量计算等……【待】。
-* */
-public class CkbsChoseGroupsRvAdapter extends RecyclerView.Adapter<CkbsChoseGroupsRvAdapter.ViewHolder> {
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
+【修改合并式学习的触发与选择逻辑】
+【SP新增设置项：①合并式学习触发容量值，默认是5。小于该值的分组在点击（普通）学习时会弹出对话框提示
+        分组容量较小，询问是否按合并式学习。并且默认筛选容量8以下，同MS的分组给用户选择】
+【SP新增设置项②：合并式学习筛选容量值,默认8。（是指默认筛选该容量及不足此容量的分组，呈给用户做选择）】
+【SP新增设置项③：分组详情页发起的学习不采用合并模式：在分组详情页发起的学习活动，在容量较小时
+        是否会弹出DFG询问是否触发合并式学习。设为不采用时，直接按LG模式进行，分组较小也无所谓。】
+【SP新增设置项④：自动选定合并式学习的来源分组。所有的合并式学习原则上都应当由用户选择来源范围，
+        而不是由系统自动根据默认值直接选定（除非用户已设置了按默认设置自动选定来源分组）】
+【应当允许用户在DFG中动态的调整筛选容量限值，从而动态获取“可选分组范围”】
 
+——从分组详情页发起的合并式学习，MS是既定的，作为来源组之一的本组是既定且不可取消的。
+——从通常方式发起的合并式学习，MS是未定的，需要在DFG中予以现场选定；且来源组并不既定，任何组都可被取消。
+——在合并询问DFG中，提供MS、容量限值两种设置，给出符合该设置的备选分组，由用户做出选择。【大改啊！！】
+public class CkbsChoseGroupsRvAdapter extends RecyclerView.Adapter<CkbsChoseGroupsRvAdapter.ViewHolder> {
+//* 用于在分组列表中，“点击学习后，若判断该组容量小于5，则触发合并式学习”时弹出的同级碎片分组选择DFG下的Rv。
+//* 与另一个用于碎片选择的dfg相比，本dfg的初始分组是既定的（但是该分组直接在dfg中显示，不传入本rv）；
+//* 区别在于总量计算等……【待】。
     //    private static final String TAG = "CkbsChoseGroupsRvAdapter";
     private List<FragGroupForMerge> groups;
     private Context context;//是所属DFG所属的Activity

@@ -2,13 +2,22 @@ package com.vkyoungcn.smartdevices.yomemory.sqlite;
 
 import android.provider.BaseColumns;
 
-
-/**
- * Created by VkYoung16 on 2018/3/26 0026.
- * 是数据库的设计方案类；描述了其中的表和字段结构。
- */
-
+/*
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 public final class YoMemoryContract {
+//* 是数据库的设计方案类；描述了其中的表和字段结构。
+//*
+//*  程序共有四种资源Mission、Group、Item、SingleLog（日志）；
+//*  Mission是程序的顶层组织单位。
+//*  Group是Mission内具体记忆活动的组织单位（承担记录复习时间、计算并显示组内资源记忆效果的职能）
+//*  其中Item是程序的基础资源。不同任务可能对应不同的Items资源，
+//*  因而Item表可能会存在不止一张，根据（由Mission提供的）不同后缀生成不同表名。
+
     private static YoMemoryContract instance;
 
     static {
@@ -21,12 +30,6 @@ public final class YoMemoryContract {
     public static YoMemoryContract getInstance(){
         return instance;
     }
-
-     /*
-     *  程序共有三种资源Mission、Group、Item；
-     *  其中Item是程序的资源，根据任务的数量，Item会存在不止一张表，其表名后半部分动态生成。
-     *  此外还有任务的学习时间记录表。
-     * */
 
 
 //    id列交似乎是由BC类自动设为_ID=_id的。

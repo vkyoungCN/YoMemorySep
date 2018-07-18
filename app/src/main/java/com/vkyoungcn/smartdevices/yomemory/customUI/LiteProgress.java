@@ -12,13 +12,17 @@ import android.view.View;
 import com.vkyoungcn.smartdevices.yomemory.R;
 
 import java.text.DecimalFormat;
-
 /*
-* 双色进度条，根据即时传入的百分比（采用float）确定显示。不刷新；
-* */
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 public class LiteProgress extends View {
-    private static final String TAG = "LiteProgress";
-    private Context mContext;
+//* 双色进度条，根据即时传入的百分比（采用float）确定显示。不刷新；
+
+    //    private static final String TAG = "LiteProgress";
     private float percentage = 0f;//按照这个数据绘制位置。
 
     //onDraw中使用，但不能在onDraw中开辟大型变量，提前全局开辟。
@@ -49,7 +53,6 @@ public class LiteProgress extends View {
     private Paint paintOutLine;
     private Paint paintSingleLine;
     private Paint paintNumber;
-//    private Paint paintBk;//调试用
 
     private int sizeChangedHeight;//是控件onSizeChanged后获得的尺寸之高度，也是传给onDraw进行线段绘制的canvas-Y坐标(单行时)
     private int sizeChangedWidth;
@@ -65,14 +68,12 @@ public class LiteProgress extends View {
     //这个可能是程序默认需要的
     public LiteProgress(Context context) {
         super(context);
-        this.mContext = context;
 
         init();
     }
 
     public LiteProgress(Context context, AttributeSet attributeset) {
         super(context, attributeset);
-        mContext = context;
         //【实测系统调用的是这个】
 
         init();
@@ -81,7 +82,6 @@ public class LiteProgress extends View {
 
     public LiteProgress(Context context, AttributeSet attrs, int defStyledAttrs) {
         super(context, attrs, defStyledAttrs);
-        mContext = context;
 
         init();
     }

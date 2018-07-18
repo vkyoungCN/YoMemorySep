@@ -3,11 +3,17 @@ package com.vkyoungcn.smartdevices.yomemory.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by VkYoung16 on 2018/3/26 0026.
- */
-
+/*
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 public class SingleItem implements Parcelable {
+//* Item资源。
+
+    /* 字段 */
     private int id =0;
     private String name="";
     private String phonetic ="";

@@ -11,14 +11,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.adapters.AllMissionRvAdapter;
-import com.vkyoungcn.smartdevices.yomemory.customUI.HorizontalProgressBar;
 import com.vkyoungcn.smartdevices.yomemory.fragments.GiveExplanationDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.models.Mission;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMission;
@@ -26,21 +24,21 @@ import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-
-import static com.vkyoungcn.smartdevices.yomemory.LogoPageActivity.YO_MEMORY_SP;
-
 /*
- * 作者1：杨胜@中国海洋大学
- * 作者2：杨镇时@中国海洋大学
- * author：Victor Young @Ocean University of China
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
  * email: yangsheng@ouc.edu.cn
- *
- * 首页。
- * 上部预留横向图片式广告位（间隔滚动式）
- * 下方是任务列表；点击可进入新Activity查看任务情况。
+ * 2018.08.01
  * */
-public class MainActivity extends AppCompatActivity implements AllMissionRvAdapter.ChangeStar{
-    private static final String TAG = "MainActivity";
+
+public class MainActivity extends AppCompatActivity
+        implements AllMissionRvAdapter.ChangeStar,Constants{
+// * 首页。
+// * 上部预留横向图片式广告位（间隔滚动式）
+// * 下方是卡片式（横向）任务列表；点击查看任务详情，并进入该任务的后续可执行逻辑。
+// * 底部是功能性按钮。
+//    private static final String TAG = "MainActivity";
     public static final int MESSAGE_DB_MISSION_FETCHED = 5001;
     private YoMemoryDbHelper memoryDbHelper;
     private ArrayList<Integer> starClickedPositions = new ArrayList<>();
@@ -70,8 +68,8 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
         tv_slideForMore = findViewById(R.id.tv_slideForMore_MA);
 
         //没有点击过“程序使用说明”按键时，将在其左上显示小标记。
-        sharedPreferences = getSharedPreferences(YO_MEMORY_SP, MODE_PRIVATE);
-        isBtnExplainBeenClicked = sharedPreferences.getBoolean("BTN_EXPLAIN_CLICKED", false);
+        sharedPreferences = getSharedPreferences(SP_STR_TITLE_YO_MEMORY, MODE_PRIVATE);
+        isBtnExplainBeenClicked = sharedPreferences.getBoolean(SP_STR_BTN_EXPLAIN_CLICKED, false);
 
         if(!isBtnExplainBeenClicked){
             //未曾点击过
@@ -222,19 +220,19 @@ public class MainActivity extends AppCompatActivity implements AllMissionRvAdapt
         isBtnExplainBeenClicked = true;
         //改变相应全局记录。
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("BTN_EXPLAIN_CLICKED", true);
+        editor.putBoolean(SP_STR_BTN_EXPLAIN_CLICKED, true);
         editor.apply();
 
         //弹出DFG
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        Fragment prev = getFragmentManager().findFragmentByTag("GIVE_EXPLANATION");
+        Fragment prev = getFragmentManager().findFragmentByTag(FG_STR_GIVE_EXPLANATION);
 
         if (prev != null) {
             Toast.makeText(this, "Old DialogFg still there, removing first...", Toast.LENGTH_SHORT).show();
             transaction.remove(prev);
         }
         DialogFragment dfg = GiveExplanationDiaFragment.newInstance();
-        dfg.show(transaction, "GIVE_EXPLANATION");
+        dfg.show(transaction, FG_STR_GIVE_EXPLANATION);
 
     }
 

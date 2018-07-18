@@ -17,8 +17,8 @@
 
 
 
-    <color name="bottomLine_default_color">#aeea00</color>
-    <color name="bottomLine_nonCorrect_color">#eef44336</color>
+    <color name="ve_bottomLine_default_color">#aeea00</color>
+    <color name="ve_bottomLine_nonCorrect_color">#e64a19</color>
 
     <color name="singleStripe_color_correct">#76ff03</color>
     <color name="singleStripe_color_nonCorrect">#f06292</color>
@@ -30,11 +30,13 @@
     <color name="white">#ffffff</color>
 
 
-    <color name="textColor">#1a237e</color>
-    <color name="text_nonCorrect_Color">#eeff5252</color>
+    <color name="ve_textColor">#1a237e</color>
+    <color name="ve_text_err_color">#ff7043</color>
 
-    <color name="ve_background">#44b2ff59</color>
-    <color name="ve_background_not_correct">#33ff5252</color>
+    <color name="ve_background">#dcedc8</color>
+    <color name="ve_background_not_correct">#f8bbd0</color>
+
+
     <color name="horizontalPB_color_done">#76ff03</color>
     <color name="horizontalPB_color_notYet">#a0a0a0</color>
     <color name="horizontalPB_color_char">#3f3f3f</color>

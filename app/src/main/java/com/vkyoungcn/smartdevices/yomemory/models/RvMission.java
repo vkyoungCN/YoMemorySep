@@ -8,11 +8,15 @@ import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 
 @SuppressWarnings("all")
-/**
- * Created by VkYoung16 on 2018/3/26 0026.
- */
-
+/*
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 public class RvMission implements Parcelable {
+//* Mission的快速显示使用版，将需要在UI（主要是RecyclerView中）显示的数据计算出来直接以显示资源形式提供
     private int id=0;
     private String name="";
     private String simpleDescription ="";

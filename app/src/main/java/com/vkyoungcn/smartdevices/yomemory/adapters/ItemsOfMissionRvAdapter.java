@@ -14,11 +14,19 @@ import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/*
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 public class ItemsOfMissionRvAdapter extends RecyclerView.Adapter<ItemsOfMissionRvAdapter.ViewHolder> {
+//* 用于展示任务所属各Items的RecyclerView的适配器
+//* 纵向列表形式
     private static final String TAG = "ItemsOfMissionRvAdapter";
 
-    private List<SingleItem> items = new ArrayList<>();
+    private List<SingleItem> items;//数据源
     private Context context;
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{

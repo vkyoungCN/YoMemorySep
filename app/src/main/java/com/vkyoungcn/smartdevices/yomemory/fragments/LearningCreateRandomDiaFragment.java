@@ -10,22 +10,30 @@ import android.widget.TextView;
 
 import com.vkyoungcn.smartdevices.yomemory.R;
 
+/*
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 @SuppressWarnings("all")
-public class LearningAddRandomDiaFragment extends DialogFragment implements View.OnClickListener {
-    private static final String TAG = "LearningAddRandomDiaFragment";
+public class LearningCreateRandomDiaFragment extends DialogFragment implements View.OnClickListener {
+//* 发起创建式学习（顺序）时弹出的确认对话框
+    private static final String TAG = "LearningCreateRandomDiaFragment";
 
     private OnGeneralDfgInteraction mListener;
 
     private TextView tvCancel;
     private TextView tvConfirm;
 
-    public LearningAddRandomDiaFragment() {
+    public LearningCreateRandomDiaFragment() {
         // Required empty public constructor
     }
 
 
-    public static LearningAddRandomDiaFragment newInstance() {
-        LearningAddRandomDiaFragment fragment = new LearningAddRandomDiaFragment();
+    public static LearningCreateRandomDiaFragment newInstance() {
+        LearningCreateRandomDiaFragment fragment = new LearningCreateRandomDiaFragment();
 
         return fragment;
     }

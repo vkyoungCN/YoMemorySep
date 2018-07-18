@@ -8,14 +8,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.vkyoungcn.smartdevices.yomemory.Constants;
 import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+【待增加一个组内乱序（仅LG模式下）】
+
+/*
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 @SuppressWarnings("all")
-public class LearningGelDiaFragment extends DialogFragment implements View.OnClickListener {
+public class LearningGelDiaFragment extends DialogFragment
+        implements View.OnClickListener,Constants {
+//* 发起常规模式学习活动时弹出的确认对话框
     private static final String TAG = "LearningGelDiaFragment";
     private OnGeneralDfgInteraction mListener;
 
@@ -32,7 +44,7 @@ public class LearningGelDiaFragment extends DialogFragment implements View.OnCli
     public static LearningGelDiaFragment newInstance(RVGroup rvGroup) {
         LearningGelDiaFragment fragment = new LearningGelDiaFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable("GROUP",rvGroup);
+        bundle.putParcelable(STR_GROUP,rvGroup);
         fragment.setArguments(bundle);
 
         return fragment;
@@ -42,7 +54,7 @@ public class LearningGelDiaFragment extends DialogFragment implements View.OnCli
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            this.rvGroup = savedInstanceState.getParcelable("GROUPS");
+            this.rvGroup = savedInstanceState.getParcelable(STR_GROUP);
         }
 
     }
@@ -60,7 +72,7 @@ public class LearningGelDiaFragment extends DialogFragment implements View.OnCli
         tvDescription.setText(rvGroup.getDescription());
 
         Date lastLearningTimeDate = new Date(rvGroup.getLastLearningTime());
-        SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdFormat = new SimpleDateFormat(STR_DATE_PATTEN_1);
         String lastLearningTimeStr = sdFormat.format(lastLearningTimeDate);
         tvLastLearningTime.setText(lastLearningTimeStr);
 
@@ -96,7 +108,7 @@ public class LearningGelDiaFragment extends DialogFragment implements View.OnCli
             case R.id.btn_confirm_learningGel:
                 //从rv中取数据，存入Bundle，最终交到学习页。
                 Bundle bundle = new Bundle();
-                bundle.putInt("GROUP_ID_TO_LEARN",rvGroup.getId());
+                bundle.putInt(STR_GROUP_ID_TO_LEARN,rvGroup.getId());
 
                 mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_GENERAL,bundle);
                 break;
@@ -106,8 +118,6 @@ public class LearningGelDiaFragment extends DialogFragment implements View.OnCli
                 this.dismiss();
                 break;
         }
-
     }
-
 
 }

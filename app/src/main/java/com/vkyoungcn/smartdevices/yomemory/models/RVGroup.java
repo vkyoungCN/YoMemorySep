@@ -6,13 +6,21 @@ import android.util.Log;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-
 /*
-* 本类用于减轻RecyclerView的Adapter中，数据显示过程中的负担，提前将需要转换的数据计算出来，直接提供。
-* */
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 public class RVGroup implements Parcelable ,Cloneable{
+//* 本类用于减轻RecyclerView在数据显示过程中的负担，提前将需要转换的数据计算出来，直接提供显示资源
+//* 本类还提供有一些公共静态计算方法，用于计算指定分组的MS/RMA/限制时间等数据
+
     private static final String TAG = "RVGroup";
 
+    /* 字段 */
+    //group表提供
     private int id = 0;//DB列
     private String description="";//DB列。默认填入该组“起始-末尾”词汇
     private int mission_id=0;//属于哪个任务。

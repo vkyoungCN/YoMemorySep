@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -20,8 +19,8 @@ import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.adapters.GroupsOfMissionRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.fragments.CreateGroupDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.LearningAddInOrderDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.LearningAddRandomDiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.LearningCreateOrderDiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.LearningCreateRandomDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningMergeDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
@@ -35,57 +34,64 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /*
- *
- * 作者1：杨胜@中国海洋大学
- * 作者2：杨镇时@中国海洋大学
- * author：Victor Young @Ocean University of China
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
  * email: yangsheng@ouc.edu.cn
- *
- * 单个Mission及其所属分组的详情页；
- * 页面上部是Mission详情；
- * 页面下部是所属分组的集合展示（Rv）；默认要按某种顺序（待定）
- * 本页面中的其他任务：①新建分组；②开始学习。
- * 当分组删除时，所属词汇回归为未选中的Item。
- * 点击Rv中的条项可以进入学习/复习页面；会有确认框弹出提示。
- * 学习/复习完成或因超时而未能完成的，都会回到本页面；完成则更新RV列表的显示，
- * 失败则产生一条消息【待实现】。
+ * 2018.08.01
  * */
-public class GroupsOfMissionActivity extends AppCompatActivity implements
-        OnGeneralDfgInteraction {
+public class GroupsOfMissionActivity extends AppCompatActivity
+        implements OnGeneralDfgInteraction,Constants {
+//本Activity是单个Mission所属所有分组（列表形式）的展示页；
+//    页面上部是简单的Mission信息；页面具备：新建分组、发起创建式学习、发起合并式学习的功能，
+// 点击FAB按钮展开相应控制面板。
+//    页面下部以RecyclerView（纵向）形式给出所属全部分组的列表；分组列表按某种顺序【待定】排列；
+// 单击列表项进入分组详情页，点击列表项目中的学习按钮，可以开始学习；
+// 长按列表项可以删除分组。（分组删除后，所属词汇回归为未选中状态）
+//     从本页面发起的学习/复习活动，在操作完成后会跳转到本页面（因随后的PFA、LA、AA三页面都不进入历史栈）
+   /* 常量声明*/
     private static final String TAG = "GroupsOfMissionActivity";
-
+    /* 消息常量声明*/
     public static final int MESSAGE_PRE_DB_FETCHED = 5011;
     public static final int MESSAGE_RE_FETCH_DONE = 5012;
     public static final int MESSAGE_RV_SCHEDULE_REFRESHING = 5013;
 
-    private static final String ITEM_TABLE_SUFFIX = "item_table_suffix";
-    public static final int REQUEST_CODE_LEARNING = 2011;//学习完成后，要回送然后更新Rv数据源和显示。
-    private ArrayList<FragGroupForMerge>[][] groupsInTwoDimensionArray;//用于后续DFG的数据装载，两个维度分别对应MS、同MS下<4,<8。
-    private int clickPosition;//点击（前往学习页面）发生的位置，需要该数据来更新rv位置
 
-    private boolean isFabPanelExtracted = false;//FAB面板组默认处于回缩状态。
-
+    /* 变量声明区*/
+    /* 从Intent获取的数据*/
     private RvMission missionFromIntent;//从前一页面获取。后续页面需要mission的id，suffix字段。
-    List<RVGroup> rvGroups = new ArrayList<>();//分开设计的目的是避免适配器内部的转换。让转换在外部完成，适配器直接使用数据才能降低卡顿。
-    TextView tv_groupAmount;
-
-    private YoMemoryDbHelper memoryDbHelper;
     private String tableItemSuffix;//由于各任务所属的Item表不同，后面所有涉及Item的操作都需要通过后缀才能构建出完整表名。
-    private RecyclerView mRv;
-    private GroupsOfMissionRvAdapter adapter = null;//Rv适配器引用
-    private Activity self;//为了后方Timer配合runOnUiThread.
+
+    /* 数据库操作，从数据库取得的数据*/
+    private YoMemoryDbHelper memoryDbHelper;
+    ArrayList<RVGroup> rvGroups = new ArrayList<>();//用于RecyclerView的数据源（由ArrayList<DbGroup>转换而来）
+
     private Handler handler = new GroupOfMissionHandler(this);//涉及弱引用，通过其发送消息。
-    private Boolean fetched = false;//是否已执行完成过从DB获取分组数据的任务；如完成，则onResume中可以重启UI-Timer
     private Boolean needForScheduleRefreshing = true;//分组列表数据定时更新线程的控制变量。当刷新分组列表时暂停该更新；（？退出到Pause状态时，是否需要手动停止？）
-    //【实际上，目前的经验表明，无论是interrupt方法还是布尔变量置否，似乎都不能使线程立即停止】
-//    private Boolean isHandyRefreshing = false;//点击刷新列表的按键后，会重新执行加载数据的线程，为与首次的自动运行相区分，此标志变量会设true。
+    private Boolean fetched = false;//是否已执行完成过从DB获取分组数据的任务；如完成，则onResume中可以重启UI-Timer
+
+    private Activity self;//为了后方Timer配合runOnUiThread.
     List<Integer> refreshingNeededPositionsList = new ArrayList<>();//更新线程会把需要更新的项目的索引Id（每分钟变更一次）存在这个表中
 
+
+    /* 控件及控件相关变量*/
+    private RecyclerView mRv;
     private FrameLayout maskFrameLayout;
     private RelativeLayout rltFabPanel;
-    //任务名称、描述两控件在onCreate内以局部变量声明。
+    TextView tv_groupAmount;
+
+    private boolean isFabPanelExtracted = false;//FAB面板组默认处于回缩状态。
+    private GroupsOfMissionRvAdapter adapter = null;//Rv适配器引用
+
+
+//任务名称、描述两控件在onCreate内以局部变量声明。
+//    private int clickPosition;//点击（前往学习页面）发生的位置，需要该数据来更新rv位置
+//    private Boolean isHandyRefreshing = false;//点击刷新列表的按键后，会重新执行加载数据的线程，为与首次的自动运行相区分，此标志变量会设true。
+//【实际上，目前的经验表明，无论是interrupt方法还是布尔变量置否，似乎都不能使线程立即停止】
+    private ArrayList<FragGroupForMerge>[][] groupsInTwoDimensionArray;//用于后续DFG的数据装载，两个维度分别对应MS、同MS下<4,<8。
+    【这个两维数组的设计不好，不够直观。建议拆成两个独立的list[]（分别对应4、8两种情况），不知逻辑上能否合理】
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +116,7 @@ public class GroupsOfMissionActivity extends AppCompatActivity implements
             }
         });
 
-        missionFromIntent = getIntent().getParcelableExtra("MISSION");
+        missionFromIntent = getIntent().getParcelableExtra(STR_MISSION);
         if (missionFromIntent == null) {
             Toast.makeText(self, "任务信息传递失败", Toast.LENGTH_SHORT).show();
             return;
@@ -384,14 +390,14 @@ public class GroupsOfMissionActivity extends AppCompatActivity implements
      * */
     public void createGroup(View view) {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        Fragment prev = getFragmentManager().findFragmentByTag("CREATE_GROUP");
+        Fragment prev = getFragmentManager().findFragmentByTag(FG_STR_CREATE_GROUP);
 
         if (prev != null) {
             Toast.makeText(self, "Old DialogFg still there, removing first...", Toast.LENGTH_SHORT).show();
             transaction.remove(prev);
         }
         DialogFragment dfg = CreateGroupDiaFragment.newInstance(missionFromIntent.getTableItem_suffix(), missionFromIntent.getId());
-        dfg.show(transaction, "CREATE_GROUP");
+        dfg.show(transaction, FG_STR_CREATE_GROUP);
     }
 
 
@@ -406,14 +412,14 @@ public class GroupsOfMissionActivity extends AppCompatActivity implements
         Toast.makeText(self, "按学习数量建立分组（顺序）", Toast.LENGTH_SHORT).show();
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        Fragment prev = getFragmentManager().findFragmentByTag("LEARNING_ADD_IN_ORDER");
+        Fragment prev = getFragmentManager().findFragmentByTag(FG_STR_LEARNING_ADD_IN_ORDER);
 
         if (prev != null) {
             Toast.makeText(self, "Old DialogFg still there, removing first...", Toast.LENGTH_SHORT).show();
             transaction.remove(prev);
         }
-        DialogFragment dfg = LearningAddInOrderDiaFragment.newInstance();
-        dfg.show(transaction, "LEARNING_ADD_IN_ORDER");
+        DialogFragment dfg = LearningCreateOrderDiaFragment.newInstance();
+        dfg.show(transaction, FG_STR_LEARNING_ADD_IN_ORDER);
 
     }
 
@@ -422,14 +428,14 @@ public class GroupsOfMissionActivity extends AppCompatActivity implements
         Toast.makeText(self, "施工中，边学边建。", Toast.LENGTH_SHORT).show();
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        Fragment prev = getFragmentManager().findFragmentByTag("LEARNING_ADD_RANDOM");
+        Fragment prev = getFragmentManager().findFragmentByTag(FG_STR_LEARNING_ADD_RANDOM);
 
         if (prev != null) {
             Toast.makeText(self, "Old DialogFg still there, removing first...", Toast.LENGTH_SHORT).show();
             transaction.remove(prev);
         }
-        DialogFragment dfg = LearningAddRandomDiaFragment.newInstance();
-        dfg.show(transaction, "LEARNING_ADD_RANDOM");
+        DialogFragment dfg = LearningCreateRandomDiaFragment.newInstance();
+        dfg.show(transaction, FG_STR_LEARNING_ADD_RANDOM);
     }
 
     public void learnAndMerge(View view) {
@@ -445,14 +451,15 @@ public class GroupsOfMissionActivity extends AppCompatActivity implements
         Toast.makeText(self, "合并学习，正在准备数据，马上就好。", Toast.LENGTH_SHORT).show();
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        Fragment prev = getFragmentManager().findFragmentByTag("READY_TO_LEARN_MERGE");
+        Fragment prev = getFragmentManager().findFragmentByTag(FG_STR_READY_TO_LEARN_MERGE);
 
         if (prev != null) {
             transaction.remove(prev);
         }
 
+        groupsInTwoDimensionArray = new
         //本页有全部分组的信息，应在本页准备好数据（容量<4、<8）
-        // 后续页面只能直接从DB取数据，而SQL复杂不宜用。
+        // 后续页面只能直接从DB取数据，SQL复杂不宜用。
         for (RVGroup rvg : rvGroups) {
             if (rvg.getTotalItemsNum() < 4) {
                 //一维上[0][x]是小于4的，x对应其不同MS；各元素本身就是一个ArrayList哦。
@@ -466,46 +473,46 @@ public class GroupsOfMissionActivity extends AppCompatActivity implements
         //数据已组织好，接下来是传递，以及DFG中的接收显示。
 
         DialogFragment dfg = LearningMergeDiaFragment.newInstance(groupsInTwoDimensionArray);
-        dfg.show(transaction, "READY_TO_LEARN_MERGE");
+        dfg.show(transaction, FG_STR_READY_TO_LEARN_MERGE);
     }
 
 
     @Override
     public void onButtonClickingDfgInteraction(int dfgType, Bundle data) {
         Intent intentToLPA = new Intent(this, PrepareForLearningActivity.class);
-        intentToLPA.putExtra("TABLE_SUFFIX", tableItemSuffix);
+        intentToLPA.putExtra(STR_TABLE_SUFFIX, tableItemSuffix);
         intentToLPA.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
         switch (dfgType) {
             case LEARNING_GENERAL:
-                intentToLPA.putExtra("LEARNING_TYPE", LEARNING_GENERAL);
-                intentToLPA.putExtra("BUNDLE_FOR_GENERAL", data);
+                intentToLPA.putExtra(STR_LEARNING_TYPE, LEARNING_GENERAL);
+                intentToLPA.putExtra(STR_BUNDLE_FOR_GENERAL, data);
                 this.startActivity(intentToLPA);
                 break;
 
             case LEARNING_AND_CREATE_ORDER:
                 //需要传递标记
-                intentToLPA.putExtra("LEARNING_TYPE", LEARNING_AND_CREATE_ORDER);
-                intentToLPA.putExtra("MISSION_ID", missionFromIntent.getId());//在最后完成页生成新组时需要本字段信息。
+                intentToLPA.putExtra(STR_LEARNING_TYPE, LEARNING_AND_CREATE_ORDER);
+                intentToLPA.putExtra(STR_MISSION_ID, missionFromIntent.getId());//在最后完成页生成新组时需要本字段信息。
                 this.startActivity(intentToLPA);
                 break;
 
             case LEARNING_AND_CREATE_RANDOM:
-                intentToLPA.putExtra("LEARNING_TYPE", LEARNING_AND_CREATE_RANDOM);
-                intentToLPA.putExtra("MISSION_ID", missionFromIntent.getId());//在最后完成页生成新组时需要本字段信息。
+                intentToLPA.putExtra(STR_LEARNING_TYPE, LEARNING_AND_CREATE_RANDOM);
+                intentToLPA.putExtra(STR_MISSION_ID, missionFromIntent.getId());//在最后完成页生成新组时需要本字段信息。
                 this.startActivity(intentToLPA);
                 break;
 
             case LEARNING_AND_MERGE:
-                intentToLPA.putExtra("LEARNING_TYPE", LEARNING_AND_MERGE);
-                intentToLPA.putExtra("BUNDLE_FOR_MERGE", data);//这里传递的是从DFG（及其选择Rv）传来的，
+                intentToLPA.putExtra(STR_LEARNING_TYPE, LEARNING_AND_MERGE);
+                intentToLPA.putExtra(STR_BUNDLE_FOR_MERGE, data);//这里传递的是从DFG（及其选择Rv）传来的，
                 // 作为合并学习的来源碎片分组的分组id（构成的bundle，内部的key：IDS_GROUPS_READY_TO_MERGE）
                 this.startActivity(intentToLPA);
                 break;
 
             case DELETE_GROUP:
                 //从DB删除该组，删除后更新UI显示
-                int position = data.getInt("POSITION");
+                int position = data.getInt(STR_POSITION);
                 memoryDbHelper.deleteGroupById(rvGroups.get(position).getId(),tableItemSuffix);
                 rvGroups.remove(position);
                 adapter.notifyItemRemoved(position);
@@ -518,11 +525,11 @@ public class GroupsOfMissionActivity extends AppCompatActivity implements
                 //Item抽取方式，随机或顺序
                 ArrayList<Integer> itemIds = new ArrayList<>();
 
-                boolean isOrder = data.getBoolean("IS_ORDER");
-                int groupSize = data.getInt("GROUP_SIZE");
+                boolean isOrder = data.getBoolean(STR_IS_ORDER);
+                int groupSize = data.getInt(STR_GROUP_SIZE);
 
                 //为描述字段获取首词name
-                String description = data.getString("DESCRIPTION");
+                String description = data.getString(STR_DESCRIPTION);
                 StringBuilder descriptionSB = new StringBuilder();
                 String groupDescriptionStr = null;
 
@@ -563,7 +570,7 @@ public class GroupsOfMissionActivity extends AppCompatActivity implements
                    //如果描述字段留空，构建默认描述字段“随机分组-时间”
                    if(description == null ||description.isEmpty()){
                        descriptionSB.append("随机分组-");
-                       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                       SimpleDateFormat sdf = new SimpleDateFormat(STR_DATE_PATTEN_1);
                        descriptionSB.append(sdf.format(System.currentTimeMillis()));
                        groupDescriptionStr = descriptionSB.toString();
                    }

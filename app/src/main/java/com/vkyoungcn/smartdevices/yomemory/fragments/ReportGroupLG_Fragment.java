@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.vkyoungcn.smartdevices.yomemory.Constants;
 import com.vkyoungcn.smartdevices.yomemory.LearningActivity;
 import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
@@ -22,16 +23,17 @@ import com.vkyoungcn.smartdevices.yomemory.validatingEditor.ValidatingEditor;
 
 @SuppressWarnings("all")
 /*
- * 作者1：杨胜 @中国海洋大学
- * 作者2：杨镇时 @中国海洋大学
- * author：Victor Young @Ocean University of China
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
  * email: yangsheng@ouc.edu.cn
- *
- * 用于单项Item的复习学习
- * 此时，默认显示英文+音标，点击翻面后显示汉译；
- * 需要点击翻面后并输入正确的拼写才能滑动到下一页。
- */
-public class ReportGroupLG_Fragment extends Fragment {
+ * 2018.08.01
+ * */
+【还要制作LM/LC对应的其他两种FG，以及对本fg的排错。】
+public class ReportGroupLG_Fragment extends Fragment implements Constants {
+//* 汇报本次学习的情况（作为Fg嵌入在学习结束页面中部）
+//* 本FG用于LG模式。
+
     private static final String TAG = "ReportGroupLG_Fragment";
 
     private TextView tv_gInfo;
@@ -84,25 +86,23 @@ public class ReportGroupLG_Fragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            totalNum = getArguments().getInt("TOTAL_NUM");
-            doneNum=getArguments().getInt("DONE_NUM");
-            emptyNum=getArguments().getInt("EMPTY_NUM");
-            correctNum=getArguments().getInt("CORRECT_NUM");
-            wrongNum=getArguments().getInt("WRONG_NUM");
+            totalNum = getArguments().getInt(STR_TOTAL_NUM);
+            doneNum=getArguments().getInt(STR_DONE_NUM);
+            emptyNum=getArguments().getInt(STR_EMPTY_NUM);
+            correctNum=getArguments().getInt(STR_CORRECT_NUM);
+            wrongNum=getArguments().getInt(STR_WRONG_NUM);
 
-            newGroupStr = getArguments().getString("NEW_GROUP");
-            wrongNamesStr = getArguments().getString("WRONG_NAMES");
+            newGroupStr = getArguments().getString(STR_NEW_GROUP);
+            wrongNamesStr = getArguments().getString(STR_WRONG_NAMES);
 
-            newRma = getArguments().getInt("NEW_RMA");
-            oldRma =getArguments().getInt("OLD_RMA");
-            newMs = getArguments().getInt("NEW_MS");
-            oldMs = getArguments().getInt("OLD_MS");
+            newRma = getArguments().getInt(STR_NEW_RMA);
+            oldRma =getArguments().getInt(STR_OLD_RMA);
+            newMs = getArguments().getInt(STR_NEW_MS);
+            oldMs = getArguments().getInt(STR_OLD_MS);
 
-            isMsUp = getArguments().getBoolean("IS_MS_UP");
-            isTooLate = getArguments().getBoolean("IS_TOO_LATE");
-
+            isMsUp = getArguments().getBoolean(STR_IS_MS_UP);
+            isTooLate = getArguments().getBoolean(STR_IS_TOO_LATE);
         }
-
     }
 
     @Override

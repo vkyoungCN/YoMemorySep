@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.vkyoungcn.smartdevices.yomemory.Constants;
 import com.vkyoungcn.smartdevices.yomemory.MainActivity;
 import com.vkyoungcn.smartdevices.yomemory.MissionDetailsActivity;
 import com.vkyoungcn.smartdevices.yomemory.R;
@@ -21,47 +22,48 @@ import com.vkyoungcn.smartdevices.yomemory.models.RvMission;
 import java.util.List;
 
 /*
- * 以列表（Rv）形式展示所有任务的集合信息（行UI分两行，上层是名称，下层是一些按钮）
- * 条目有点击事件，点击后跳转到相应任务的详情页MissionDetailActivity。
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
  * */
-public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapter.ViewHolder>{
-    //    private static final String TAG = "AllMissionRvAdapter";
-    private List<RvMission> missions;//本页暂时只显示titles，但后续页面需要suffix，点击事件需要相应id
-    private Context context;//用于点击事件的启动新Activity
-    private boolean is4BtnsShowing = false;
+public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapter.ViewHolder>
+        implements Constants{
+// * 以RecyclerView形式展示所有任务
+// * 各条项采用CardView的形式
+// *
+// * 卡片上的星标可以点击切换；卡片上的详情按钮点击后可跳转到详情页获取更多功能。
+// *
 
+//    private static final String TAG = "AllMissionRvAdapter";
+    private List<RvMission> missions;//数据源
+    private Context context;//用于点击事件的启动新Activity
 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        private final TextView title;
-        private final ImageView star;
-        private final TextView simpleDetail;
-        private final LiteProgress litePB;
-        private final LinearLayout llt_header;
+        private final TextView title;//任务标题（名称）
+        private final TextView simpleDetail;//（任务的简略说明）
 
-//        private final TextView groupsOfThis;//跳到任务详情与所属分组页
-        private final TextView tv_toMissionDetails;//跳到任务详情与所属资源页
+        private final LiteProgress litePB;//卡片下方的“本任务进度条”（轻量版）
+        private final ImageView star;//任务左上角的星标，可点击切换。【功能暂未明确，或是用于任务的种类定位】
+        private final LinearLayout llt_header;//点击星标后，卡片页头会随之改变底色
+        private final TextView tvBtn_toMissionDetails;//跳到任务详情与所属资源页
 
-
-
-        int tempStarType = 1;//用于临时改变（存入DB前的）星标状态记录。
+        int tempStarType = 1;//用于（存入DB前）临时改变星标状态记录。
 
         private ViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.title_rvAllMission);
-//            fgsList = itemView.findViewById(R.id.fragmentGroupsList);
-//            groupsOfThis = itemView.findViewById(R.id.groupsOfThisMission);
-            tv_toMissionDetails = itemView.findViewById(R.id.tv_toMissionDetails_rvAllMissions);
+            tvBtn_toMissionDetails = itemView.findViewById(R.id.tv_toMissionDetails_rvAMs);
             simpleDetail = itemView.findViewById(R.id.tv_sDetail_rvAllMission);
             star = itemView.findViewById(R.id.starAtStart);
             litePB = itemView.findViewById(R.id.litePB_RvAM);
             llt_header = itemView.findViewById(R.id.llt_header_rvAM);
 
-            title.setOnClickListener(this);//点击名称区域后，下方llt展开显示
-//            groupsOfThis.setOnClickListener(this);
-            tv_toMissionDetails.setOnClickListener(this);
+            title.setOnClickListener(this);
+            tvBtn_toMissionDetails.setOnClickListener(this);
             star.setOnClickListener(this);
-
         }
 
         public TextView getTitle() {
@@ -90,21 +92,13 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
             if (position != RecyclerView.NO_POSITION){ // Check if an item was deleted, but the user clicked it before the UI removed it
                 switch (view.getId()){
 
-                   /* case R.id.groupsOfThisMission:
-                        //跳转到任务详情页。
-                        if(position!=0){return;}//测试期间由于只有第一项任务是有效数据，临时禁止其他项目的跳转
-                        Intent intentToGroups = new Intent(context, GroupsAndMissionDetailActivity.class);
-                        intentToGroups.putExtra("Mission",missions.get(position));
-                        context.startActivity(intentToGroups);
-                        break;*/
 
-                    case R.id.tv_toMissionDetails_rvAllMissions:
+                    case R.id.tv_toMissionDetails_rvAMs:
                         //跳转到任务详情页。
                         Intent intentToMDA = new Intent(context, MissionDetailsActivity.class);
                         Bundle bundle = new Bundle();
-                        bundle.putParcelable("MISSION",missions.get(position));
-                        intentToMDA.putExtra("BUNDLE_FOR_MISSION",bundle);
-//                        Toast.makeText(context, "mission's detail Description:"+missions.get(position).getDetailDescription(), Toast.LENGTH_SHORT).show();
+                        bundle.putParcelable(STR_MISSION,missions.get(position));
+                        intentToMDA.putExtra(STR_BUNDLE_FOR_MISSION,bundle);
                         context.startActivity(intentToMDA);
                         break;
 

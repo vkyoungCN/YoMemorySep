@@ -10,11 +10,19 @@ import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleLearningLog;
 
 import java.util.ArrayList;
-
+/*
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 public class LearningLogsOfGroupRvAdapter extends RecyclerView.Adapter<LearningLogsOfGroupRvAdapter.ViewHolder> {
+//* 用于展示指定分组的所有复习记录
+//* 纵向列表形式
     private static final String TAG = "LearningLogsOfGroupRvAdapter";
-//    private String[] strGroupLogs;//【这里初始化无意义的，如果传入的是null一样挂。已出错记录】
-    private ArrayList<SingleLearningLog> learningLogs = new ArrayList<>();
+//    private String[] strGroupLogs;//【这里初始化无意义的，如果传入的是null一样崩溃。】
+    private ArrayList<SingleLearningLog> learningLogs;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView tv_Num;
@@ -26,7 +34,6 @@ public class LearningLogsOfGroupRvAdapter extends RecyclerView.Adapter<LearningL
             tv_Num = itemView.findViewById(R.id.tv_num_LG);
             tv_Time = itemView.findViewById(R.id.tv_time_LG);
             tv_isEffect = itemView.findViewById(R.id.tv_isEffect_LG);
-
         }
 
         public TextView getTv_Num() {
@@ -44,7 +51,6 @@ public class LearningLogsOfGroupRvAdapter extends RecyclerView.Adapter<LearningL
 
     public LearningLogsOfGroupRvAdapter(ArrayList<SingleLearningLog> learningLogs) {
         this.learningLogs = learningLogs;
-
     }
 
     @Override
@@ -54,7 +60,6 @@ public class LearningLogsOfGroupRvAdapter extends RecyclerView.Adapter<LearningL
         holder.getTv_Num().setText(String.valueOf(position));
         holder.getTv_Time().setText(String.valueOf(singleLearningLog.getTimeInLong()));
         holder.getTv_isEffect().setAlpha(singleLearningLog.isEffective()?1:0);
-
     }
 
 

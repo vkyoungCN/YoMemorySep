@@ -15,30 +15,25 @@ import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.customUI.HorizontalProgressBar;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 
 import java.lang.ref.WeakReference;
-
 /*
-* 作者1：杨胜 @中国海洋大学
-* 作者2：杨镇时 @中国海洋大学
-* author：Victor Young @Ocean University of China
-* email: yangsheng@ouc.edu.cn
-*
-* 本页面是程序第一个页面
-* 职能：①欢迎（Logo动画）；②首次运行时向DB填充数据；③获取Mission信息向后传递（本项取消）
-* 本页一旦离开不能退回（在下一页以禁止回退方式实现）
-* */
-public class LogoPageActivity extends AppCompatActivity {
-    
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
+public class LogoPageActivity extends AppCompatActivity implements Constants {
+//* 程序第一个页面，过渡性页面（结束后不可返回）
+//* 功能：①欢迎（Logo动画）；②首次运行时向DB填充预置数据；
     private static final String TAG = "LogoPageActivity";
     private Handler handler = new LogoPageActivity.FirstActivityHandler(this);//通过其发送消息。
     public static final int MESSAGE_DB_POPULATED = 5001;
     public static final int MESSAGE_NEW_PERCENTAGE_NUMBER = 5002;
-    public static final String YO_MEMORY_SP = "YO_MEMORY_SP";
 
     private TextView logoStrCn;
     private HorizontalProgressBar hpb_progress;//需要传入百分比的分子数值。
@@ -54,8 +49,8 @@ public class LogoPageActivity extends AppCompatActivity {
         hpb_progress = findViewById(R.id.hpb_LPA);
         llt_firstRun = findViewById(R.id.llt_forFirstRun_LPA);
 
-        SharedPreferences sharedPreferences=getSharedPreferences(YO_MEMORY_SP, MODE_PRIVATE);
-        boolean isFirstLaunch=sharedPreferences.getBoolean("IS_FIRST_LAUNCH", true);
+        SharedPreferences sharedPreferences=getSharedPreferences(SP_STR_TITLE_YO_MEMORY, MODE_PRIVATE);
+        boolean isFirstLaunch=sharedPreferences.getBoolean(STR_IS_FIRST_LAUNCH, true);
         SharedPreferences.Editor editor=sharedPreferences.edit();
         if(isFirstLaunch){
             //第一次运行：开启新线程执行DB填充操作然，同时提示。
@@ -63,7 +58,7 @@ public class LogoPageActivity extends AppCompatActivity {
             llt_firstRun.setVisibility(View.VISIBLE);
             new Thread(new PopTheDatabaseRunnable()).start();
 
-            editor.putBoolean("IS_FIRST_LAUNCH", false);
+            editor.putBoolean(STR_IS_FIRST_LAUNCH, false);
             editor.apply();
         }else{
             //执行动画效果，在动画执行完后（监听器）跳转下一Activity。
@@ -115,7 +110,7 @@ public class LogoPageActivity extends AppCompatActivity {
         }
     }
 
-
+//    动画
     private void startAnimator(){
          ValueAnimator CenterLogoAnimator = ValueAnimator.ofFloat(0,80,90,100);
                 CenterLogoAnimator.setDuration(1200);

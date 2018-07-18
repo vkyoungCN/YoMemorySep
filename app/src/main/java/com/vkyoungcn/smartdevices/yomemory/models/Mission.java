@@ -4,11 +4,20 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 @SuppressWarnings("all")
-/**
+/*
  * Created by VkYoung16 on 2018/3/26 0026.
- */
-
+ *
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 public class Mission implements Parcelable {
+//* 对应“任务”的数据类
+//* 任务有数据版、显示版两种，分别对应DB操作和UI（主要是RecyclerView）显示
+
+    /* 字段 */
     private int id=0;
     private String name="";
     private String simpleDescription ="";
@@ -21,8 +30,6 @@ public class Mission implements Parcelable {
     }
 
     //完全构造器
-
-
     public Mission(int id, String name, String simpleDescription, String detailDescriptions, String tableItem_suffix, int starType) {
         this.id = id;
         this.name = name;
@@ -32,7 +39,7 @@ public class Mission implements Parcelable {
         this.starType = starType;
     }
 
-    //无id构造器
+    //无id构造器（生成有预定数据而又暂未加入到DB的任务时使用）
     public Mission(String name, String simpleDescription, String detailDescriptions, String tableItem_suffix, int starType) {
         this.name = name;
         this.simpleDescription = simpleDescription;

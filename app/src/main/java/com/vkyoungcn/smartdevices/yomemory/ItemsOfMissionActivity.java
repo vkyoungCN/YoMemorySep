@@ -22,41 +22,43 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 /*
- * 作者1：杨胜 @中国海洋大学
- * 作者2：杨镇时 @中国海洋大学
- * author：Victor Young @Ocean University of China
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
  * email: yangsheng@ouc.edu.cn
- *
- * Mission所属Items的列表页及Mission详情信息；
- * 页面上部是Mission情况简报；
- * 页面下部是所属Items资源的列表展示（Rv）；
- * 页面底部提供对所属Items列表中项目进行增删改查操作的按钮。
- *
- * 列表加载期间展示遮罩层，加载完毕后取消遮罩。
- * 对列表的CURD操作都会更新RV列表的显示。
+ * 2018.08.01
  * */
-public class ItemsOfMissionActivity extends AppCompatActivity {
+public class ItemsOfMissionActivity extends AppCompatActivity implements Constants {
+// Mission所属Items的列表页；
+// 页面上部是Mission情况简报；
+// 页面下部是所属Items资源的列表展示（Rv）；
+// 页面底部提供对所属Items列表中项目进行增删改查操作的按钮。
+// 对列表的CURD操作都会更新RV列表的显示。
+// 列表加载期间展示遮罩层，加载完毕后取消遮罩。
     private static final String TAG = "ItemsOfMissionActivity";
 
     public static final int MESSAGE_ITEMS_DB_PRE_FETCHED =5011;
 
-    private static final String ITEM_TABLE_SUFFIX = "item_table_suffix";
-
+    /* 从Intent获取的数据*/
     private RvMission missionFromIntent;//从前一页面获取。后续需要mission的id，suffix字段。
-    List<SingleItem> itemList = new ArrayList<>();//数据源
-    private YoMemoryDbHelper memoryDbHelper;
     private String tableItemSuffix;//由于各任务所属的Item表不同，后面所有涉及Item的操作都需要通过后缀才能构建出完整表名。
-    private RecyclerView mRv;
-    private ItemsOfMissionRvAdapter adapter = null;//Rv适配器引用
-    private int clickPosition;//点击发生的位置，需要该数据来更新rv
 
+    /*数据库*/
+    private YoMemoryDbHelper memoryDbHelper;
+    List<SingleItem> itemList = new ArrayList<>();//数据源
+
+    /*线程*/
+    private Handler handler = new ItemsOfMissionHandler(this);//涉及弱引用，通过其发送消息。
+    private Boolean fetched =false;//是否已完成过从DB获取数据的任务；
+
+    /*控件*/
     private FrameLayout maskFrameLayout;
     private TextView itemsTotalNumber;
     private TextView learnedPercentage;
+    private RecyclerView mRv;
+    private ItemsOfMissionRvAdapter adapter = null;//Rv适配器引用
     //另有“任务名称、描述”两个控件（位于页面上部Mission详情区）在onCreate内声明为局部变量。
 
-    private Handler handler = new ItemsOfMissionHandler(this);//涉及弱引用，通过其发送消息。
-    private Boolean fetched =false;//是否已完成过从DB获取数据的任务；
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +71,7 @@ public class ItemsOfMissionActivity extends AppCompatActivity {
         learnedPercentage = (TextView) findViewById(R.id.learnedPercentageOfTotalItemsOfMission);
 
         maskFrameLayout = (FrameLayout)findViewById(R.id.maskOverRv_MissionItemsDetail);
-        missionFromIntent = getIntent().getParcelableExtra("MISSION");
+        missionFromIntent = getIntent().getParcelableExtra(STR_MISSION);
 
         if (missionFromIntent == null) {
             Toast.makeText(this, "任务信息传递失败", Toast.LENGTH_SHORT).show();
@@ -146,7 +148,7 @@ public class ItemsOfMissionActivity extends AppCompatActivity {
 
                 //修改上方详情区的两个字段
                 itemsTotalNumber.setText(String.valueOf(message.arg1));
-                learnedPercentage.setText((String)message.getData().get("STR_PERCENTAGE"));
+                learnedPercentage.setText((String)message.getData().get(STR_STR_PERCENTAGE));
         }
     }
 

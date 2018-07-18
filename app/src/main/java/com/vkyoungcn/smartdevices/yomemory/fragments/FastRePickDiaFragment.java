@@ -13,21 +13,27 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.vkyoungcn.smartdevices.yomemory.Constants;
 import com.vkyoungcn.smartdevices.yomemory.R;
-
 /*
-* 涉及到的Sp操作返回Activity后处理，发送数据过去
-* 发回：①对SP的操作：MS/RMA/TT哪项优先（已超时组的顺序），是否取消显示框。
-* （如果是tThold优先，默认会将已超时的置于最前，则同时给出Ckb：已超时分组后置）
-* ②默认不使用LM（LM原则上作为一种特别复习手段只在group列表页呈现），
-* 由于不是新学，所以也不使用LCO/LCR，因而学习方式是LG，不需发回学习类型。
-* ③分组筛选方式（同SP），由Activity根据此标准挑选适合的分组（或者将请求进一步发送到PrepareActivity由
-* PA负责计算所有各组的tT时限。）
-*
-* 给出选择：①低MS优先、②低RMA优先、③timeThreshold优先（计算负荷大，发送到Pa处理）
-* */
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 @SuppressWarnings("all")
-public class FastRePickDiaFragment extends DialogFragment implements View.OnClickListener,CheckBox.OnCheckedChangeListener {
+public class FastRePickDiaFragment extends DialogFragment
+        implements View.OnClickListener,CheckBox.OnCheckedChangeListener,Constants {
+//* 涉及到的Sp操作返回Activity后处理，发送数据过去
+//* 发回：①对SP的操作：MS/RMA/TT哪项优先（已超时组的顺序），是否取消显示框。
+//* （如果是tThold优先，默认会将已超时的置于最前，则同时给出Ckb：已超时分组后置）
+//* ②默认不使用LM（LM原则上作为一种特别复习手段只在group列表页呈现），
+//* 由于不是新学，所以也不使用LCO/LCR，因而学习方式是LG，不需发回学习类型。
+//* ③分组筛选方式（同SP），由Activity根据此标准挑选适合的分组（或者将请求进一步发送到PrepareActivity由
+//* PA负责计算所有各组的tT时限。）
+//*
+//* 给出选择：①低MS优先、②低RMA优先、③timeThreshold优先（计算负荷大，发送到Pa处理）
     private static final String TAG = "FastRePickDiaFragment";
     public static final int DEFAULT_MANNER_MS = 1251;
     public static final int DEFAULT_MANNER_RMA = 1252;
@@ -55,7 +61,7 @@ public class FastRePickDiaFragment extends DialogFragment implements View.OnClic
     public static FastRePickDiaFragment newInstance(int defaultManner) {
         FastRePickDiaFragment fragment = new FastRePickDiaFragment();
         Bundle data = new Bundle();
-        data.putInt("DEFAULT_MANNER",defaultManner);
+        data.putInt(STR_DEFAULT_MANNER,defaultManner);
         fragment.setArguments(data);
 
         return fragment;
@@ -65,7 +71,7 @@ public class FastRePickDiaFragment extends DialogFragment implements View.OnClic
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {//【易误点：不能判断savedInstanceState，数据不在sis内】
-            this.defaultManner = getArguments().getInt("DEFAULT_MANNER");
+            this.defaultManner = getArguments().getInt(STR_DEFAULT_MANNER);
         }
     }
 
@@ -127,8 +133,8 @@ public class FastRePickDiaFragment extends DialogFragment implements View.OnClic
                 //要根据选定的不同模式向调用方activity发回不同消息
                 int rBtnId = rgp_Manners.getCheckedRadioButtonId();
                 Bundle data = new Bundle();
-                data.putInt("DEFAULT_MANNER_R_SETTINGS",defaultManner);
-                data.putBoolean("NO_MORE_R_BOX",isNoMoreBox);
+                data.putInt(STR_DEFAULT_MANNER_R_SETTINGS,defaultManner);
+                data.putBoolean(STR_NO_MORE_R_BOX,isNoMoreBox);
                 //快速复习情景下，只需LG一种模式。区别只在目标分组的选择优先条件。
                 mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.FAST_RE_PICK, data);
                 this.dismiss();//如果没有dismiss则从目标Activity返回后该dfg会还在。

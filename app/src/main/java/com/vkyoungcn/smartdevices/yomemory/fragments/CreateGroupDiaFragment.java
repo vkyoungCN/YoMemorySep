@@ -12,6 +12,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vkyoungcn.smartdevices.yomemory.Constants;
 import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
@@ -20,9 +21,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.CREATE_GROUP;
-
+/*
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 @SuppressWarnings("all")
-public class CreateGroupDiaFragment extends DialogFragment implements View.OnClickListener {
+public class CreateGroupDiaFragment extends DialogFragment
+        implements View.OnClickListener,Constants {
     private static final String TAG = "CreateGroupDiaFragment";
 //    private String suffix = "";//Item表的后缀，每个Mission不同，创建分组时需要从对应的Item表中拉取Items数据。
 //    private int missionId = 0;
@@ -146,9 +154,9 @@ public class CreateGroupDiaFragment extends DialogFragment implements View.OnCli
 
 
                 //发送数据
-                data.putBoolean("IS_ORDER",isOrder);
-                data.putInt("GROUP_SIZE",groupSize);
-                data.putString("DESCRIPTION",description);
+                data.putBoolean(STR_IS_ORDER,isOrder);
+                data.putInt(STR_GROUP_SIZE,groupSize);
+                data.putString(STR_DESCRIPTION,description);
                 mListener.onButtonClickingDfgInteraction(CREATE_GROUP,data);
 
                 dismiss();

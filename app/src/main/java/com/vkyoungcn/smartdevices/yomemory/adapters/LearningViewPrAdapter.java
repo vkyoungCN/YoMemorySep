@@ -10,11 +10,18 @@ import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/*
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
 public class LearningViewPrAdapter extends FragmentStatePagerAdapter {
-//    private static final String TAG = "LearningViewPrAdapter";
+//* 学习页LearningActivity中用于展示学习卡片（横向ViewPager形式，加载的fragment中以CardView为主控件）
+    //    private static final String TAG = "LearningViewPrAdapter";
     private List<SingleItem> singleItems;
-    private ArrayList<Byte> restChances;
+    private ArrayList<Byte> restChances;//各卡片对应的提示次数（学习业务中的一个业务逻辑）
     public SingleItemLearningFragment currentFragment;
 
     public LearningViewPrAdapter(FragmentManager fm, List<SingleItem> singleItems, ArrayList<Byte> restChances) {

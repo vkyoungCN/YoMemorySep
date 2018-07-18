@@ -8,22 +8,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.vkyoungcn.smartdevices.yomemory.Constants;
 import com.vkyoungcn.smartdevices.yomemory.R;
 
-
 /*
-
-* 本DFG对应是"创建式"学习下的手动结束情形：
-* （首先显示还剩余多少时间，可以返回查看）
-* ①提示已完成量（创建该容量的分组），不提示未完成量；
-* ②已填写词中的未正确数量，提示将记录错误一次；
-* ③如果没有上述情况任一，则提示正确（？），也可返回查看。
-*
-* 确然后的跳转操作还是由Activity负责，所以不需要持有gid。
-*
-* 三种不同学习模式的手动结束DFG使用同一布局文件。
-* */
-public class Finish_LC_DiaFragment extends DialogFragment implements View.OnClickListener {
+ * 作者：杨胜 @中国海洋大学
+ * 别名：杨镇时
+ * author：Victor Young@ Ocean University of China
+ * email: yangsheng@ouc.edu.cn
+ * 2018.08.01
+ * */
+public class Finish_LC_DiaFragment extends DialogFragment
+        implements View.OnClickListener,Constants {
+//* 本DFG对应是"创建式"学习下的手动结束情形：
+//* （首先显示还剩余多少时间，可以返回查看）
+//* ①提示已完成量（创建该容量的分组），不提示未完成量；
+//* ②已填写词中的未正确数量，提示将记录错误一次；
+//* ③如果没有上述情况任一，则提示正确（？），也可返回查看。
+//*
+//* 确然后的跳转操作还是由Activity负责，所以不需要持有gid。
+//*
+//* 三种不同学习模式的手动结束DFG使用同一布局文件。
     private static final String TAG = "Finish_LC_DiaFragment";
 
 
@@ -46,10 +51,10 @@ public class Finish_LC_DiaFragment extends DialogFragment implements View.OnClic
     public static Finish_LC_DiaFragment newInstance(int finishAmount, int wrongAmount, int restMinutes, int restSeconds) {
         Finish_LC_DiaFragment fragment = new Finish_LC_DiaFragment();
         Bundle args = new Bundle();
-        args.putInt("WRONG_AMOUNT",wrongAmount);
-        args.putInt("FINISH_AMOUNT",finishAmount);
-        args.putInt("REST_SECONDS",restSeconds);
-        args.putInt("REST_MINUTES",restMinutes);
+        args.putInt(STR_WRONG_AMOUNT,wrongAmount);
+        args.putInt(STR_FINISH_AMOUNT,finishAmount);
+        args.putInt(Constants.STR_REST_SECONDS,restSeconds);
+        args.putInt(Constants.STR_REST_MINUTES,restMinutes);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,10 +63,10 @@ public class Finish_LC_DiaFragment extends DialogFragment implements View.OnClic
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            this.wrongAmount = getArguments().getInt("WRONG_AMOUNT");
-            this.finishAmount = getArguments().getInt("FINISH_AMOUNT");
-            this.restSeconds = getArguments().getInt("REST_SECONDS");
-            this.restMinutes = getArguments().getInt("REST_MINUTES");
+            this.wrongAmount = getArguments().getInt(STR_WRONG_AMOUNT);
+            this.finishAmount = getArguments().getInt(STR_FINISH_AMOUNT);
+            this.restSeconds = getArguments().getInt(STR_REST_SECONDS);
+            this.restMinutes = getArguments().getInt(STR_REST_MINUTES);
         }
     }
 
