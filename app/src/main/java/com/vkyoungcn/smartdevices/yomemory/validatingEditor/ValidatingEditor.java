@@ -43,7 +43,7 @@ public class ValidatingEditor extends View {
 
     private boolean isDataInitBeInterruptedBecauseOfNoSize = false;
 
-    /* 画笔组 */
+    /* 画笔组*/
     private Paint bottomLinePaint;
     private Paint bottomLineErrPaint;
     private Paint textPaint;
