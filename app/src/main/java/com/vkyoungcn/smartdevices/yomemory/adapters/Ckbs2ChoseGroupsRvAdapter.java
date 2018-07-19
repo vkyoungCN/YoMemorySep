@@ -32,7 +32,7 @@ public class Ckbs2ChoseGroupsRvAdapter extends RecyclerView.Adapter<Ckbs2ChoseGr
     private static final String TAG = "Ckbs2ChoseGroupsRvAdapter";
     private List<RvMergeGroup> groups;//数据源
     private LearningMerge2DiaFragment dfg;//保持一个到对话框的引用，以便改变对话框的UI（由DFG提供改变UI的实际调用方法）
-    private int keepCheckedPosition = -1;//发起组固定的场景（如从分组详情页发起）需要对发起组保持强制选中
+    private int keepCheckedPosition = -1;//发起组固定的场景（如从分组详情页发起）需要对发起组保持强制选中[是索引位置]
     private int howManyGroupsChecked = 0;//（除已移除的触发组外，已选中了多少个分组）用于判断是否是全选（从而影响对话框中的全选ckb）
     private ArrayList<Integer> idsList = new ArrayList<>();//最终外传/回传的数据
     private int choseAmount = 0;
@@ -164,6 +164,13 @@ public class Ckbs2ChoseGroupsRvAdapter extends RecyclerView.Adapter<Ckbs2ChoseGr
                 //改变外部dfg的文本
                 dfg.changeTotalChoseNumTvStr(choseAmount);
 
+            }
+
+            //不论何种模式，只要选中数量=1，则显示dfg的底部提示条“将实际按LG…”
+            if(howManyGroupsChecked == 1) {
+                dfg.showBottomTv(true);
+            }else {
+                dfg.showBottomTv(false);
             }
         }
     }

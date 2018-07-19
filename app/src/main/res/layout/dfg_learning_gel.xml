@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="240dp"
-    android:layout_height="300dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".fragments.LearningGelDiaFragment">
 
@@ -24,7 +24,7 @@
     <!--中间区域，控制高度-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="220dp"
         android:orientation="vertical">
 
         <!--中部，上文本-->
@@ -34,73 +34,88 @@
             android:gravity="center"
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
-            android:text="@string/explanations_learningGel"
-            android:textColor="#ffe52525"
-            android:textSize="12sp" />
+            android:text="@string/explanations_learningGel" />
 
         <!--横分割线-->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#efefef"
-            />
+            android:background="#efefef" />
         <!--中部，信息文本1-->
         <TextView
             android:id="@+id/tv_group_description_learningGel"
             android:layout_width="match_parent"
-            android:layout_height="20dp"
+            android:layout_height="24dp"
             android:gravity="top|center_horizontal"
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
             android:text="@string/group_info_learningGel"
-            android:textColor="#f57f17"
-            android:textSize="12sp" />
+            android:textColor="@color/yo_orange" />
         <!--横分割线-->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#efefef"
-            />
+            android:background="#efefef" />
 
         <!--中部，信息文本2-->
         <TextView
             android:id="@+id/tv_group_lastTime_learningGel"
             android:layout_width="match_parent"
-            android:layout_height="20dp"
+            android:layout_height="24dp"
             android:gravity="top|center_horizontal"
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
             android:text="@string/group_info_learningGel"
-            android:textColor="#f57f17"
-            android:textSize="12sp" />
+            android:textColor="@color/yo_orange" />
+        <!--横分割线-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#efefef" />
 
+        <CheckBox
+            android:id="@+id/ckb_noOrder_dfgLG"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:layout_marginTop="4dp"
+            android:layout_gravity="end"
+            android:gravity="center"
+            android:text="@string/use_no_order" />
 
 
     </LinearLayout>
 
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/yo_light_green"
+        />
     <!--按钮区-->
     <LinearLayout
-        android:layout_width="260dp"
+        android:layout_width="match_parent"
         android:layout_height="48dp"
         android:orientation="horizontal"
         android:padding="2dp">
 
         <TextView
             android:id="@+id/btn_cancel_learningGel"
-            android:layout_width="64dp"
+            android:layout_width="0dp"
             android:layout_height="48dp"
+            android:layout_weight="1"
             android:layout_marginEnd="1dp"
-            android:background="#efefef"
+            android:background="#f5f5f5"
             android:gravity="center"
             android:text="@string/cancel"
             android:textSize="14sp" />
 
         <TextView
             android:id="@+id/btn_confirm_learningGel"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="match_parent"
             android:layout_marginStart="1dp"
-            android:background="#cc64dd17"
+            android:background="#e0e0e0"
             android:gravity="center"
             android:text="@string/confirm"
             android:textSize="16sp"

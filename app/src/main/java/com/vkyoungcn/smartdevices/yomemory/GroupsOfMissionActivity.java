@@ -21,6 +21,7 @@ import com.vkyoungcn.smartdevices.yomemory.adapters.GroupsOfMissionRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.fragments.CreateGroupDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningCreateOrderDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningCreateRandomDiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.LearningGelDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningMerge2DiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningMergeDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
@@ -90,8 +91,7 @@ public class GroupsOfMissionActivity extends AppCompatActivity
 //    private int clickPosition;//点击（前往学习页面）发生的位置，需要该数据来更新rv位置
 //    private Boolean isHandyRefreshing = false;//点击刷新列表的按键后，会重新执行加载数据的线程，为与首次的自动运行相区分，此标志变量会设true。
 //【实际上，目前的经验表明，无论是interrupt方法还是布尔变量置否，似乎都不能使线程立即停止】
-    private ArrayList<RvMergeGroup>[][] groupsInTwoDimensionArray;//用于后续DFG的数据装载，两个维度分别对应MS、同MS下<4,<8。
-    【这个两维数组的设计不好，不够直观。建议拆成两个独立的list[]（分别对应4、8两种情况），不知逻辑上能否合理】
+//    private ArrayList<RvMergeGroup>[][] groupsInTwoDimensionArray;//用于后续DFG的数据装载，两个维度分别对应MS、同MS下<4,<8。
 
 
     @Override
@@ -458,7 +458,40 @@ public class GroupsOfMissionActivity extends AppCompatActivity
             transaction.remove(prev);
         }
 
-        groupsInTwoDimensionArray = new
+        Bundle data = new Bundle();
+        //应当保证在自动发起的模式下，必然先展示有数据的条件设置
+        //【注意，dfg的设计规则是传入同MS的所有(小于amount最大上限)分组，然后在dfg内按amount限制再二次区分】
+        int autoSetMsTerm = 0;
+        int maxAmountTerm = 12;
+        ArrayList<RvMergeGroup> groupsForLmSelecting = new ArrayList<>();
+        for (RVGroup rg :rvGroups) {
+            if (rg.getTotalItemsNum()<= maxAmountTerm) {
+                if(autoSetMsTerm == 0) {
+                    //找到第一个符合“碎片”尺寸的分组，获取其ms
+                    autoSetMsTerm = rg.getMemoryStage();
+                    groupsForLmSelecting.add(new RvMergeGroup(rg));
+                }else {
+                    //利用该MS条件继续寻找碎片分组，并加入
+                    if(rg.getMemoryStage() == autoSetMsTerm){
+                        groupsForLmSelecting.add(new RvMergeGroup(rg));
+                    }
+                }
+            }
+        }
+
+        if(groupsForLmSelecting.size() == 0) {
+            Toast.makeText(self, "所有分组的容量都大于12，没有合并的必要。", Toast.LENGTH_SHORT).show();
+            //不执行实际动作
+        }else {
+            //确定有数据，启动dfg
+            data.putInt(STR_TERM_MS, autoSetMsTerm);
+            data.putInt(STR_TERM_AMOUNT, maxAmountTerm);
+            data.putParcelableArrayList(STR_RV_MERGE_GROUP, groupsForLmSelecting);
+            DialogFragment dfg = LearningMerge2DiaFragment.newInstance(data);
+            dfg.show(transaction, FG_STR_READY_TO_LEARN_MERGE);
+        }
+
+    /* groupsInTwoDimensionArray = new
         //本页有全部分组的信息，应在本页准备好数据（容量<4、<8）
         // 后续页面只能直接从DB取数据，SQL复杂不宜用。
         for (RVGroup rvg : rvGroups) {
@@ -469,12 +502,7 @@ public class GroupsOfMissionActivity extends AppCompatActivity
             } else if (rvg.getTotalItemsNum() < 8) {
                 groupsInTwoDimensionArray[1][rvg.getMemoryStage()].add(new RvMergeGroup(rvg));
             }
-        }
-
-        //数据已组织好，接下来是传递，以及DFG中的接收显示。
-
-        DialogFragment dfg = LearningMergeDiaFragment.newInstance(groupsInTwoDimensionArray);
-        dfg.show(transaction, FG_STR_READY_TO_LEARN_MERGE);
+        }*/
     }
 
 
@@ -486,12 +514,20 @@ public class GroupsOfMissionActivity extends AppCompatActivity
 
         switch (dfgType) {
             case LEARNING_GENERAL:
+                //已从LG的dfg确认返回，并紧接着要开始LG学习
                 intentToLPA.putExtra(STR_LEARNING_TYPE, LEARNING_GENERAL);
                 intentToLPA.putExtra(STR_BUNDLE_FOR_GENERAL, data);
                 this.startActivity(intentToLPA);
                 break;
 
+            case LEARNING_GENERAL_INNER_RANDOM://LG但是开启组内乱序
+                //已从LG的dfg确认返回（并且选择了开启组内乱序），紧接着要跳转到LPA并进一步开始LG学习
+                intentToLPA.putExtra(STR_LEARNING_TYPE, LEARNING_GENERAL_INNER_RANDOM);
+                intentToLPA.putExtra(STR_BUNDLE_FOR_GENERAL, data);
+                this.startActivity(intentToLPA);
+                break;
             case LEARNING_AND_CREATE_ORDER:
+                //已从LCO的dfg确认返回，并紧接着要开始LCO学习
                 //需要传递标记
                 intentToLPA.putExtra(STR_LEARNING_TYPE, LEARNING_AND_CREATE_ORDER);
                 intentToLPA.putExtra(STR_MISSION_ID, missionFromIntent.getId());//在最后完成页生成新组时需要本字段信息。
@@ -499,12 +535,14 @@ public class GroupsOfMissionActivity extends AppCompatActivity
                 break;
 
             case LEARNING_AND_CREATE_RANDOM:
+                //已从LCR的dfg确认返回，并紧接着要开始LCR学习
                 intentToLPA.putExtra(STR_LEARNING_TYPE, LEARNING_AND_CREATE_RANDOM);
                 intentToLPA.putExtra(STR_MISSION_ID, missionFromIntent.getId());//在最后完成页生成新组时需要本字段信息。
                 this.startActivity(intentToLPA);
                 break;
 
             case LEARNING_AND_MERGE:
+                //已从LM的dfg确认返回，并紧接着要开始LM学习
                 intentToLPA.putExtra(STR_LEARNING_TYPE, LEARNING_AND_MERGE);
                 intentToLPA.putExtra(STR_BUNDLE_FOR_MERGE, data);//这里传递的是从DFG（及其选择Rv）传来的，
                 // 作为合并学习的来源碎片分组的分组id（构成的bundle，内部的key：IDS_GROUPS_READY_TO_MERGE）
@@ -602,7 +640,7 @@ public class GroupsOfMissionActivity extends AppCompatActivity
                 break;
 
             case FETCH_NEW_GROUPS_INFO_FOR_MERGE:
-                //发起了合并学习的请求，正在DFG中筛选分组；此消息代表需要根据指定的新MS值获取一组新的分组数据再传入
+                //发起了合并学习的请求且正在DFG中筛选分组；当需要根据指定的新MS值获取一组新的分组数据再传入时发送来此消息
                 int msForFetch = data.getInt(STR_NEW_MS_FOR_FETCH,0);
                 ArrayList<RvMergeGroup> newList = new ArrayList<>();//用于传给dfg的新数据源
                 if(msForFetch!=0) {
@@ -619,6 +657,64 @@ public class GroupsOfMissionActivity extends AppCompatActivity
                 Fragment prev = getFragmentManager().findFragmentByTag(FG_STR_READY_TO_LEARN_MERGE);
                 //数据传入，并触发dfg中的后续改变
                 ((LearningMerge2DiaFragment)prev).changetListAsMsChanged(newList);
+
+                break;
+
+            case OK_THEN_USE_LM:
+                //从询问dfg发过来（发起组的容量过小，询问是否以LM方式开始，选择了是）
+                FragmentTransaction transaction_2 = getFragmentManager().beginTransaction();
+                Fragment prev_2 = getFragmentManager().findFragmentByTag(FG_STR_READY_TO_LEARN_MERGE);
+                if (prev_2 != null) {
+                    transaction_2.remove(prev_2);
+                }
+                int position_2 = data.getInt(STR_POSITION,-1);
+                if(position_2 == -1){
+                    return;
+                }
+                Bundle data_2 = new Bundle();
+
+                data_2.putInt(STR_TERM_MS,rvGroups.get(position_2).getMemoryStage());
+                data_2.putInt(STR_TERM_AMOUNT,8);
+
+                //接下来的操作可能耗时，所以提示一下
+                Toast.makeText(this, "正在努力准备数据……", Toast.LENGTH_SHORT).show();
+
+                ArrayList<DBGroup> dbGroups = memoryDbHelper.getAllGroupsByMissionId(rvGroups.get(position_2).getMission_id(),tableItemSuffix);
+                ArrayList<RvMergeGroup> rvMergeGroups = new ArrayList<>();
+                int positionKeep = 0;
+                boolean couldSkip = false;//找到就能跳过后续
+
+                for (DBGroup dbg :dbGroups) {
+                    if(dbg.getEffectiveRePickingTimes() == rvGroups.get(position_2).getMemoryStage()){
+                        rvMergeGroups.add(new RvMergeGroup(dbg));
+                        if(dbg.getId() == rvGroups.get(position_2).getId() && !couldSkip){
+                            positionKeep = rvMergeGroups.size()-1;
+                            couldSkip = true;
+                        }
+                    }
+                }
+                data_2.putInt(STR_FIXED_GROUP_POSITION,positionKeep);
+                data_2.putParcelableArrayList(STR_RV_MERGE_GROUP,rvMergeGroups);
+
+                DialogFragment dfg_LM = LearningMerge2DiaFragment.newInstance(data_2);
+                dfg_LM.show(transaction_2, FG_STR_READY_TO_LEARN_MERGE);
+
+                break;
+            case FORCE_USE_LG:
+                //从询问dfg发过来（发起组的容量过小，询问是否以LM方式开始，选择了否）
+                FragmentTransaction transaction_3 = getFragmentManager().beginTransaction();
+                Fragment prev_3 = getFragmentManager().findFragmentByTag(FG_STR_READY_TO_LEARN_GEL);
+
+                if (prev_3 != null) {
+                    transaction_3.remove(prev_3);
+                }
+                int position_3 = data.getInt(STR_POSITION,-1);
+                if(position_3 == -1){
+                    return;
+                }
+                DialogFragment dfg_LG = LearningGelDiaFragment.newInstance(rvGroups.get(position_3));
+                dfg_LG.show(transaction_3, FG_STR_READY_TO_LEARN_GEL);
+                break;
         }
     }
 

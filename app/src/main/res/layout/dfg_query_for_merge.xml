@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="42dp"
         android:background="#efefef"
-        android:text="@string/confirm_delete"
+        android:text="@string/query"
         android:textSize="16sp"
         android:gravity="center"
         />
@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:padding="32dp"
-        android:text="@string/confirm_delete_2"
+        android:text="@string/low_size_better_using_merge"
         android:gravity="center"
         android:textSize="16sp"
         android:textColor="#ef5350"
@@ -32,7 +32,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/yo_red"
+        android:background="@color/yo_light_green"
         />
     <LinearLayout
         android:layout_width="match_parent"
@@ -42,9 +42,9 @@
         >
 
         <TextView
-            android:id="@+id/btn_cancel_deleteGroupDfg"
+            android:id="@+id/btn_cancel_queryDfg"
             android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:layout_height="match_parent"
             android:gravity="center"
             android:layout_margin="1dp"
@@ -52,17 +52,27 @@
             android:textSize="16sp"
             android:background="#efefef"
             />
-
         <TextView
-            android:id="@+id/btn_ok_deleteGroupDfg"
+            android:id="@+id/btn_ok_queryDfg"
             android:layout_width="0dp"
-            android:layout_weight="2"
+            android:layout_weight="3"
             android:layout_height="match_parent"
             android:gravity="center"
             android:layout_margin="1dp"
-            android:text="@string/confirm"
+            android:text="@string/ok_with_that"
             android:textSize="16sp"
-            android:background="#e57373"
+            android:background="@color/yo_teal"
+            />
+        <TextView
+            android:id="@+id/btn_lg_queryDfg"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_margin="1dp"
+            android:text="@string/still_use_lg"
+            android:textSize="16sp"
+            android:background="@color/yo_orange"
             />
     </LinearLayout>
 

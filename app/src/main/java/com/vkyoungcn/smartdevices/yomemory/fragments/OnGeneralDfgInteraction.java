@@ -14,13 +14,14 @@ public interface OnGeneralDfgInteraction {
 // 以Bundle形式发回。）
 
     int LEARNING_GENERAL = 2021;
-    int LEARNING_GENERAL_NO_GID = 2029;//快速复习模式下特殊信号，通常的LG是提前准备好目标gid发送
     // 给LPA的，而快速复习可能需要根据timeThreshold筛选最需要复习的组，该工作需由LPA负责，因而暂无gid发送。
     int LEARNING_AND_CREATE_ORDER = 2022;
     int LEARNING_AND_CREATE_RANDOM = 2023;
     int LEARNING_AND_MERGE =2024;
 
     int JUMP_TO_GROUP_LIST_THIS_FRAG = 2027;
+    int LEARNING_GENERAL_INNER_RANDOM = 2028;//LG模式，但是开启组内乱序。
+    int LEARNING_GENERAL_NO_GID = 2029;//快速复习模式下特殊信号，通常的LG是提前准备好目标gid发送
 
     int LEARNING_FINISH_DFG_CONFIRM = 2101;
     int LEARNING_FINISH_DFG_BACK = 2102;
@@ -33,6 +34,9 @@ public interface OnGeneralDfgInteraction {
 
     int DELETE_GROUP = 2221;
     int CREATE_GROUP = 2222;
+
+    int OK_THEN_USE_LM = 2223;
+    int FORCE_USE_LG =2224;
 
     int FAST_LEARN = 2231;
     int FAST_RE_PICK = 2232;

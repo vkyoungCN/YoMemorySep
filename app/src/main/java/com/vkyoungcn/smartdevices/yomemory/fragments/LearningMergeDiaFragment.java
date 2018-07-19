@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.adapters.Ckbs2ChoseGroupsRvAdapter;
-import com.vkyoungcn.smartdevices.yomemory.adapters.FragGroupCategoryRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMergeGroup;
 
 import java.util.ArrayList;

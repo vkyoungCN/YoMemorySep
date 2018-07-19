@@ -77,7 +77,7 @@
                 android:gravity="center"
                 android:text="@string/holder_total_itemNum"
                 android:lines="1"
-                android:textColor="#f57f17" />
+                android:textColor="@color/yo_orange" />
             <!--横向小分割线-->
             <TextView
                 android:layout_width="match_parent"
@@ -91,7 +91,7 @@
                 android:gravity="center"
                 android:lines="1"
                 android:text="@string/holder_learned_itemNum"
-                android:textColor="#f57f17" />
+                android:textColor="@color/yo_orange" />
 
 
             <!--横向小分割线-->
@@ -183,7 +183,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="#b2ff59"
+        android:background="@color/yo_light_green"
         />
     <!--&lt;!&ndash;I&G区内第4行，解释条&ndash;&gt;
     <TextView
@@ -235,7 +235,7 @@
             android:scrollbars="vertical"
             />
 
-        <!--横分割线-->
+        <!--横分割线。由于靠近底部，采用比标准亮绿稍深的颜色-->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="2dp"

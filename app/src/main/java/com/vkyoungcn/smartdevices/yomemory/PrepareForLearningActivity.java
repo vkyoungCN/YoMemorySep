@@ -25,6 +25,7 @@ import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteract
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_AND_CREATE_RANDOM;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_AND_MERGE;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_GENERAL;
+import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_GENERAL_INNER_RANDOM;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_GENERAL_NO_GID;
 
 /*
@@ -58,11 +59,12 @@ public class PrepareForLearningActivity extends AppCompatActivity implements Con
     private Handler handler = new PrepareLearningDataHandler(this);
     /* 预定义的线程消息常量*/
     public static final int MESSAGE_LG_DB_DATA_FETCHED = 5071;
-    public static final int MESSAGE_LGN_DB_DATA_FETCHED = 5077;
     public static final int MESSAGE_LCO_DB_DATA_FETCHED = 5072;
     public static final int MESSAGE_LCR_DB_DATA_FETCHED = 5073;
     public static final int MESSAGE_LM_DB_DATA_FETCHED = 5074;
 
+    public static final int MESSAGE_LGN_DB_DATA_FETCHED = 5077;
+    public static final int MESSAGE_LGR_DB_DATA_FETCHED = 5078;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +90,22 @@ public class PrepareForLearningActivity extends AppCompatActivity implements Con
                     Toast.makeText(this, "groupId未能传递过来", Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case LEARNING_GENERAL_INNER_RANDOM:
+                Bundle bundleForGeneral_innerRandom = getIntent().getBundleExtra(STR_BUNDLE_FOR_GENERAL);
+                if(bundleForGeneral_innerRandom!=null){
+                    groupId = bundleForGeneral_innerRandom.getInt(STR_GROUP_ID_TO_LEARN,0);
+                    //通用模式下额外传入的数据只有1个gid。
+
+                    //下面为通用模式(组内乱序)准备数据List<Item>。
+                    //①开启新线程：拉取数据；【然后乱序之】。完成后发送消息
+                    //②接收到消息后，跳转，将List装入Intent传递。（同时还要传递learningType和gid以备结束Activity使用）
+                    new Thread(new PrepareDataForInnerRandomGeneralLearningRunnable()).start();         // start thread
+                }else {
+                    Toast.makeText(this, "groupId未能传递过来", Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+
             case LEARNING_GENERAL_NO_GID:
 //                Log.i(TAG, "onCreate: LGN");
                 if(getIntent()!=null){
@@ -167,6 +185,20 @@ public class PrepareForLearningActivity extends AppCompatActivity implements Con
                 this.startActivity(intentToLearningActivity);
 
                 break;
+
+            case MESSAGE_LGR_DB_DATA_FETCHED:
+                //加载完数据后，准备向后传递，本Activity结束。（组内乱序）
+                Intent intentToLearningActivity_LGR = new Intent(this,LearningActivity.class);
+                intentToLearningActivity_LGR.putExtra(STR_LEARNING_TYPE,LEARNING_GENERAL);
+                intentToLearningActivity_LGR.putExtra(STR_TABLE_NAME_SUFFIX,tableNameSuffix);
+                intentToLearningActivity_LGR.putExtra(STR_GROUP_ID,groupId);
+                intentToLearningActivity_LGR.putParcelableArrayListExtra(STR_ITEMS_FOR_LEARNING,items);
+                //Items采用统一的同一个关键字传递即可。
+
+                intentToLearningActivity_LGR.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);//要求不记录
+                this.startActivity(intentToLearningActivity_LGR);
+
+                break;
             case MESSAGE_LGN_DB_DATA_FETCHED:
                 //加载完数据后，准备向后传递，本Activity结束。
                 RVGroup rvGroup = (RVGroup) message.obj;
@@ -236,6 +268,21 @@ public class PrepareForLearningActivity extends AppCompatActivity implements Con
 
             Message message = new Message();
             message.what = MESSAGE_LG_DB_DATA_FETCHED;
+            handler.sendMessage(message);
+        }
+    }
+
+    /* 为“普通学习”（LG）模式准备数据*/
+    public class PrepareDataForInnerRandomGeneralLearningRunnable implements Runnable {
+//        private static final String TAG = "PrepareDataForGeneralLearningRunnable";
+
+        @Override
+        public void run() {
+            items = memoryDbHelper.getItemsByGroupId(groupId, tableNameSuffix);
+            Collections.shuffle(items);//随机打乱。
+
+            Message message = new Message();
+            message.what = MESSAGE_LGR_DB_DATA_FETCHED;
             handler.sendMessage(message);
         }
     }

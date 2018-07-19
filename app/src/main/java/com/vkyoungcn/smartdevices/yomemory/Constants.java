@@ -81,7 +81,8 @@ public interface Constants {
     public static final String STR_TERM_AMOUNT ="KEY_M";
     public static final String STR_RV_MERGE_GROUP = "RV_MERGE_GROUP";
     public static final String STR_NEW_MS_FOR_FETCH = "NEW_MS_FOR_FETCH";
-    public static final String STR_FIXED_CHOSED_GROUP = "STR_FIXED_CHOSED_GROUP";
+    public static final String STR_FIXED_GROUP_POSITION = "FIXED_CHOSED_GROUP";
+    public static final String STR_NO_DATA_BELLOW_THIS_AMOUNT = "NO_DATA_BELLOW_THIS_AMOUNT" ;
 
 
 
@@ -108,7 +109,7 @@ public interface Constants {
 
 
     public static final String FG_STR_DELETE_GROUP ="DELETE_GROUP";
-    public static final String FG_STR_;
+    public static final String FG_STR_QUERY_FOR_MERGE = "QUERY_FOR_MERGE";
 
     /* SharedPreferences */
     public static final String SP_STR_TITLE_YO_MEMORY = "SP_STR_TITLE_YO_MEMORY";
@@ -118,8 +119,8 @@ public interface Constants {
 
     public static final String SP_FAST_R_MANNER = "FAST_R_MANNER";
     public static final String SP_NO_MORE_R_TIPS ="NO_MORE_R_TIPS";
-    public static final String SP_;
-    public static final String SP_;
+//    public static final String SP_;
+//    public static final String SP_;
 
 
 

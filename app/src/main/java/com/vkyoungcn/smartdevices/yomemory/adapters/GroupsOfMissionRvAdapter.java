@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,11 +21,9 @@ import com.vkyoungcn.smartdevices.yomemory.GroupDetailActivity;
 import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.fragments.DeleteGroupDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningGelDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.LearningLessDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.models.RvMergeGroup;
+import com.vkyoungcn.smartdevices.yomemory.fragments.QueryForMergeDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 /*
  * 作者：杨胜 @中国海洋大学
@@ -98,15 +97,20 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
                     }
 
                     RVGroup triggerGroup = groups.get(getAdapterPosition());
-                    int subNum = triggerGroup.getTotalItemsNum();
-                    byte msNum = triggerGroup.getMemoryStage();
 
-                    //由于DFG需要SubNum字段，若只传ID届时无法获取subNum，所以不能只传ids；
-                    // 而完整的Group类不含isCheck字段不能与DFG内的Rv很好的匹配，所以新建了一个专用的model类FragGFM。
-                    ArrayList<RvMergeGroup> groupsListForChose = new ArrayList<>();
-                    groupsListForChose.add(new RvMergeGroup(triggerGroup));//触发组作为第一个元素。
+                    if(triggerGroup.getTotalItemsNum()<5){
+                        //4个（含）以内的，触发合并式学习的询问对话框
+                        Bundle data_2 = new Bundle();
+                        data_2.putInt(STR_POSITION,getAdapterPosition());
+                        DialogFragment dfg = QueryForMergeDiaFragment.newInstance(data_2);
+                        dfg.show(transaction, FG_STR_QUERY_FOR_MERGE);
+                    }else {
+                        //正常容量正常学习。此时只需传递正常的分组信息即可
+                        DialogFragment dfg = LearningGelDiaFragment.newInstance(triggerGroup);
+                        dfg.show(transaction, FG_STR_READY_TO_LEARN_GEL);
 
-                    if(subNum<5){
+                    }
+                 /*   if(subNum<5){
                         //4个（含）以内的，触发合并式学习
                         //准备数据
                         for (RVGroup rgp :groups) {
@@ -124,7 +128,7 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
                         DialogFragment dfg = LearningGelDiaFragment.newInstance(groups.get(getAdapterPosition()));
                         dfg.show(transaction, FG_STR_READY_TO_LEARN_GEL);
 
-                    }
+                    }*/
 
                     break;
 

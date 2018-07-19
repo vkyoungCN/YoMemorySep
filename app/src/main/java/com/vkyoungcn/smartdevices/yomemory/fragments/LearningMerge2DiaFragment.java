@@ -88,6 +88,8 @@ public class LearningMerge2DiaFragment extends DialogFragment
     private int totalChoseNum = 0;//此外还需要保持原始数量（或者保持触发组整组信息？）
     boolean isCkbChangedByApp = false;//与ckbAll配合使用，平常置否，程序调用的setChecked中先置真，setChecked设置后再置否。也可采用isPressed判断。
     private int fixedGroupPosition = -1;//若从详情页发起合并学习（等类似场景），则发起组是固定的，必须强制选中；而且不可改动ms，容量限值也不能低于本组
+//    private boolean noDataBellowThisAmount = false;//如果在发起方检索过发现传入的term_amount容量以内都没有分组数据，则传入标记true
+    private boolean isBottomTvShowWords = false;
 
     private Ckbs2ChoseGroupsRvAdapter adapter;
 //    private TextView tvTotalNum;//显示当前已经选中的组共有多少项items。
@@ -140,7 +142,9 @@ public class LearningMerge2DiaFragment extends DialogFragment
             this.term_ms = savedInstanceState.getInt(STR_TERM_MS);
             this.term_amount = savedInstanceState.getInt(STR_TERM_AMOUNT);
             this.rvMergeGroups = savedInstanceState.getParcelableArrayList(STR_RV_MERGE_GROUP);
-            this.fixedGroupPosition = savedInstanceState.getInt(STR_FIXED_CHOSED_GROUP);
+            this.fixedGroupPosition = savedInstanceState.getInt(STR_FIXED_GROUP_POSITION);
+//            this.noDataBellowThisAmount = savedInstanceState.getBoolean(STR_NO_DATA_BELLOW_THIS_AMOUNT,false);
+
         }
         groupsUnderFixedAmount = new ArrayList<>();//初始化
     }
@@ -209,6 +213,10 @@ public class LearningMerge2DiaFragment extends DialogFragment
         });
 
 
+        //传入方已知在此数量限之下都没有数据，则下限上提。
+       /* if(noDataBellowThisAmount){
+            minTermAmount = term_amount;
+        }*/
 
         if(rvMergeGroups !=null){
             //只有在传入了数据后才会非空，此外都是未传数据，不处理。
@@ -528,6 +536,7 @@ public class LearningMerge2DiaFragment extends DialogFragment
 
             }
         }
+
     }
 
 
@@ -564,6 +573,27 @@ public class LearningMerge2DiaFragment extends DialogFragment
 
 
     }
+
+    //如果只选定了一条，则显示下方信息“将按照普通模式处理”。由rv适配器调用
+    public void showBottomTv(boolean show){
+        if(show){
+            if(isBottomTvShowWords){
+                //已经置显示，则退出。（毕竟高开销）
+                return;
+            }
+
+            tvInfos_2.setText(getResources().getString(R.string.one_group_will_as_lg));
+            isBottomTvShowWords = true;
+        }else {
+            if(!isBottomTvShowWords){
+                //已经置空了
+                return;
+            }
+            tvInfos_2.setText("");
+            isBottomTvShowWords = false;
+        }
+    }
+
     /*
      * 当上方Grid区域单项点击后，下方mRV要改变数据
      * */

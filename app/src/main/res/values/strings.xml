@@ -167,7 +167,7 @@
     <string name="str_filter_1">筛选</string>
     <string name="str_size4"><![CDATA[容量<4]]></string>
     <string name="str_size8"><![CDATA[容量<8]]></string>
-    <string name="explanations_learningGel">将对该分组进行识记</string>
+    <string name="explanations_learningGel">将对该分组进行复习</string>
     <string name="group_info_learningGel">分组信息：xxxx</string>
     <string name="explanations_learningGD">本组容量过小，\n应采取合并式学习</string>
     <string name="str_jumpToGroupListAct">点击确认后转到分组列表\n点击取消返回分组详情</string>
@@ -374,8 +374,15 @@
     <string name="select_2">筛\n选</string>
     <string name="groups_under_term">符合条件的分组</string>
     <string name="select_all">全选</string>
-    <string name="no_group_matches">没有符合条件的分组</string>
+    <string name="no_group_matches">没有符合当前条件设置的分组。</string>
     <string name="hs_totalNum">已选分组词汇量合计：%1$d</string>
+    <string name="one_group_will_as_lg">如果只选定一个分组，则将实际执行普通学习模式</string>
+    <string name="query">询问</string>
+    <string name="low_size_better_using_merge">本组容量较小，是否以合并方式开始学习（如选择是，则将跳转到可合并分组选择页）</string>
+    <string name="still_use_lg">不用</string>
+    <string name="ok_with_that">好的</string>
+    <string name="no_lastLearningTime">没有复习记录。</string>
+    <string name="use_no_order">开启组内乱序</string>
 
 
 </resources>
