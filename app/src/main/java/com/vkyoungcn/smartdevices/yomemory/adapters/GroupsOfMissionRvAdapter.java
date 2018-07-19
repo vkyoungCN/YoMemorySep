@@ -21,7 +21,7 @@ import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.fragments.DeleteGroupDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningGelDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningLessDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
+import com.vkyoungcn.smartdevices.yomemory.models.RvMergeGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 
 import java.util.ArrayList;
@@ -103,8 +103,8 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
 
                     //由于DFG需要SubNum字段，若只传ID届时无法获取subNum，所以不能只传ids；
                     // 而完整的Group类不含isCheck字段不能与DFG内的Rv很好的匹配，所以新建了一个专用的model类FragGFM。
-                    ArrayList<FragGroupForMerge> groupsListForChose = new ArrayList<>();
-                    groupsListForChose.add(new FragGroupForMerge(triggerGroup));//触发组作为第一个元素。
+                    ArrayList<RvMergeGroup> groupsListForChose = new ArrayList<>();
+                    groupsListForChose.add(new RvMergeGroup(triggerGroup));//触发组作为第一个元素。
 
                     if(subNum<5){
                         //4个（含）以内的，触发合并式学习
@@ -112,7 +112,7 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
                         for (RVGroup rgp :groups) {
                             if(rgp.getTotalItemsNum()<9 && rgp.getMemoryStage()==msNum){
                                 //8个以下（含），且MS同级的分组，可选
-                                groupsListForChose.add(new FragGroupForMerge(rgp));
+                                groupsListForChose.add(new RvMergeGroup(rgp));
                             }
                         }
 

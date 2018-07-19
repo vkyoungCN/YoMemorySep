@@ -204,7 +204,7 @@ public class LearningActivity extends AppCompatActivity
             targetCodes.add(si.getName());
             veFillings.add("");
             restChances.add((byte)3);//默认可提示次数，3。【后期可开放修改】
-//            itemIds.add(si.getId());//【其实这样一来可能就不必传递Merge时的itemsId了。待】
+//            itemIds.add(si.getgIndex());//【其实这样一来可能就不必传递Merge时的itemsId了。待】
         }
         spb_bar.initNecessaryData(targetCodes);
 

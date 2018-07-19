@@ -11,49 +11,58 @@
         android:layout_height="40dp"
         android:orientation="horizontal"
         >
-
-        <CheckBox
-            android:id="@+id/ckb_isChose_rvMergeChoose"
-            android:layout_width="40dp"
+        <TextView
+            android:id="@+id/index_rvMergeChoose"
+            android:layout_width="24dp"
             android:layout_height="match_parent"
+            android:text="@string/sharp_x2_default"
             android:gravity="center"
             />
-        
-        <!--竖线-->
+        <!--竖分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefef"
+            />
+        <TextView
+            android:id="@+id/description_rvMergeChoose"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:gravity="center"
+            />
+        <!--竖分割线-->
         <TextView
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:background="#efefef"
             />
 
-        <!--分组id-->
-        <TextView
-            android:id="@+id/group_id_rvMergeChoose"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:padding="2dp"
-            android:gravity="center"
-            android:text="@string/sharp_x2_default"
-            />
-
-        <!--箭头-->
-        <TextView
-            android:layout_width="36dp"
-            android:layout_height="match_parent"
-            android:padding="2dp"
-            android:gravity="center"
-            android:text="@string/arrows"
-            />
-
         <!--数量-->
         <TextView
-            android:id="@+id/group_num_rvMergeChoose"
-            android:layout_width="40dp"
+            android:id="@+id/groupNum_rvMergeChoose"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="match_parent"
-            android:padding="2dp"
             android:gravity="center"
             android:text="@string/sharp_x2_default"
             />
+        <!--竖分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefef"
+            />
+        <CheckBox
+            android:id="@+id/ckb_isChose_rvMergeChoose"
+            android:layout_width="42dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            />
+        
+
+
+
     </LinearLayout>
 
     <!--图片横线-->

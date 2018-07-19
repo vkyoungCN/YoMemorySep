@@ -366,6 +366,16 @@
     <string name="done_nothing">一个都没完成哦。</string>
     <string name="hs_merge_part">完成部分生成分组：%1$s</string>
     <string name="hs_wrong_items_names">错误的单词：%1$s</string>
+    <string name="chose_groups_for_merge">选择用于合并的分组</string>
+    <string name="terms_for_chose">筛选条件</string>
+    <string name="str_MS_equals">MS=</string>
+    <string name="str_Amount_lessEquals">容量≤</string>
+    <string name="str_OK">OK</string>
+    <string name="select_2">筛\n选</string>
+    <string name="groups_under_term">符合条件的分组</string>
+    <string name="select_all">全选</string>
+    <string name="no_group_matches">没有符合条件的分组</string>
+    <string name="hs_totalNum">已选分组词汇量合计：%1$d</string>
 
 
 </resources>

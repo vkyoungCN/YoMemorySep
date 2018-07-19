@@ -21,10 +21,11 @@ import com.vkyoungcn.smartdevices.yomemory.adapters.GroupsOfMissionRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.fragments.CreateGroupDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningCreateOrderDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningCreateRandomDiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.LearningMerge2DiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningMergeDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
-import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
+import com.vkyoungcn.smartdevices.yomemory.models.RvMergeGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMission;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
@@ -89,7 +90,7 @@ public class GroupsOfMissionActivity extends AppCompatActivity
 //    private int clickPosition;//点击（前往学习页面）发生的位置，需要该数据来更新rv位置
 //    private Boolean isHandyRefreshing = false;//点击刷新列表的按键后，会重新执行加载数据的线程，为与首次的自动运行相区分，此标志变量会设true。
 //【实际上，目前的经验表明，无论是interrupt方法还是布尔变量置否，似乎都不能使线程立即停止】
-    private ArrayList<FragGroupForMerge>[][] groupsInTwoDimensionArray;//用于后续DFG的数据装载，两个维度分别对应MS、同MS下<4,<8。
+    private ArrayList<RvMergeGroup>[][] groupsInTwoDimensionArray;//用于后续DFG的数据装载，两个维度分别对应MS、同MS下<4,<8。
     【这个两维数组的设计不好，不够直观。建议拆成两个独立的list[]（分别对应4、8两种情况），不知逻辑上能否合理】
 
 
@@ -463,10 +464,10 @@ public class GroupsOfMissionActivity extends AppCompatActivity
         for (RVGroup rvg : rvGroups) {
             if (rvg.getTotalItemsNum() < 4) {
                 //一维上[0][x]是小于4的，x对应其不同MS；各元素本身就是一个ArrayList哦。
-                groupsInTwoDimensionArray[0][rvg.getMemoryStage()].add(new FragGroupForMerge(rvg));
+                groupsInTwoDimensionArray[0][rvg.getMemoryStage()].add(new RvMergeGroup(rvg));
                 //替代了switch，简洁。
             } else if (rvg.getTotalItemsNum() < 8) {
-                groupsInTwoDimensionArray[1][rvg.getMemoryStage()].add(new FragGroupForMerge(rvg));
+                groupsInTwoDimensionArray[1][rvg.getMemoryStage()].add(new RvMergeGroup(rvg));
             }
         }
 
@@ -600,6 +601,24 @@ public class GroupsOfMissionActivity extends AppCompatActivity
                 tv_groupAmount.setText(String.valueOf(rvGroups.size()));
                 break;
 
+            case FETCH_NEW_GROUPS_INFO_FOR_MERGE:
+                //发起了合并学习的请求，正在DFG中筛选分组；此消息代表需要根据指定的新MS值获取一组新的分组数据再传入
+                int msForFetch = data.getInt(STR_NEW_MS_FOR_FETCH,0);
+                ArrayList<RvMergeGroup> newList = new ArrayList<>();//用于传给dfg的新数据源
+                if(msForFetch!=0) {
+                    for (RVGroup rg :rvGroups) {
+                        if(rg.getMemoryStage() == msForFetch){
+                            //符合条件的组，转换后加入
+                            newList.add(new RvMergeGroup(rg));
+                        }//如无符合者，则结果是空组
+                    }
+                }   //如果要求MS=0时，传递空组即可。
+
+                //数据准备好【？】，通知传入及后续操作
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                Fragment prev = getFragmentManager().findFragmentByTag(FG_STR_READY_TO_LEARN_MERGE);
+                //数据传入，并触发dfg中的后续改变
+                ((LearningMerge2DiaFragment)prev).changetListAsMsChanged(newList);
         }
     }
 

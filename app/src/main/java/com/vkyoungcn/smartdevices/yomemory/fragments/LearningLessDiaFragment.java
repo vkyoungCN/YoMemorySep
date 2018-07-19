@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.vkyoungcn.smartdevices.yomemory.Constants;
 import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.adapters.CkbsChoseGroupsRvAdapter;
-import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
+import com.vkyoungcn.smartdevices.yomemory.models.RvMergeGroup;
 
 import java.util.ArrayList;
 /*
@@ -36,7 +36,7 @@ public class LearningLessDiaFragment extends DialogFragment
 
     private OnGeneralDfgInteraction mListener;
 
-    private ArrayList<FragGroupForMerge> groups = new ArrayList<>();//所有符合条件的待选组（从上一页传来）
+    private ArrayList<RvMergeGroup> groups = new ArrayList<>();//所有符合条件的待选组（从上一页传来）
 
     private TextView tvCancel;
     private TextView tvConfirm;
@@ -59,7 +59,7 @@ public class LearningLessDiaFragment extends DialogFragment
         // Required empty public constructor
     }
 
-    public static LearningLessDiaFragment newInstance(ArrayList<FragGroupForMerge> groupsForMerge) {
+    public static LearningLessDiaFragment newInstance(ArrayList<RvMergeGroup> groupsForMerge) {
         LearningLessDiaFragment fragment = new LearningLessDiaFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(STR_GROUPS,groupsForMerge);
@@ -72,7 +72,7 @@ public class LearningLessDiaFragment extends DialogFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            this.groups = (ArrayList<FragGroupForMerge>) savedInstanceState.getSerializable(STR_GROUPS);
+            this.groups = (ArrayList<RvMergeGroup>) savedInstanceState.getSerializable(STR_GROUPS);
         }
 
     }
@@ -94,9 +94,9 @@ public class LearningLessDiaFragment extends DialogFragment
         tvTriggerGroupNum = (TextView) rootView.findViewById(R.id.group_num_triggerGroup);
 
         tvTriggerGroupid.setText(String.valueOf(groups.get(0).getId()));
-        tvTriggerGroupNum.setText(String.valueOf(groups.get(0).getTotalItemsNum()));
+        tvTriggerGroupNum.setText(String.valueOf(groups.get(0).getSize()));
 
-        triggerGroupNum = groups.get(0).getTotalItemsNum();
+        triggerGroupNum = groups.get(0).getSize();
         totalChoseNum = triggerGroupNum;
         tvTotalNum.setText(String.valueOf(triggerGroupNum));//暂时只有触发组的容量。
 
@@ -186,9 +186,9 @@ public class LearningLessDiaFragment extends DialogFragment
                 //通知Rv，将所有项目的ckb置真
 
                 int totalNum = triggerGroupNum;
-                for (FragGroupForMerge f :groups) {
+                for (RvMergeGroup f :groups) {
                     f.setChecked(true);//其中各项设为选中（此时该数据集已经没有首项了，都是Rv的数据）
-                     totalNum = totalNum + f.getTotalItemsNum();//计算数量
+                     totalNum = totalNum + f.getSize();//计算数量
                 }
                 totalChoseNum = totalNum;//要保持数据和选择一致。
                 adapter.notifyDataSetChanged();//通过改变数据集的方式使Rv中的显示改变（可能是最省力的方式）
@@ -197,7 +197,7 @@ public class LearningLessDiaFragment extends DialogFragment
 
             }else {
                 //手动取消所有ckbs的选中。通知Rv,将所有项目的ckb置否
-                for (FragGroupForMerge f :groups) {
+                for (RvMergeGroup f :groups) {
                     f.setChecked(false);
                 }
                 totalChoseNum = triggerGroupNum;//要保持数据和选择一致。

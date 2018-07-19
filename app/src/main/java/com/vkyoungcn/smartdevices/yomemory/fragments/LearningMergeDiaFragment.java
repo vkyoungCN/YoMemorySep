@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.adapters.Ckbs2ChoseGroupsRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.adapters.FragGroupCategoryRvAdapter;
-import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
+import com.vkyoungcn.smartdevices.yomemory.models.RvMergeGroup;
 
 import java.util.ArrayList;
 
@@ -26,7 +26,7 @@ public class LearningMergeDiaFragment extends DialogFragment implements View.OnC
 
     private OnGeneralDfgInteraction mListener;
 
-    private ArrayList<FragGroupForMerge>[][] groupsInTwoDimensionArray;//在本DFG的设计方案下，需要这样一个结构来装载数据。
+    private ArrayList<RvMergeGroup>[][] groupsInTwoDimensionArray;//在本DFG的设计方案下，需要这样一个结构来装载数据。
     //【最终回传给GofM页面（然后从该页面发起向学习页的跳转）的数据其实是ArrayList<Integer>】
 
     private TextView tvCancel;
@@ -46,26 +46,26 @@ public class LearningMergeDiaFragment extends DialogFragment implements View.OnC
     private RecyclerView mRvDowner;//根据上方rv的选择，动态加载下方的列表。【发现还是用“上、下”比用类别内容更易区分】
     FragGroupCategoryRvAdapter adapterUpper;//需要在多个方法中操作，全局化。
     Ckbs2ChoseGroupsRvAdapter adapterDowner;
-    ArrayList<FragGroupForMerge> singleArrayList;//下方RV的数据源，未初始化。
+    ArrayList<RvMergeGroup> singleArrayList;//下方RV的数据源，未初始化。
 
     public LearningMergeDiaFragment() {
         // Required empty public constructor
     }
 
 
-    public static LearningMergeDiaFragment newInstance(ArrayList<FragGroupForMerge>[][] originGroupsForMerge) {
+    public static LearningMergeDiaFragment newInstance(ArrayList<RvMergeGroup>[][] originGroupsForMerge) {
         LearningMergeDiaFragment fragment = new LearningMergeDiaFragment();
         Bundle bundle = new Bundle();
 
         //如果要采取bundle传递，似乎只能采用拆开传（如果是基础类型，可以传序列化）
         int n = 0;//计数用，计算一共传递了多少个<4的不同MS的ArrayList；（也用于给不同参数做标记）
-        for (ArrayList<FragGroupForMerge> arrayList : originGroupsForMerge[0]){
+        for (ArrayList<RvMergeGroup> arrayList : originGroupsForMerge[0]){
             n++;
             bundle.putParcelableArrayList("KEY_4_"+n,arrayList);
         }
 
         int m = 0;//同上
-        for (ArrayList<FragGroupForMerge> arrayList : originGroupsForMerge[1]){
+        for (ArrayList<RvMergeGroup> arrayList : originGroupsForMerge[1]){
             m++;
             bundle.putParcelableArrayList("KEY_8_"+m,arrayList);
         }
@@ -123,12 +123,12 @@ public class LearningMergeDiaFragment extends DialogFragment implements View.OnC
         ArrayList<ModelForGRv> tempListForGird_8 = new ArrayList<>();//4、8分开
 
         int index_4=0,index_8 =0;//计数用【仅在按序排列时有效】
-        for (ArrayList<FragGroupForMerge> alf : groupsInTwoDimensionArray[0]) {//这是4的
+        for (ArrayList<RvMergeGroup> alf : groupsInTwoDimensionArray[0]) {//这是4的
             if(alf.size()==0) continue;//为0就不添加了。【在这里处理】
             tempListForGird_4.add(new ModelForGRv(index_4, alf.size()));
         }
 
-        for (ArrayList<FragGroupForMerge> alf : groupsInTwoDimensionArray[1]) {//这是8的
+        for (ArrayList<RvMergeGroup> alf : groupsInTwoDimensionArray[1]) {//这是8的
             if(alf.size()==0) continue;//为0就不添加了。【在这里处理】
             tempListForGird_8.add(new ModelForGRv(index_8, alf.size()));
         }
@@ -195,7 +195,7 @@ public class LearningMergeDiaFragment extends DialogFragment implements View.OnC
     }
 
     //由所含的mRv调用，改变下方Tv控件的值
-    //传递加或减；以及改变量。
+    //传递的是总量
     public void changeTotalChoseNumTvStr(boolean isAdd,int deltaNum){
         if(isAdd){
             String num = String.valueOf(totalChoseNum+deltaNum);
@@ -252,9 +252,9 @@ public class LearningMergeDiaFragment extends DialogFragment implements View.OnC
                 //通知Rv，将所有项目的ckb置真
 
                 int totalNum = 0;//准备计数
-                for (FragGroupForMerge f :singleArrayList) {
+                for (RvMergeGroup f :singleArrayList) {
                     f.setChecked(true);//其中各项设为选中
-                     totalNum = totalNum + f.getTotalItemsNum();//计算数量
+                     totalNum = totalNum + f.getSize();//计算数量
                 }
                 totalChoseNum = totalNum;//要保持数据和选择一致。
                 adapterDowner.notifyDataSetChanged();//通过改变数据集的方式使Rv中的显示改变（可能是最省力的方式）
@@ -263,7 +263,7 @@ public class LearningMergeDiaFragment extends DialogFragment implements View.OnC
 
             }else {
                 //手动取消所有ckbs的选中。通知Rv,将所有项目的ckb置否
-                for (FragGroupForMerge f :singleArrayList) {
+                for (RvMergeGroup f :singleArrayList) {
                     f.setChecked(false);
                 }
                 totalChoseNum = 0;//要保持数据和选择一致（以备其他方法使用时数值正确）。

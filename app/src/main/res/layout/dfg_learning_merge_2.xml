@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".fragments.LearningMergeDiaFragment">
+
+
+    <!--标题-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:background="#e0e0e0"
+        android:gravity="center"
+        android:paddingEnd="24dp"
+        android:paddingStart="24dp"
+        android:text="@string/chose_groups_for_merge"
+        android:textSize="16sp" />
+
+
+    <!--上方1区：条件设定-->
+    <!--标题-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="26dp"
+        android:background="#efefef"
+        android:gravity="center"
+        android:paddingEnd="24dp"
+        android:paddingStart="24dp"
+        android:text="@string/terms_for_chose" />
+    <!--筛选条件有MS/容量两种，左右并置-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
+        <!--MS筛选条件设置组件群-->
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            >
+
+            <!--竖分割线-->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#e0e0e0"
+                />
+            <TextView
+                android:id="@+id/tv_msTermLabel_dfgLM"
+                android:layout_width="36dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="2dp"
+                android:layout_marginStart="2dp"
+                android:gravity="center"
+                android:text="@string/str_MS_equals"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_toEndOf="@+id/tv_msTermLabel_dfgLM"
+                android:background="#efefef" />
+
+            <EditText
+                android:id="@+id/et_msTermResultWindow_dfgLM"
+                android:layout_width="54dp"
+                android:layout_height="64dp"
+                android:layout_toEndOf="@+id/tv_msTermLabel_dfgLM"
+                android:background="@null"
+                android:gravity="center"
+                android:text="@string/sharp_x2_default"
+                android:textColor="@color/yo_red"
+                android:textSize="24sp"
+                android:inputType="number"
+                />
+
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_toEndOf="@+id/et_msTermResultWindow_dfgLM"
+                android:background="#efefef" />
+
+            <TextView
+                android:id="@+id/tv_msTermAdd_dfgLM"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="1dp"
+                android:layout_toEndOf="@id/et_msTermResultWindow_dfgLM"
+                android:gravity="center"
+                android:text="@string/plus"
+                android:textSize="18sp" />
+            <!--加减按钮间短横分割线-->
+            <TextView
+                android:layout_width="32dp"
+                android:layout_height="1dp"
+                android:layout_below="@id/tv_msTermAdd_dfgLM"
+                android:layout_toEndOf="@id/et_msTermResultWindow_dfgLM"
+                android:background="#efefef" />
+
+            <TextView
+                android:id="@+id/tv_msTermMinus_dfgLM"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_below="@id/tv_msTermAdd_dfgLM"
+                android:layout_marginStart="1dp"
+                android:layout_marginTop="1dp"
+                android:layout_toEndOf="@id/et_msTermResultWindow_dfgLM"
+                android:gravity="center"
+                android:text="@string/symbol_minus"
+                android:textSize="18sp" />
+            <!--深色尾竖线-->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_toEndOf="@id/tv_msTermMinus_dfgLM"
+                android:background="#e0e0e0" />
+        </RelativeLayout>
+        <!--尾竖分割线-->
+        <Space
+            android:layout_width="12dp"
+            android:layout_height="match_parent" />
+        <!--头竖分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#e0e0e0"
+            />
+        <!--容量筛选条件设置组件群-->
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            >
+
+            <TextView
+                android:id="@+id/tv_amountTermLabel_dfgLM"
+                android:layout_width="36dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="2dp"
+                android:layout_marginStart="2dp"
+                android:gravity="center"
+                android:text="@string/str_Amount_lessEquals"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_toEndOf="@+id/tv_amountTermLabel_dfgLM"
+                android:background="#efefef" />
+
+            <TextView
+                android:id="@+id/tv_amountTermResultWindow_dfgLM"
+                android:layout_width="54dp"
+                android:layout_height="64dp"
+                android:layout_toEndOf="@+id/tv_amountTermLabel_dfgLM"
+                android:background="@null"
+                android:gravity="center"
+                android:text="@string/sharp_x2_default"
+                android:textColor="@color/yo_red"
+                android:textSize="24sp" />
+
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_toEndOf="@+id/tv_amountTermResultWindow_dfgLM"
+                android:background="#efefef" />
+
+            <TextView
+                android:id="@+id/tv_amountTermAdd_dfgLM"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="1dp"
+                android:layout_toEndOf="@id/tv_amountTermResultWindow_dfgLM"
+                android:gravity="center"
+                android:text="@string/plus"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="32dp"
+                android:layout_height="1dp"
+                android:layout_below="@id/tv_amountTermAdd_dfgLM"
+                android:layout_toEndOf="@id/tv_amountTermResultWindow_dfgLM"
+                android:background="#efefef" />
+
+            <TextView
+                android:id="@+id/tv_amountTermMinus_dfgLM"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_below="@id/tv_amountTermAdd_dfgLM"
+                android:layout_marginStart="1dp"
+                android:layout_marginTop="1dp"
+                android:layout_toEndOf="@id/tv_amountTermResultWindow_dfgLM"
+                android:gravity="center"
+                android:text="@string/symbol_minus"
+                android:textSize="18sp" />
+            <!--深色尾竖线-->
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_toEndOf="@id/tv_amountTermMinus_dfgLM"
+                android:background="#e0e0e0" />
+        </RelativeLayout>
+
+
+
+       <!-- <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/yo_light_green"
+            />
+        <TextView
+            android:id="@+id/tv_termDone_LM"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_margin="2dp"
+            android:text="@string/select_2"
+            android:background="#ffe0b2"
+            android:gravity="center"
+            />-->
+
+
+    </LinearLayout>
+
+
+
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#efefef"
+        />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="18dp" />
+
+    <!--符合条件的备选组列表区-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:background="#f5f5f5"
+        android:gravity="center"
+        android:paddingEnd="24dp"
+        android:paddingStart="12dp"
+        android:text="@string/groups_under_term" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="165dp">
+        <!--三者显示其一-->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_groupsForSelect_dfgLM"
+            android:layout_width="match_parent"
+            android:layout_height="165dp"/>
+
+        <!--正在准备数据-->
+        <TextView
+            android:id="@+id/tv_prepareData_dfgLM"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:background="#efefef"
+            android:text="@string/preparing_data_please_wait"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            />
+
+        <!--没有合适的分组-->
+        <TextView
+            android:id="@+id/tv_noGroupMatch_dfgLM"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:text="@string/no_group_matches"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            />
+    </FrameLayout>
+
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#efefef"
+        />
+    <!--下方信息区+ckBox全选框-->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/tv_bottomInfo_dfgLM"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            />
+
+        <CheckBox
+            android:id="@+id/ckb_allCkeck_dfgLM"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:text="@string/select_all"
+            />
+    </FrameLayout>
+    <!--底部附属信息区-->
+    <TextView
+        android:id="@+id/tv_bottomInfo2_dfgLM"
+        android:layout_width="match_parent"
+        android:layout_height="22dp"
+        android:background="#f5f5f5"
+        />
+    <!--底部横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/yo_light_green"
+        />
+    <!--底部按钮区-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:id="@+id/btn_cancel_dfgLearningMerge"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="2dp"
+            android:layout_weight="1"
+            android:background="#F5F5F5"
+            android:gravity="center"
+            android:text="@string/cancel"
+            android:textSize="16sp"
+
+            />
+
+        <TextView
+            android:id="@+id/btn_confirm_dfgLearningMerge"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="2dp"
+            android:layout_weight="2"
+            android:background="#e0e0e0"
+            android:gravity="center"
+            android:text="@string/confirm_go"
+            android:textSize="16sp"
+
+            />
+
+
+    </LinearLayout>
+
+    <!--中间区域（很长），分左右两栏，左侧两个Rv、右侧若干Tv-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:orientation="horizontal">
+
+        <!--左栏-->
+        <LinearLayout
+            android:layout_width="180dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!--上部。这里发现没法采用Rv-Gird形式，因为两维行列头没法设置-->
+            <!--代码中动态添加-->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_category_chose_DfgLearningMerge"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"/>
+
+
+            <!--左，上区的底部。文本+两个筛选按钮（4/8）-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="1dp"
+                android:orientation="horizontal"
+                >
+
+                <TextView
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    />
+
+                <!--筛选键-4-->
+                <TextView
+                    android:id="@+id/select_4_DfgLearningMerge"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/str_size4"
+                    android:background="#aa64dd17"
+                    />
+
+                <!--筛选键-8-->
+                <TextView
+                    android:id="@+id/select_8_DfgLearningMerge"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/str_size8"
+                    android:background="#aa304ffe"
+
+                    />
+
+
+            </LinearLayout>
+
+            <!--左栏内，横分割线-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="1dp"
+                android:background="#efefef" />
+            <!--下部Rv，行形式-->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_group_chose_DfgLearningMerge"
+                android:layout_width="match_parent"
+                android:layout_height="160dp" />
+
+            <!--左，底文本+全选框-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginBottom="2dp"
+                android:background="#efefef"
+                android:orientation="horizontal"
+                android:paddingTop="4dp">
+
+                <TextView
+                    android:id="@+id/tv_total_items_DfgLearningMerge"
+                    android:layout_width="125dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:text="@string/str_total_items" />
+
+                <CheckBox
+                    android:id="@+id/ckb_all_DfgLearningMerge"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!--中部分栏区的，中央竖分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="1dp"
+            android:background="#efefef" />
+
+        <!--右栏-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!--右侧，顶部文本-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:gravity="start|center_vertical"
+                android:text="@string/str_choseCategory_dfgLearningMerge"
+                android:textColor="#f57f17" />
+
+            <!--横分割线-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#f57f17" />
+
+            <!--上部文本-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="129dp"
+                android:gravity="center"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:paddingTop="8dp"
+                android:text="@string/str_explanation_merge2"
+                android:textColor="#f57f17"
+                android:textSize="12sp" />
+            <!--右栏内，横分割线1-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginTop="4dp"
+                android:background="#efefef"
+                android:visibility="gone" />
+
+
+            <!--下部文本1-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:gravity="start|center_vertical"
+                android:text="@string/str_choseGroup_dfgLearningMerge"
+                android:textColor="#e52525" />
+            <!--横分割线-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#e52525" />
+
+            <!--下部文本-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:gravity="center"
+                android:paddingEnd="4dp"
+                android:paddingStart="4dp"
+                android:text="@string/str_explanation_merge3"
+                android:textColor="#e52525"
+                android:textSize="12sp" />
+
+            <!--填充色块，底边的阴影要大于顶部才好看-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#efefef" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <!--按钮区-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:orientation="horizontal"
+        android:padding="1dp">
+
+        <TextView
+            android:layout_width="64dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="1dp"
+            android:background="#e0e0e0"
+            android:gravity="center"
+            android:text="@string/cancel"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="1dp"
+            android:background="#cc64dd17"
+            android:gravity="center"
+            android:text="@string/confirm"
+            android:textSize="16sp"
+
+            />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

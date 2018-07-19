@@ -77,9 +77,11 @@ public interface Constants {
     public static final String STR_OLD_MS="OLD_MS";
     public static final String STR_IS_MS_UP="IS_MS_UP";
     public static final String STR_IS_TOO_LATE="IS_TOO_LATE";
-    public static final String STR_;
-
-
+    public static final String STR_TERM_MS = "KEY_N";
+    public static final String STR_TERM_AMOUNT ="KEY_M";
+    public static final String STR_RV_MERGE_GROUP = "RV_MERGE_GROUP";
+    public static final String STR_NEW_MS_FOR_FETCH = "NEW_MS_FOR_FETCH";
+    public static final String STR_FIXED_CHOSED_GROUP = "STR_FIXED_CHOSED_GROUP";
 
 
 

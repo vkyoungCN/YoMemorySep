@@ -1,6 +1,5 @@
 package com.vkyoungcn.smartdevices.yomemory.adapters;
 
-import android.app.DialogFragment;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,8 +11,7 @@ import android.widget.TextView;
 
 import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningLessDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
-import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
+import com.vkyoungcn.smartdevices.yomemory.models.RvMergeGroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +40,7 @@ public class CkbsChoseGroupsRvAdapter extends RecyclerView.Adapter<CkbsChoseGrou
 //* 与另一个用于碎片选择的dfg相比，本dfg的初始分组是既定的（但是该分组直接在dfg中显示，不传入本rv）；
 //* 区别在于总量计算等……【待】。
     //    private static final String TAG = "CkbsChoseGroupsRvAdapter";
-    private List<FragGroupForMerge> groups;
+    private List<RvMergeGroup> groups;
     private Context context;//是所属DFG所属的Activity
     private LearningLessDiaFragment dfg;//保持一个引用，以便改变dfg的UI（由DFG提供改变UI的公共方法）
     private int howManyGroupsChecke = 0;//（除已移除的触发组外，已选中了多少个分组）用于判断是否是全选
@@ -57,7 +55,7 @@ public class CkbsChoseGroupsRvAdapter extends RecyclerView.Adapter<CkbsChoseGrou
             super(itemView);
             checkBox = itemView.findViewById(R.id.ckb_isChose_rvMergeChoose);
             id = itemView.findViewById(R.id.group_id_rvMergeChoose);
-            subNum = itemView.findViewById(R.id.group_num_rvMergeChoose);
+            subNum = itemView.findViewById(R.id.groupNum_rvMergeChoose);
 
             checkBox.setOnCheckedChangeListener(this);
 
@@ -93,7 +91,7 @@ public class CkbsChoseGroupsRvAdapter extends RecyclerView.Adapter<CkbsChoseGrou
                 // （总量文本的改变等任务交由DFG处理。）但是，回传的idList仍要正确改写。
                 if(isChecked) {
                     idsList.clear();//先清除再全加入
-                    for (FragGroupForMerge f : groups) {
+                    for (RvMergeGroup f : groups) {
                         idsList.add(f.getId());
                     }
                 }else {
@@ -116,7 +114,7 @@ public class CkbsChoseGroupsRvAdapter extends RecyclerView.Adapter<CkbsChoseGrou
                 }
 
                 //改变外部dfg的文本
-                dfg.changeTotalChoseNumTvStr(true,groups.get(getAdapterPosition()).getTotalItemsNum());
+                dfg.changeTotalChoseNumTvStr(true,groups.get(getAdapterPosition()).getSize());
 
             }else {
                 //取消某项时，将其从List移除
@@ -130,7 +128,7 @@ public class CkbsChoseGroupsRvAdapter extends RecyclerView.Adapter<CkbsChoseGrou
                 }
 
                 //改变外部dfg的文本
-                dfg.changeTotalChoseNumTvStr(false,groups.get(getAdapterPosition()).getTotalItemsNum());
+                dfg.changeTotalChoseNumTvStr(false,groups.get(getAdapterPosition()).getSize());
 
             }
 
@@ -143,7 +141,7 @@ public class CkbsChoseGroupsRvAdapter extends RecyclerView.Adapter<CkbsChoseGrou
         return idsList;
     }
 
-    public CkbsChoseGroupsRvAdapter(List<FragGroupForMerge> groups, Context context, LearningLessDiaFragment dfg) {
+    public CkbsChoseGroupsRvAdapter(List<RvMergeGroup> groups, Context context, LearningLessDiaFragment dfg) {
         this.groups = groups;
         this.context = context;
         this.dfg = dfg;
@@ -159,10 +157,10 @@ public class CkbsChoseGroupsRvAdapter extends RecyclerView.Adapter<CkbsChoseGrou
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        FragGroupForMerge group = groups.get(position);
+        RvMergeGroup group = groups.get(position);
         holder.getCheckBox().setChecked(true);
         holder.getId().setText(String.valueOf(group.getId()));
-        holder.getSubNum().setText(String.valueOf(group.getTotalItemsNum()));
+        holder.getSubNum().setText(String.valueOf(group.getSize()));
 
     }
 

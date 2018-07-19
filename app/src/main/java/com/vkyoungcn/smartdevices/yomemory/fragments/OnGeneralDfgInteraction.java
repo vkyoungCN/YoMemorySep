@@ -26,6 +26,9 @@ public interface OnGeneralDfgInteraction {
     int LEARNING_FINISH_DFG_BACK = 2102;
     int LEARNING_FINISH_DFG_GIVE_UP = 2103;
 
+    int LEARNING_TIME_UP_DFG_CONFIRM = 2111;
+    int LEARNING_TIME_UP_DFG_GIVE_UP = 2112;
+
     int LC_FINISH_AMOUNT_ZERO =2121;//对应于结束dfg中，完成数量实际为0（从而不生成新组）的情况
 
     int DELETE_GROUP = 2221;
@@ -34,8 +37,7 @@ public interface OnGeneralDfgInteraction {
     int FAST_LEARN = 2231;
     int FAST_RE_PICK = 2232;
 
-    int LEARNING_TIME_UP_DFG_CONFIRM = 2111;
-    int LEARNING_TIME_UP_DFG_GIVE_UP = 2112;
+    int FETCH_NEW_GROUPS_INFO_FOR_MERGE = 2151;
 
 
     void onButtonClickingDfgInteraction(int dfgType, Bundle data);

@@ -1,22 +1,16 @@
 package com.vkyoungcn.smartdevices.yomemory.adapters;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.vkyoungcn.smartdevices.yomemory.R;
-import com.vkyoungcn.smartdevices.yomemory.fragments.LearningLessDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningMergeDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.models.FragGroupForMerge;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /*
 * 用于点击“合并学习”后弹出的dfg中（该dfg有两个RV），其中上方rv用于选择碎片类型；
