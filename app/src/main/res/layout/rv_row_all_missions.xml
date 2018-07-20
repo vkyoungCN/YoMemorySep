@@ -98,7 +98,6 @@
     <!--下方是两个按钮（摆放更多按钮不好看）-->
     <!--llt的缩进是为了不挡圆角-->
     <LinearLayout
-        android:id="@+id/llt_triBtn_rvAllMissions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center|bottom"

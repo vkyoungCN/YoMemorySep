@@ -23,6 +23,8 @@ public interface OnGeneralDfgInteraction {
     int LEARNING_GENERAL_INNER_RANDOM = 2028;//LG模式，但是开启组内乱序。
     int LEARNING_GENERAL_NO_GID = 2029;//快速复习模式下特殊信号，通常的LG是提前准备好目标gid发送
 
+    int LEARNING_EXTRA_NO_RECORDS = 2030;//用于对高优先级词汇进行分组以外的，不做记录的额外复习。
+
     int LEARNING_FINISH_DFG_CONFIRM = 2101;
     int LEARNING_FINISH_DFG_BACK = 2102;
     int LEARNING_FINISH_DFG_GIVE_UP = 2103;

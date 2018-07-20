@@ -51,11 +51,14 @@
             android:background="#efefef"
             />
 
-        <ImageView
+        <TextView
             android:id="@+id/tv_isEffect_LG"
-            android:layout_width="36dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/start_yellow"
+            android:padding="4dp"
+            android:gravity="center"
+            android:textColor="@color/yo_teal"
+            android:text="@string/str_MS_plus"
             />
 
 

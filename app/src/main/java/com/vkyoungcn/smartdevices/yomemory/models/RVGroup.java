@@ -261,7 +261,7 @@ public class RVGroup implements Parcelable ,Cloneable{
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
+    public Object clone() {
         //如果不包含引用成员，则浅复制即可
         RVGroup rvGroup = new RVGroup();//这里指向new或者null都不出错。但是即使指向null，RvGroup也必须有空构造器
         // 否则崩溃，空指针错误。同时RvGroup需要实现Cloneable.

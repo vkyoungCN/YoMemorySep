@@ -242,7 +242,6 @@
 
     <!--下部，Rv区域。含遮盖区以及Fab的主按键-->
     <FrameLayout
-        android:id="@+id/flt_nether_GMDA"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/llt_middle_01_GMDA"
@@ -273,7 +272,6 @@
         <!--FAB主按键，位于Fl底部-->
         <!--增-->
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/addGroup_GroupAndMissionDetailActivity"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="bottom|end"
@@ -285,7 +283,6 @@
             app:backgroundTint="@color/litePB_color_index" />
 
         <TextView
-            android:id="@+id/fabTv_IAMD"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/click_and_more_2"
@@ -384,7 +381,6 @@
         <!--FAB组的按键组，这里没有使用support.design库，而是直接用了普通的ImageView，
         本组位于解释文本组上方-->
         <LinearLayout
-            android:id="@+id/fabBtns_Line2_GMDA"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_above="@id/lltInRlt_FAB_GMDA"
@@ -392,7 +388,6 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/fabBtn_addNewGroup_GMDA"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="15dp"
@@ -403,7 +398,6 @@
                 android:src="@drawable/add_new_group" />
 
             <ImageView
-                android:id="@+id/fabBtn_learnAndAdd_order_GMDA"
                 android:layout_width="0dp"
                 android:layout_height="34dp"
                 android:layout_marginStart="15dp"
@@ -414,7 +408,6 @@
                 android:src="@drawable/learn_and_add_in_order_2" />
 
             <ImageView
-                android:id="@+id/fabBtn_learnAndAdd_random_GMDA"
                 android:layout_width="0dp"
                 android:layout_height="34dp"
                 android:layout_weight="1"
@@ -429,7 +422,7 @@
 
         <!--FAB组（上）的底边线。在上文本组的下方-->
         <LinearLayout
-            android:id="@+id/fab_BottomLine_upper_GMDA"
+            android:id="@+id/fab_BottomLine_IMA"
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_alignParentBottom="true"
@@ -458,10 +451,10 @@
 
         <!--FAB组的解释性文本组（上）-->
         <LinearLayout
-            android:id="@+id/fabText_upper_GMDA"
+            android:id="@+id/fabText_IMA"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/fab_BottomLine_upper_GMDA"
+            android:layout_above="@+id/fab_BottomLine_IMA"
             android:layout_marginBottom="4dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
@@ -488,7 +481,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_above="@id/fabText_upper_GMDA"
+            android:layout_above="@id/fabText_IMA"
             android:layout_marginEnd="4dp"
             android:layout_marginStart="4dp"
             android:orientation="horizontal">
@@ -499,7 +492,6 @@
                 android:layout_weight="1" />
 
             <ImageView
-                android:id="@+id/fabBtn_merge_GMDA"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"

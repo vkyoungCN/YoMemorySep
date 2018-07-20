@@ -11,19 +11,15 @@ import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.adapters.LearningViewPrAdapter;
-import com.vkyoungcn.smartdevices.yomemory.fragments.Finish_LC_DiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.Finish_LG_DiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.Finish_LM_DiaFragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.FinishL_AllinOne_DiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
-import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 import com.vkyoungcn.smartdevices.yomemory.customUI.StripeProgressBar;
 import com.vkyoungcn.smartdevices.yomemory.validatingEditor.ValidatingEditor;
 
@@ -118,6 +114,7 @@ public class LearningActivity extends AppCompatActivity
     int emptyAmount = 0;//emptyPositions.size()
     int wrongAmount =0;//wrongPositions.size()，是已填写词汇中的错误数量，不包括空词数量。
     int finishAmount =0;//totalAmount-emptyAmount，是已填写数量。
+    int correctAmount = 0;//完成部分中的正确部分。
 
     private long startingTimeMillis;//学习开始的时间。
 
@@ -172,33 +169,34 @@ public class LearningActivity extends AppCompatActivity
             groupId = getIntent().getIntExtra(STR_GROUP_ID,0);
         }else if(learningType == LEARNING_AND_MERGE){
             gIdsForMerge = getIntent().getIntegerArrayListExtra(STR_GROUP_ID_FOR_MERGE);
-        }else{
+        }else if(learningType == LEARNING_AND_CREATE_RANDOM ||learningType==LEARNING_AND_CREATE_ORDER){
             //在剩余两种模式是LCO/LCR时有效。如果增加了其他新模式，则本逻辑必须修改。
             missionId = getIntent().getIntExtra(STR_MISSION_ID,0);
-        }
+        }//在后来新增的LEX模式不需获取任何额外数据没有操作
 
 
-        //获取各控件
-        tv_timeRestMin = (TextView)findViewById(R.id.tv_time_past_numMinute_Learning);
-        tv_timeRestScd = (TextView)findViewById(R.id.tv_time_past_numSecond_Learning);
+
+    //获取各控件
+        tv_timeRestMin = findViewById(R.id.tv_time_past_numMinute_Learning);
+        tv_timeRestScd = findViewById(R.id.tv_time_past_numSecond_Learning);
         //给时间的分、秒数设置字体
         Typeface typeFace = Typeface.createFromAsset(getAssets(),"fonts/digit.ttf");
         tv_timeRestMin.setTypeface(typeFace);
         tv_timeRestScd.setTypeface(typeFace);
 
-        llt_timeCount = (LinearLayout)findViewById(R.id.llt_timeCountGroup);
-        tv_currentPageNum = (TextView)findViewById(R.id.currentPageNum_learningActivity);
-        tv_totalPageNum = (TextView)findViewById(R.id.totalPageNum_learningActivity);//总数字需要在数据加载完成后设置，在handleMessage中处理
+        llt_timeCount = findViewById(R.id.llt_timeCountGroup);
+        tv_currentPageNum = findViewById(R.id.currentPageNum_learningActivity);
+        tv_totalPageNum = findViewById(R.id.totalPageNum_learningActivity);//总数字需要在数据加载完成后设置，在handleMessage中处理
         tv_totalPageNum.setText(String.valueOf(items.size()));
 //        tv_rollLabel = (TextView)findViewById(R.id.tv_rollLabel_learningActivity) ;
 
-        tv_finish = (TextView)findViewById(R.id.finish_tv_learningActivity);
-        fab_finish = (FloatingActionButton)findViewById(R.id.finish_fab_learningActivity);
+        tv_finish = findViewById(R.id.finish_tv_learningActivity);
+        fab_finish = findViewById(R.id.finish_fab_learningActivity);
 
         veFillings = new ArrayList<>();//只这样初始化是不够的，后面按索引位置设置值时会提示越界错误
         restChances = new ArrayList<>();
 
-        spb_bar = (StripeProgressBar) findViewById(R.id.stripeProgressBar_LearningActivity);
+        spb_bar = findViewById(R.id.stripeProgressBar_LearningActivity);
         for (SingleItem si : items) {
             //需要这样彻底初始化
             targetCodes.add(si.getName());
@@ -210,7 +208,7 @@ public class LearningActivity extends AppCompatActivity
 
         spb_bar.setCurrentCodes(veFillings);
 
-        viewPager = (ViewPager) findViewById(R.id.viewPager_ItemLearning);
+        viewPager = findViewById(R.id.viewPager_ItemLearning);
 
         LearningViewPrAdapter learningVpAdapter = new LearningViewPrAdapter(getSupportFragmentManager(), items,restChances);
         viewPager.setAdapter(learningVpAdapter);
@@ -323,8 +321,7 @@ public class LearningActivity extends AppCompatActivity
                 itemLearningActivity.handleMessage(msg);
             }
 
-    }};
-
+    }}
 
 
     public class TimingRunnable implements Runnable {
@@ -420,6 +417,11 @@ public class LearningActivity extends AppCompatActivity
 
         switch (dfgType){
             case LEARNING_FINISH_DFG_CONFIRM:
+
+                if(learningType == LEARNING_EXTRA_NO_RECORDS){
+                    //此模式下不需结束处理，直接返回调用方即可
+                    finish();
+                }
                 //确认。
                 // 要跳转到结束页，根据完成情况（并结合learningType）进行DB处理
                 //
@@ -553,22 +555,27 @@ public class LearningActivity extends AppCompatActivity
             Toast.makeText(this, "Old Dfg still there, removing...", Toast.LENGTH_SHORT).show();
             transaction.remove(prev);
         }
-
-        switch (learningType){
+        //结束询问dfg改为统一的，在结束页才采用不同（也只是其中fg部分不同）
+        DialogFragment dfg = FinishL_AllinOne_DiaFragment.newInstance(finishAmount,
+                emptyAmount,correctAmount,wrongAmount,restMinutes,restSeconds,learningType);
+        dfg.show(transaction,FG_STR_HANDY_FINISH);
+       /* switch (learningType){
             case LEARNING_AND_CREATE_ORDER:
             case LEARNING_AND_CREATE_RANDOM:
-                DialogFragment dfgLC = Finish_LC_DiaFragment.newInstance(finishAmount,wrongAmount,restMinutes,restSeconds);
-                dfgLC.show(transaction,FG_STR_HANDY_FINISH);
+
                 break;
             case LEARNING_GENERAL:
                 DialogFragment dfgLG = Finish_LG_DiaFragment.newInstance(totalAmount,emptyAmount,wrongAmount,restMinutes,restSeconds);
                 dfgLG.show(transaction,FG_STR_HANDY_FINISH);
                 break;
             case LEARNING_AND_MERGE:
-                DialogFragment dfg = Finish_LM_DiaFragment.newInstance(totalAmount,finishAmount,wrongAmount,restMinutes,restSeconds);
+                DialogFragment dfg = FinishL_AllinOne_DiaFragment.newInstance(totalAmount,finishAmount,wrongAmount,restMinutes,restSeconds);
                 dfg.show(transaction,FG_STR_HANDY_FINISH);
                 break;
-        }
+            case LEARNING_EXTRA_NO_RECORDS:
+                DialogFragment dfgLEX = Finish_LX_DiaFragment.newInstance(totalAmount,finishAmount,wrongAmount,restMinutes,restSeconds);
+                dfgLEX.show(transaction,FG_STR_TIME_UP_FINISH);
+        }*/
 
     }
 
@@ -601,8 +608,11 @@ public class LearningActivity extends AppCompatActivity
             Toast.makeText(this, "Old Dfg still there, removing...", Toast.LENGTH_SHORT).show();
             transaction.remove(prev);
         }
+        DialogFragment dfg = FinishL_AllinOne_DiaFragment.newInstance(finishAmount,
+                emptyAmount,correctAmount,wrongAmount,restMinutes,restSeconds,learningType);
+        dfg.show(transaction,FG_STR_TIME_UP_FINISH);
 
-        switch (learningType){
+        /*switch (learningType){
             case LEARNING_AND_CREATE_ORDER:
             case LEARNING_AND_CREATE_RANDOM:
                 DialogFragment dfgLC = Finish_LC_DiaFragment.newInstance(finishAmount,wrongAmount,restMinutes,restSeconds);
@@ -613,10 +623,15 @@ public class LearningActivity extends AppCompatActivity
                 dfgLG.show(transaction,FG_STR_TIME_UP_FINISH);
                 break;
             case LEARNING_AND_MERGE:
-                DialogFragment dfg = Finish_LM_DiaFragment.newInstance(totalAmount,finishAmount,wrongAmount,restMinutes,restSeconds);
+                DialogFragment dfg = FinishL_AllinOne_DiaFragment.newInstance(totalAmount,finishAmount,wrongAmount,restMinutes,restSeconds);
                 dfg.show(transaction,FG_STR_TIME_UP_FINISH);
                 break;
-        }
+            case LEARNING_EXTRA_NO_RECORDS:
+                DialogFragment dfgLEX = Finish_LX_DiaFragment.newInstance(totalAmount,finishAmount,wrongAmount,restMinutes,restSeconds);
+                dfgLEX.show(transaction,FG_STR_TIME_UP_FINISH);
+
+                break;
+        }*/
 
     }
 
@@ -627,6 +642,7 @@ public class LearningActivity extends AppCompatActivity
         emptyAmount = 0;
         wrongAmount =0;
         finishAmount = totalAmount-emptyAmount;
+        correctAmount = finishAmount-wrongAmount;
 
         //对“填写记录”列表逐项判断,计数并记录索引列表。
         for (int i =0; i<totalAmount;i++){

@@ -51,7 +51,6 @@
         >
         <!--Rv标题、横向Rv区-->
         <LinearLayout
-            android:id="@+id/llt_top_rlt_MA"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -111,7 +110,6 @@
             />
         <!--底部横向按键栏-->
         <LinearLayout
-            android:id="@+id/llt_rlt_bottom_MA"
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:background="#efefef"

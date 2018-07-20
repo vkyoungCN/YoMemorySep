@@ -11,6 +11,12 @@ import android.widget.TextView;
 import com.vkyoungcn.smartdevices.yomemory.Constants;
 import com.vkyoungcn.smartdevices.yomemory.R;
 
+import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_AND_CREATE_ORDER;
+import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_AND_CREATE_RANDOM;
+import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_AND_MERGE;
+import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_EXTRA_NO_RECORDS;
+import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_GENERAL;
+
 /*
  * 作者：杨胜 @中国海洋大学
  * 别名：杨镇时
@@ -18,9 +24,9 @@ import com.vkyoungcn.smartdevices.yomemory.R;
  * email: yangsheng@ouc.edu.cn
  * 2018.08.01
  * */
-public class Finish_LG_DiaFragment extends DialogFragment
+public class FinishL_AllinOne_DiaFragment extends DialogFragment
         implements View.OnClickListener,Constants {
-//* 本DFG对应普通学习模式下的手动结束情形：
+//* 本DFG对应合并学习模式下的手动结束情形：
 //* （首先显示还剩余多少时间，可以返回查看）
 //* 需要传入：总量、未完成量。（若只传未完成量，则无法分辨是否是“一个也没写”的极端情况）
 //* ①提示总量、未完成量，提示会拆分；（or全部完成、or全部未完成（隐藏确认键））
@@ -29,33 +35,39 @@ public class Finish_LG_DiaFragment extends DialogFragment
 //*
 //* 确然后的跳转操作还是由Activity负责，所以不需要持有gid。
 //* 三种不同学习模式的手动结束DFG使用同一布局文件。
-    private static final String TAG = "Finish_LG_DiaFragment";
+    private static final String TAG = "FinishL_AllinOne_DiaFragment";
 
     private int totalAmount;
     private int emptyAmount;
     private int wrongAmount;
+    private int correctAmount;
     private int restSeconds;
     private int restMinutes;
 
-    private TextView tvWrongInfo;
+    private int learningType;
+
+    private TextView tvAmountReport;
     private TextView tvEmptyInfo;
     private TextView tvRestTimeInfo;
     private TextView btn_Confirm;
+    private TextView tvBottomInfo;
 
     private OnGeneralDfgInteraction mListener;
 
-    public Finish_LG_DiaFragment() {
+    public FinishL_AllinOne_DiaFragment() {
         // Required empty public constructor
     }
 
-    public static Finish_LG_DiaFragment newInstance(int totalAmount, int emptyAmount, int wrongAmount, int restMinutes, int restSeconds) {
-        Finish_LG_DiaFragment fragment = new Finish_LG_DiaFragment();
+    public static FinishL_AllinOne_DiaFragment newInstance(int totalAmount, int emptyAmount, int correctAmount, int wrongAmount, int restMinutes, int restSeconds, int learningType) {
+        FinishL_AllinOne_DiaFragment fragment = new FinishL_AllinOne_DiaFragment();
         Bundle args = new Bundle();
         args.putInt(STR_TOTAL_AMOUNT,totalAmount);
         args.putInt(STR_WRONG_AMOUNT,wrongAmount);
         args.putInt(STR_EMPTY_AMOUNT,emptyAmount);
+        args.putInt(STR_CORRECT_AMOUNT,correctAmount);
         args.putInt(STR_REST_SECONDS,restSeconds);
         args.putInt(STR_REST_MINUTES,restMinutes);
+        args.putInt(STR_LEARNING_TYPE,learningType);
         fragment.setArguments(args);
         return fragment;
     }
@@ -67,8 +79,10 @@ public class Finish_LG_DiaFragment extends DialogFragment
             this.totalAmount = getArguments().getInt(STR_TOTAL_AMOUNT);
             this.wrongAmount = getArguments().getInt(STR_WRONG_AMOUNT);
             this.emptyAmount = getArguments().getInt(STR_EMPTY_AMOUNT);
+            this.correctAmount = getArguments().getInt(STR_CORRECT_AMOUNT);
             this.restSeconds = getArguments().getInt(STR_REST_SECONDS);
             this.restMinutes = getArguments().getInt(STR_REST_MINUTES);
+            this.learningType = getArguments().getInt(STR_LEARNING_TYPE);
         }
     }
 
@@ -76,35 +90,18 @@ public class Finish_LG_DiaFragment extends DialogFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.dfg_learning_handy_finish, container, false);
-        rootView.findViewById(R.id.tvBtn_back_dfgLHFinish).setOnClickListener(this);
-        rootView.findViewById(R.id.tvBtn_giveUp_dfgLHFinish).setOnClickListener(this);
-        btn_Confirm = rootView.findViewById(R.id.tvBtn_confirm_dfgLHFinish);
+        View rootView = inflater.inflate(R.layout.dfg_finish_all_in_one, container, false);
+
+        rootView.findViewById(R.id.tvBtn_back_dfgLmFinish).setOnClickListener(this);
+        rootView.findViewById(R.id.tvBtn_giveUp_dfgLmFinish).setOnClickListener(this);
+        btn_Confirm = rootView.findViewById(R.id.tvBtn_confirm_dfgLmFinish);
         btn_Confirm.setOnClickListener(this);
-        TextView space = rootView.findViewById(R.id.space_64);
 
-        tvWrongInfo = rootView.findViewById(R.id.tv_wrong_dfgLHFinish);
-        tvEmptyInfo = rootView.findViewById(R.id.tv_empty_dfgLHFinish);
-        tvRestTimeInfo = rootView.findViewById(R.id.tv_restTime_dfgLHFinish);
+        tvAmountReport = rootView.findViewById(R.id.tv_amountInfo_dfgLmFinish);
+        tvRestTimeInfo = rootView.findViewById(R.id.tv_restTime_dfgLmFinish);
+        tvBottomInfo = rootView.findViewById(R.id.tv_bottomInfo_dfgFinish);
 
-
-        if(wrongAmount==0 ){
-            tvWrongInfo.setText(getResources().getString(R.string.wrong_amount_equals_zero));
-            //如果下方finishAmount==0,则应对本Tv进行覆盖。
-        }else {
-            tvWrongInfo.setText(String.format(getResources().getString(R.string.wrong_amount_some),wrongAmount));
-        }
-
-        if(emptyAmount == totalAmount){
-            //一个没写
-            tvEmptyInfo.setText(getResources().getString(R.string.finish_amount_equals_zero_LG));
-            tvWrongInfo.setVisibility(View.GONE);//一个没写当然没错误，但也绝不是“全对”。不予显示。
-            space.setVisibility(View.VISIBLE);//替代性地，在时间tv下方，按钮组上方显示一个大空间以撑开整体
-            btn_Confirm.setVisibility(View.GONE);//此时不建组，确认键无意义。不予显示。
-        }else {
-                tvEmptyInfo.setText(String.format(getResources().getString(R.string.finish_amount_some_LG), totalAmount,emptyAmount));
-                //总量%1$d个，未完成的%2$d个单词会被拆分到新分组
-        }
+        tvAmountReport.setText(String.format(getResources().getString(R.string.hs_end_report),totalAmount,correctAmount,wrongAmount,emptyAmount));
 
         if(restMinutes==0&&restSeconds==0){
             //已到时间（可能是timeUp触发的结束）
@@ -112,6 +109,28 @@ public class Finish_LG_DiaFragment extends DialogFragment
         }else {
             tvRestTimeInfo.setText(String.format(getResources().getString(R.string.rest_min_and_sec), restMinutes, restSeconds));
         }
+
+        switch (learningType){
+            case LEARNING_AND_MERGE:
+                //底部显示“完成部分将被合并”
+                tvBottomInfo.setText(getResources().getString(R.string.finish_will_be_merged));
+                break;
+
+            case LEARNING_GENERAL:
+                //底部显示“若有未完成词汇，则将拆分分组”
+                tvBottomInfo.setText(getResources().getString(R.string.finish_not_will_be_divided));
+                break;
+            case LEARNING_AND_CREATE_ORDER:
+            case LEARNING_AND_CREATE_RANDOM:
+                //底部显示“将根据完成部分生成新分组”
+                tvBottomInfo.setText(getResources().getString(R.string.finish_will_be_created));
+                break;
+            case LEARNING_EXTRA_NO_RECORDS:
+                //底部显示“额外学习不会产生学习记录”
+                tvBottomInfo.setText(getResources().getString(R.string.finish_extra_with_no_records));
+                break;
+        }
+
         return rootView;
 
 
@@ -123,20 +142,20 @@ public class Finish_LG_DiaFragment extends DialogFragment
         //不论点击的是确认还是取消或其他按键，直接调用Activity中实现的监听方法，
         // 将view的id传给调用方处理。
         switch (v.getId()){
-            case R.id.tvBtn_confirm_dfgLHFinish:
+            case R.id.tvBtn_confirm_dfgLmFinish:
                 // 由LearningActivity根据其持有的状态列表具体判断拆分等操作。在此不判断不传递。
                 mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_FINISH_DFG_CONFIRM,null);
                 dismiss();
 
                 break;
-            case R.id.tvBtn_back_dfgLHFinish:
+            case R.id.tvBtn_back_dfgLmFinish:
                 //返回查看，继续计时
                 mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_FINISH_DFG_BACK,null);
                 dismiss();
 
                 break;
 
-            case R.id.tvBtn_giveUp_dfgLHFinish:
+            case R.id.tvBtn_giveUp_dfgLmFinish:
                 //放弃，就当什么都没发生。通知Act，直接返回分组的Rv列表页。
                 mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_FINISH_DFG_GIVE_UP,null);
                 dismiss();

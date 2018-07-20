@@ -100,11 +100,11 @@ public class GroupsOfMissionActivity extends AppCompatActivity
         this.self = this;
         setContentView(R.layout.activity_groups_of_mission);
 
-        TextView missionDetailName = (TextView) findViewById(R.id.tv_mission_detail_name_GMDA);
-        TextView missionDetailDescription = (TextView) findViewById(R.id.tv_mission_detail_description_GMDA);
-        tv_groupAmount = (TextView)findViewById(R.id.tv_groupAmount_GMD);
-        maskFrameLayout = (FrameLayout) findViewById(R.id.maskOverRv_MissionDetail_GMDA);
-        rltFabPanel = (RelativeLayout) findViewById(R.id.rlt_fabFlat_GMDA);
+        TextView missionDetailName = findViewById(R.id.tv_mission_detail_name_GMDA);
+        TextView missionDetailDescription = findViewById(R.id.tv_mission_detail_description_GMDA);
+        tv_groupAmount = findViewById(R.id.tv_groupAmount_GMD);
+        maskFrameLayout = findViewById(R.id.maskOverRv_MissionDetail_GMDA);
+        rltFabPanel = findViewById(R.id.rlt_fabFlat_GMDA);
 
         rltFabPanel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,12 +217,9 @@ public class GroupsOfMissionActivity extends AppCompatActivity
             }
 
             //将选出的最小项目复制到目标列表；然后再次开始循环，选除“次小”的项目。
-            try {
-                RVGroup gp = (RVGroup) minRVGroup.clone();//克隆方式复制（以免只复制地址）。
-                resultRVGroups.add(gp);
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
+            RVGroup gp = (RVGroup) minRVGroup.clone();//克隆方式复制（以免只复制地址）。
+            resultRVGroups.add(gp);
+
             RVGroups.remove(RVGroups.indexOf(minRVGroup));//源列中，最小的项目已删除；则再次的循环筛选将选出次小项。
 
         }

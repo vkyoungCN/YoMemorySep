@@ -61,7 +61,7 @@ public class LogsOfGroupDiaFragment extends DialogFragment {
         View rootView = inflater.inflate(R.layout.dfg_logs_of_group, container, false);
 
         //通过调整外层VG的大小将dialogFg的宽度设置为75%，高度设为屏幕可用部分的70%。
-        LinearLayout llt = (LinearLayout) rootView.findViewById(R.id.frame_resize_logs_dfg);
+        LinearLayout llt = rootView.findViewById(R.id.frame_resize_logs_dfg);
         WindowManager appWm = (WindowManager) getActivity().getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
         Point point = new Point();
         try {
@@ -74,7 +74,7 @@ public class LogsOfGroupDiaFragment extends DialogFragment {
         llt.setLayoutParams(gLp);
 
 
-        logRv =  (RecyclerView) rootView.findViewById(R.id.rv_logs_list);
+        logRv = rootView.findViewById(R.id.rv_logs_list);
         logRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         logRv.setAdapter(new LearningLogsOfGroupRvAdapter(learningLogs));
         logRv.setHasFixedSize(true);

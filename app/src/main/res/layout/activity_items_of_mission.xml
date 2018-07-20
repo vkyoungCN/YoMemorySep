@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.vkyoungcn.smartdevices.yomemory.ItemsOfMissionActivity"
-    android:orientation="vertical">
+    >
 
+    <!--实际组件，fab面板以外的主体内容，fba按钮也在此内-->
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
     <!--页面上部，横向llt-->
     <LinearLayout
         android:layout_width="match_parent"
@@ -109,9 +115,6 @@
 
 
     </LinearLayout>
-
-
-
 
     <!--Rv部分上部的条纹分割线、题头，与Rv独立并列-->
     <LinearLayout
@@ -231,7 +234,7 @@
 
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_IAMD"
+            android:id="@+id/fab_more_IMA"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fabSize="normal"
@@ -243,7 +246,6 @@
             android:translationZ="2dp"
             />
         <TextView
-            android:id="@+id/fabTv_IAMD"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/click_and_more_2"
@@ -256,6 +258,250 @@
 
     </FrameLayout>
 
-
-
 </LinearLayout>
+
+
+    <!--FAB面板-->
+    <RelativeLayout
+        android:id="@+id/rlt_fabFlat_IMA"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.7"
+        android:background="#111111"
+        android:translationZ="4dp"
+        android:visibility="gone">
+
+        <!--FAB组的解释性文本组，位于FAB下方。其中设置44底边距，以让出下方按键的空间-->
+
+        <!--FAB组底边线。在文本组下方-->
+
+        <!--FAB组的按键组，这里没有使用support.design库，而是直接用了普通的ImageView，
+        本组位于解释文本组上方-->
+
+
+        <!--FAB组（上）的底边线。在上文本组的下方-->
+        <LinearLayout
+            android:id="@+id/fab_BottomLine_IMA"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="48dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:orientation="horizontal">
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_weight="2" />
+
+            <!--用于长度调整的小短线-->
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="3"
+                android:background="#ffffff" />
+        </LinearLayout>
+
+        <!--FAB组的解释性文本组（上）-->
+        <LinearLayout
+            android:id="@+id/fabText_IMA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/fab_BottomLine_IMA"
+            android:layout_marginBottom="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:orientation="horizontal">
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:gravity="center"
+                android:text="@string/str_extra_item_learn"
+                android:textColor="#ffffff"
+                android:textSize="12sp" />
+
+
+        </LinearLayout>
+
+        <!--FAB组的按键组（上）-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_above="@id/fabText_IMA"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:orientation="horizontal">
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="2" />
+
+            <ImageView
+                android:id="@+id/imv_extraRePick_IMA"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:gravity="center"
+                android:scaleType="centerInside"
+                android:src="@drawable/enhance" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <!--优先级筛选组件面板-->
+    <LinearLayout
+        android:id="@+id/llt_selectPanel_IMA"
+        android:layout_width="match_parent"
+        android:layout_height="112dp"
+        android:layout_marginTop="10dp"
+        android:alpha="0.9"
+        android:background="#222222"
+        android:orientation="vertical"
+        android:translationZ="4dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="@string/select_by_priority"
+            android:textColor="#ffffff" />
+        <!--第一行ckb-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:paddingTop="6dp">
+
+            <CheckBox
+                android:id="@+id/ckb_3_AIM"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:buttonTint="@color/yo_teal"
+                android:text="@string/num_3"
+                android:checked="true"
+                android:textColor="#ffffff" />
+
+            <CheckBox
+                android:id="@+id/ckb_4_AIM"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:checked="true"
+                android:buttonTint="@color/yo_teal"
+                android:text="@string/num_4"
+                android:textColor="#ffffff" />
+
+            <CheckBox
+                android:id="@+id/ckb_5_AIM"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:checked="true"
+                android:buttonTint="@color/yo_teal"
+                android:text="@string/num_5"
+                android:textColor="#ffffff" />
+
+            <CheckBox
+                android:id="@+id/ckb_6_AIM"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:checked="true"
+                android:layout_weight="1"
+                android:buttonTint="@color/yo_teal"
+                android:text="@string/num_6"
+                android:textColor="#ffffff" />
+
+            <CheckBox
+                android:id="@+id/ckb_7_AIM"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:buttonTint="@color/yo_teal"
+                android:checked="true"
+                android:text="@string/num_7"
+                android:textColor="#ffffff" />
+
+            <CheckBox
+                android:id="@+id/ckb_8_AIM"
+                android:layout_width="0dp"
+                android:checked="true"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:buttonTint="@color/yo_teal"
+                android:text="@string/num_8"
+                android:textColor="#ffffff" />
+
+            <CheckBox
+                android:id="@+id/ckb_9_AIM"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:checked="true"
+                android:layout_weight="1"
+                android:buttonTint="@color/yo_teal"
+                android:text="@string/num_9"
+                android:textColor="#ffffff" />
+
+        </LinearLayout>
+        <!--横分割线-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/yo_teal" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_selectingInfo_IMA"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
+                android:paddingEnd="12dp"
+                android:paddingStart="12dp"
+                android:text="@string/hs_selected_item_amount"
+                android:textColor="@color/yo_orange" />
+            <ImageView
+                android:id="@+id/imvBtn_selectingCancel_IMA"
+                android:layout_width="84dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:paddingEnd="8dp"
+                android:paddingStart="6dp"
+                android:paddingTop="6dp"
+                android:src="@drawable/cancel_3"
+                android:layout_toStartOf="@+id/imvBtn_selectingOk_IMA"
+                />
+            <ImageView
+                android:id="@+id/imvBtn_selectingOk_IMA"
+                android:layout_width="84dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:paddingEnd="6dp"
+                android:paddingStart="6dp"
+                android:paddingTop="6dp"
+                android:src="@drawable/confirm_4" />
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+
+
+</FrameLayout>

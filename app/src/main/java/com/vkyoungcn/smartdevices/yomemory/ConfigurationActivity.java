@@ -36,10 +36,10 @@ public class ConfigurationActivity extends AppCompatActivity implements
         showMoreBox = !noMoreTipBox;
         isFastLearnUseOrder = sharedPreferences.getBoolean(STR_IS_ORDER,true);
 
-        rgp_orderOrRandom = (RadioGroup) findViewById(R.id.rg_fastLearnManner_C);
-        rbn_random = (RadioButton) findViewById(R.id.rb_random_C);
-        rbn_order = (RadioButton) findViewById(R.id.rb_order_C);
-        ckb_showTipBox = (CheckBox) findViewById(R.id.ckb_showTipBox_C);
+        rgp_orderOrRandom = findViewById(R.id.rg_fastLearnManner_C);
+        rbn_random = findViewById(R.id.rb_random_C);
+        rbn_order = findViewById(R.id.rb_order_C);
+        ckb_showTipBox = findViewById(R.id.ckb_showTipBox_C);
 
         if(!noMoreTipBox){
             ckb_showTipBox.setChecked(true);//根据现有设置，配置对应的正确UI显示。
@@ -62,11 +62,7 @@ public class ConfigurationActivity extends AppCompatActivity implements
         switch (buttonView.getId()){
             case R.id.ckb_showTipBox_C:
 //                Log.i(TAG, "onCheckedChanged: ckb");
-                if(isChecked){
-                    showMoreBox = true;
-                }else {
-                    showMoreBox =false;
-                }
+                showMoreBox = isChecked;
                 editor.putBoolean(SP_STR_NO_MORE_TIPS,!showMoreBox);
                 editor.apply();
 

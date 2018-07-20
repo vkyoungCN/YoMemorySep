@@ -29,13 +29,13 @@
         />
 
     <TextView
-        android:id="@+id/tv_empty_dfgLHFinish"
+        android:id="@+id/tv_amountInfo_dfgLmFinish"
         android:layout_width="match_parent"
-        android:layout_height="42dp"
+        android:layout_height="64dp"
         android:gravity="center"
         android:paddingEnd="12dp"
         android:paddingStart="12dp"
-        android:text="@string/empty_amount_divide" />
+        android:text="@string/hs_end_report" />
 
     <!--横分割线-->
     <TextView
@@ -43,15 +43,6 @@
         android:layout_height="1dp"
         android:background="#efefef"
         />
-
-    <TextView
-        android:id="@+id/tv_wrong_dfgLHFinish"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:gravity="center"
-        android:paddingEnd="12dp"
-        android:paddingStart="12dp"
-        android:text="@string/wrong_info_un_correct" />
 
 
     <!--横分割线-->
@@ -62,7 +53,7 @@
         />
 
     <TextView
-        android:id="@+id/tv_restTime_dfgLHFinish"
+        android:id="@+id/tv_restTime_dfgLmFinish"
         android:layout_width="match_parent"
         android:layout_height="36dp"
         android:gravity="center"
@@ -75,14 +66,21 @@
         android:layout_height="1dp"
         android:background="#efefef"
         />
+    <TextView
+        android:id="@+id/tv_bottomInfo_dfgFinish"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center_vertical|start"
+        android:paddingEnd="12dp"
+        android:paddingStart="20dp"
+        android:textColor="@color/yo_orange"
+        />
     <Space
         android:layout_width="match_parent"
         android:layout_height="64dp" />
-    <TextView
-        android:id="@+id/space_64"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:visibility="gone"/>
+
+
     <!--横分割线-->
     <TextView
         android:layout_width="match_parent"
@@ -95,9 +93,8 @@
         android:orientation="horizontal"
         >
 
-
         <TextView
-            android:id="@+id/tvBtn_giveUp_dfgLHFinish"
+            android:id="@+id/tvBtn_giveUp_dfgLmFinish"
             android:layout_width="0dp"
             android:layout_weight="2"
             android:layout_height="match_parent"
@@ -105,11 +102,12 @@
             android:gravity="center"
             android:text="@string/give_up_2" />
 
+      
         <Space
             android:layout_width="1dp"
             android:layout_height="match_parent" />
         <TextView
-            android:id="@+id/tvBtn_back_dfgLHFinish"
+            android:id="@+id/tvBtn_back_dfgLmFinish"
             android:layout_width="0dp"
             android:layout_weight="2"
             android:layout_height="match_parent"
@@ -121,7 +119,7 @@
             android:layout_width="1dp"
             android:layout_height="match_parent" />
         <TextView
-            android:id="@+id/tvBtn_confirm_dfgLHFinish"
+            android:id="@+id/tvBtn_confirm_dfgLmFinish"
             android:layout_width="0dp"
             android:layout_weight="3"
             android:layout_height="match_parent"

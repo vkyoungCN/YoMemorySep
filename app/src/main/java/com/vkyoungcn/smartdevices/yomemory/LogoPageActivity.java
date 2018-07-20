@@ -45,7 +45,7 @@ public class LogoPageActivity extends AppCompatActivity implements Constants {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logo_page);
 
-        logoStrCn = (TextView)findViewById(R.id.logo_cn);
+        logoStrCn = findViewById(R.id.logo_cn);
         hpb_progress = findViewById(R.id.hpb_LPA);
         llt_firstRun = findViewById(R.id.llt_forFirstRun_LPA);
 

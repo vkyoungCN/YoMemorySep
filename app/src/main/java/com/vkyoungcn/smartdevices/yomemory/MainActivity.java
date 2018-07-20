@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity
 
     SharedPreferences sharedPreferences;
     boolean isBtnExplainBeenClicked;
-    ;
     private Handler handler = new MainActivity.MainActivityHandler(this);//通过其发送消息。
 
     private RecyclerView allMissionRecyclerView;
@@ -63,7 +62,7 @@ public class MainActivity extends AppCompatActivity
         //从数据库获取数据源Missions，本页其实只需要显示名称字段；但是按钮需要其所属碎片信息。
         new Thread(new FetchMissionsFromDBRunnable()).start();
 
-        allMissionRecyclerView = (RecyclerView) findViewById(R.id.all_missions_rv);
+        allMissionRecyclerView = findViewById(R.id.all_missions_rv);
         btn_explain = findViewById(R.id.btn_explain_MA);
         tv_slideForMore = findViewById(R.id.tv_slideForMore_MA);
 

@@ -75,7 +75,7 @@ public class RvMergeGroup implements Parcelable{
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
+    public Object clone() {
         //如果不包含引用成员，则浅复制即可
         RvMergeGroup rvMergeGroup = null;
         try {

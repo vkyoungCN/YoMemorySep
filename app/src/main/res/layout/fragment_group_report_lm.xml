@@ -14,7 +14,6 @@
         android:textSize="16sp" />
     <!--空词信息·全完成、部分完成-->
     <TextView
-        android:id="@+id/tv_groupInfo_fgLM_AC"
         android:layout_width="match_parent"
         android:layout_height="32dp"
         android:gravity="center_vertical"
@@ -49,7 +48,6 @@
 
 
         <TextView
-            android:id="@+id/tv_wrongInfo_fgLM_AC"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
@@ -67,7 +65,6 @@
             />
         <!--向下展开的按键-->
         <TextView
-            android:id="@+id/tvBtn_wrongWords_fgLM"
             android:layout_width="42dp"
             android:layout_height="match_parent"
             android:layout_gravity="end"
@@ -174,7 +171,6 @@
 
     <!--源碎片改变列表-->
     <LinearLayout
-        android:id="@+id/llt_oldFrags_ACA"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -187,7 +183,6 @@
             android:background="#efefef" />
         <!--源分组（碎片）的改变状态（合并（主）、合并（删）、拆（合并）、拆（无变化）、无变化）-->
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_oldFragsChange_ACA"
             android:layout_width="match_parent"
             android:layout_height="120dp"
 

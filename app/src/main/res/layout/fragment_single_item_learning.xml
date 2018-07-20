@@ -18,7 +18,6 @@
 
         <!--cardView本身基于Flt，估计不利排版，改套一层llt-->
         <LinearLayout
-            android:id="@+id/llt_singleItemLearningCDV"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"

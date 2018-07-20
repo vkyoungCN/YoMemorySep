@@ -24,6 +24,7 @@ import static com.vkyoungcn.smartdevices.yomemory.fragments.FastRePickDiaFragmen
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_AND_CREATE_ORDER;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_AND_CREATE_RANDOM;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_AND_MERGE;
+import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_EXTRA_NO_RECORDS;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_GENERAL;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_GENERAL_INNER_RANDOM;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.LEARNING_GENERAL_NO_GID;
@@ -149,6 +150,18 @@ public class PrepareForLearningActivity extends AppCompatActivity implements Con
                 new Thread(new PrepareDataForLMergeRunnable()).start();         // start thread
 
                 break;
+            case LEARNING_EXTRA_NO_RECORDS:
+                //此中模式下不需开启额外线程
+                ArrayList<SingleItem> items = getIntent().getParcelableArrayListExtra(STR_ITEMS_FOR_LEARNING);
+
+                Intent intentToLearningActivity_EXL = new Intent(this,LearningActivity.class);
+                intentToLearningActivity_EXL.putExtra(STR_LEARNING_TYPE,LEARNING_EXTRA_NO_RECORDS);
+                intentToLearningActivity_EXL.putExtra(STR_TABLE_NAME_SUFFIX,tableNameSuffix);
+                intentToLearningActivity_EXL.putParcelableArrayListExtra(STR_ITEMS_FOR_LEARNING,items);
+
+                intentToLearningActivity_EXL.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);//要求不记录
+                this.startActivity(intentToLearningActivity_EXL);
+
         }
     }
 

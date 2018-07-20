@@ -54,18 +54,18 @@ public class GroupDetailActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_detail);
 
-        TextView groupId = (TextView) findViewById(R.id.tv_id_GD);
-        TextView groupDescription = (TextView) findViewById(R.id.tv_description_GD);
-        TextView groupSubNum = (TextView) findViewById(R.id.tv_subNum_GD);
-        TextView settingUpTime = (TextView) findViewById(R.id.tv_setupTime_GD);
-        TextView lastLearnTime = (TextView) findViewById(R.id.tv_lastLearningTime_GD);
-        TextView group_MS = (TextView) findViewById(R.id.tv_ms_GD);
-        TextView group_RMA = (TextView) findViewById(R.id.tv_rma_GD);
-        TextView remainTime = (TextView) findViewById(R.id.tv_remainTime_GD);
+        TextView groupId = findViewById(R.id.tv_id_GD);
+        TextView groupDescription = findViewById(R.id.tv_description_GD);
+        TextView groupSubNum = findViewById(R.id.tv_subNum_GD);
+        TextView settingUpTime = findViewById(R.id.tv_setupTime_GD);
+        TextView lastLearnTime = findViewById(R.id.tv_lastLearningTime_GD);
+        TextView group_MS = findViewById(R.id.tv_ms_GD);
+        TextView group_RMA = findViewById(R.id.tv_rma_GD);
+        TextView remainTime = findViewById(R.id.tv_remainTime_GD);
 
         TextView moreLogsBtn = findViewById(R.id.ivBtn_allLogs_GD);
 
-        RecyclerView rv_itemsOfGroup = (RecyclerView)findViewById(R.id.rv_itemsOfGroup_GD);
+        RecyclerView rv_itemsOfGroup = findViewById(R.id.rv_itemsOfGroup_GD);
 
         rvGroup = getIntent().getParcelableExtra(STR_GROUP);
 //        Log.i(TAG, "onCreate: get rvg from intent,-.ms="+rvGroup.getMemoryStage());

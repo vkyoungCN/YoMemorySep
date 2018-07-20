@@ -19,106 +19,107 @@ public interface Constants {
 
 
     /* Bundle TAGs */
-    public static final String STR_BUNDLE_FOR_GENERAL = "BUNDLE_FOR_GENERAL";
-    public static final String STR_BUNDLE_FOR_MISSION = "BUNDLE_FOR_MISSION";
-    public static final String STR_BUNDLE_FOR_MERGE ="BUNDLE_FOR_MERGE";  public static final String STR_GROUP = "GROUP";
-    public static final String STR_DEFAULT_MANNER_SETTINGS ="DEFAULT_MANNER_SETTINGS";
-    public static final String STR_DEFAULT_MANNER_R_SETTINGS = "DEFAULT_MANNER_R_SETTINGS";
-    public static final String STR_DESCRIPTION ="DESCRIPTION";
-    public static final String STR_FAST_R_MANNER = "FAST_R_MANNER";
+    String STR_BUNDLE_FOR_GENERAL = "BUNDLE_FOR_GENERAL";
+    String STR_BUNDLE_FOR_MISSION = "BUNDLE_FOR_MISSION";
+    String STR_BUNDLE_FOR_MERGE ="BUNDLE_FOR_MERGE";  String STR_GROUP = "GROUP";
+    String STR_DEFAULT_MANNER_SETTINGS ="DEFAULT_MANNER_SETTINGS";
+    String STR_DEFAULT_MANNER_R_SETTINGS = "DEFAULT_MANNER_R_SETTINGS";
+    String STR_DESCRIPTION ="DESCRIPTION";
+    String STR_FAST_R_MANNER = "FAST_R_MANNER";
 
-    public static final String STR_GIDS_FOR_MERGE = "GIDS_FOR_MERGE";
-    public static final String STR_GROUP_ID = "GROUP_ID";
-    public static final String STR_GROUP_ID_FOR_MERGE ="GROUP_ID_FOR_MERGE";
-    public static final String STR_GROUP_ID_TO_JUMP = "GROUP_ID_TO_JUMP";
-    public static final String STR_GROUP_ID_TO_LEARN = "GROUP_ID_TO_LEARN";
-    public static final String STR_GROUP_SIZE = "GROUP_SIZE";
-    public static final String STR_GROUPS = "GROUPS";
+    String STR_GIDS_FOR_MERGE = "GIDS_FOR_MERGE";
+    String STR_GROUP_ID = "GROUP_ID";
+    String STR_GROUP_ID_FOR_MERGE ="GROUP_ID_FOR_MERGE";
+    String STR_GROUP_ID_TO_JUMP = "GROUP_ID_TO_JUMP";
+    String STR_GROUP_ID_TO_LEARN = "GROUP_ID_TO_LEARN";
+    String STR_GROUP_SIZE = "GROUP_SIZE";
+    String STR_GROUPS = "GROUPS";
 
-    public static final String STR_EMPTY_ITEMS_POSITIONS = "EMPTY_ITEMS_POSITIONS";
-    public static final String STR_IDS_GROUPS_READY_TO_MERGE = "IDS_GROUPS_READY_TO_MERGE";
-    public static final String STR_IS_FIRST_LAUNCH = "STR_IS_FIRST_LAUNCH";
-    public static final String STR_IS_ORDER = "IS_ORDER";
-    public static final String STR_ITEMS = "ITEMS";
-    public static final String STR_ITEMS_FOR_LEARNING = "ITEMS_FOR_LEARNING";
+    String STR_EMPTY_ITEMS_POSITIONS = "EMPTY_ITEMS_POSITIONS";
+    String STR_IDS_GROUPS_READY_TO_MERGE = "IDS_GROUPS_READY_TO_MERGE";
+    String STR_IS_FIRST_LAUNCH = "STR_IS_FIRST_LAUNCH";
+    String STR_IS_ORDER = "IS_ORDER";
+    String STR_ITEMS = "ITEMS";
+    String STR_ITEMS_FOR_LEARNING = "ITEMS_FOR_LEARNING";
 
-    public static final String STR_LEARNING_TYPE = "LEARNING_TYPE";
-    public static final String STR_MISSION = "MISSION";
-    public static final String STR_MISSION_ID ="MISSION_ID";
-    public static final String STR_NO_MORE_BOX = "NO_MORE_BOX";
+    String STR_LEARNING_TYPE = "LEARNING_TYPE";
+    String STR_MISSION = "MISSION";
+    String STR_MISSION_ID ="MISSION_ID";
+    String STR_NO_MORE_BOX = "NO_MORE_BOX";
 
-    public static final String STR_POSITION = "POSITION";
-    public static final String STR_PRIORITY_SETTING = "PRIORITY_SETTING";
-        public static final String STR_REST_MINUTES = "REST_MINUTES";
-    public static final String STR_REST_SECONDS = "REST_SECONDS";
-    public static final String STR_START_TIME = "START_TIME";
-    public static final String STR_STR_PERCENTAGE = "STR_PERCENTAGE";
-    public static final String STR_TABLE_NAME_SUFFIX = "TABLE_NAME_SUFFIX";
-    public static final String STR_TABLE_SUFFIX="TABLE_SUFFIX";
+    String STR_POSITION = "POSITION";
+    String STR_PRIORITY_SETTING = "PRIORITY_SETTING";
+        String STR_REST_MINUTES = "REST_MINUTES";
+    String STR_REST_SECONDS = "REST_SECONDS";
+    String STR_START_TIME = "START_TIME";
+    String STR_STR_PERCENTAGE = "STR_PERCENTAGE";
+    String STR_TABLE_NAME_SUFFIX = "TABLE_NAME_SUFFIX";
+    String STR_TABLE_SUFFIX="TABLE_SUFFIX";
 
-    public static final String STR_WRONG_ITEMS_POSITIONS = "WRONG_ITEMS_POSITIONS";
+    String STR_WRONG_ITEMS_POSITIONS = "WRONG_ITEMS_POSITIONS";
 
-    public static final String STR_DEFAULT_MANNER = "DEFAULT_MANNER";
-    public static final String STR_NO_MORE_R_BOX = "NO_MORE_R_BOX";
-    public static final String STR_WRONG_AMOUNT="WRONG_AMOUNT";
-    public static final String STR_FINISH_AMOUNT ="FINISH_AMOUNT";
-    public static final String STR_TOTAL_AMOUNT="TOTAL_AMOUNT";
-    public static final String STR_EMPTY_AMOUNT = "EMPTY_AMOUNT";
-    public static final String STR_TOTAL_NUM = "TOTAL_NUM";
-    public static final String STR_DONE_NUM="DONE_NUM";
-    public static final String STR_EMPTY_NUM = "EMPTY_NUM";
-    public static final String STR_CORRECT_NUM = "CORRECT_NUM";
-    public static final String STR_WRONG_NUM="WRONG_NUM";
-    public static final String STR_NEW_GROUP="NEW_GROUP";
-    public static final String STR_WRONG_NAMES="WRONG_NAMES";
-    public static final String STR_NEW_RMA="NEW_RMA";
-    public static final String STR_OLD_RMA="OLD_RMA";
-    public static final String STR_NEW_MS="NEW_MS";
-    public static final String STR_OLD_MS="OLD_MS";
-    public static final String STR_IS_MS_UP="IS_MS_UP";
-    public static final String STR_IS_TOO_LATE="IS_TOO_LATE";
-    public static final String STR_TERM_MS = "KEY_N";
-    public static final String STR_TERM_AMOUNT ="KEY_M";
-    public static final String STR_RV_MERGE_GROUP = "RV_MERGE_GROUP";
-    public static final String STR_NEW_MS_FOR_FETCH = "NEW_MS_FOR_FETCH";
-    public static final String STR_FIXED_GROUP_POSITION = "FIXED_CHOSED_GROUP";
-    public static final String STR_NO_DATA_BELLOW_THIS_AMOUNT = "NO_DATA_BELLOW_THIS_AMOUNT" ;
+    String STR_DEFAULT_MANNER = "DEFAULT_MANNER";
+    String STR_NO_MORE_R_BOX = "NO_MORE_R_BOX";
+    String STR_WRONG_AMOUNT="WRONG_AMOUNT";
+    String STR_FINISH_AMOUNT ="FINISH_AMOUNT";
+    String STR_TOTAL_AMOUNT="TOTAL_AMOUNT";
+    String STR_EMPTY_AMOUNT = "EMPTY_AMOUNT";
+    String STR_TOTAL_NUM = "TOTAL_NUM";
+    String STR_DONE_NUM="DONE_NUM";
+    String STR_EMPTY_NUM = "EMPTY_NUM";
+    String STR_CORRECT_NUM = "CORRECT_NUM";
+    String STR_CORRECT_AMOUNT = "CORRECT_AMOUNT";
+    String STR_WRONG_NUM="WRONG_NUM";
+    String STR_NEW_GROUP="NEW_GROUP";
+    String STR_WRONG_NAMES="WRONG_NAMES";
+    String STR_NEW_RMA="NEW_RMA";
+    String STR_OLD_RMA="OLD_RMA";
+    String STR_NEW_MS="NEW_MS";
+    String STR_OLD_MS="OLD_MS";
+    String STR_IS_MS_UP="IS_MS_UP";
+    String STR_IS_TOO_LATE="IS_TOO_LATE";
+    String STR_TERM_MS = "KEY_N";
+    String STR_TERM_AMOUNT ="KEY_M";
+    String STR_RV_MERGE_GROUP = "RV_MERGE_GROUP";
+    String STR_NEW_MS_FOR_FETCH = "NEW_MS_FOR_FETCH";
+    String STR_FIXED_GROUP_POSITION = "FIXED_CHOSED_GROUP";
+    String STR_NO_DATA_BELLOW_THIS_AMOUNT = "NO_DATA_BELLOW_THIS_AMOUNT" ;
 
 
 
     /* Date类Pattern字串 */
-    public static final String STR_DATE_PATTEN_1 = "yyyy-MM-dd HH:mm:ss";
+    String STR_DATE_PATTEN_1 = "yyyy-MM-dd HH:mm:ss";
 
     /* Fragment TAGs */
-    public static final String FG_STR_CREATE_GROUP = "CREATE_GROUP";
-    public static final String FG_STR_FAST_LEARN = "FAST_LEARN";
-    public static final String FG_STR_FAST_RE_PICK ="FAST_RE_PICK";
-    public static final String FG_STR_GIVE_EXPLANATION = "GIVE_EXPLANATION";
-    public static final String FG_STR_HANDY_FINISH = "HANDY_FINISH";
+    String FG_STR_CREATE_GROUP = "CREATE_GROUP";
+    String FG_STR_FAST_LEARN = "FAST_LEARN";
+    String FG_STR_FAST_RE_PICK ="FAST_RE_PICK";
+    String FG_STR_GIVE_EXPLANATION = "GIVE_EXPLANATION";
+    String FG_STR_HANDY_FINISH = "HANDY_FINISH";
 
-    public static final String FG_STR_LEARNING_ADD_IN_ORDER="LEARNING_ADD_IN_ORDER";
-    public static final String FG_STR_LEARNING_ADD_RANDOM = "LEARNING_ADD_RANDOM";
-    public static final String FG_STR_LESS_IN_GD_DIA = "LESS_IN_GD_DIA";
+    String FG_STR_LEARNING_ADD_IN_ORDER="LEARNING_ADD_IN_ORDER";
+    String FG_STR_LEARNING_ADD_RANDOM = "LEARNING_ADD_RANDOM";
+    String FG_STR_LESS_IN_GD_DIA = "LESS_IN_GD_DIA";
 
-    public static final String FG_STR_READY_TO_LEARN_GEL = "READY_TO_LEARN_GEL";
-    public static final String FG_STR_READY_TO_LEARN_LESS = "READY_TO_LEARN_LESS";
-    public static final String FG_STR_READY_TO_LEARN_MERGE ="READY_TO_LEARN_MERGE";
+    String FG_STR_READY_TO_LEARN_GEL = "READY_TO_LEARN_GEL";
+    String FG_STR_READY_TO_LEARN_LESS = "READY_TO_LEARN_LESS";
+    String FG_STR_READY_TO_LEARN_MERGE ="READY_TO_LEARN_MERGE";
 
-    public static final String FG_STR_SHOW_LOGS = "SHOW_LOGS";
-    public static final String FG_STR_TIME_UP_FINISH ="TIME_UP_FINISH";
+    String FG_STR_SHOW_LOGS = "SHOW_LOGS";
+    String FG_STR_TIME_UP_FINISH ="TIME_UP_FINISH";
 
 
-    public static final String FG_STR_DELETE_GROUP ="DELETE_GROUP";
-    public static final String FG_STR_QUERY_FOR_MERGE = "QUERY_FOR_MERGE";
+    String FG_STR_DELETE_GROUP ="DELETE_GROUP";
+    String FG_STR_QUERY_FOR_MERGE = "QUERY_FOR_MERGE";
 
     /* SharedPreferences */
-    public static final String SP_STR_TITLE_YO_MEMORY = "SP_STR_TITLE_YO_MEMORY";
-    public static final String SP_STR_BTN_EXPLAIN_CLICKED = "BTN_EXPLAIN_CLICKED";
-    public static final String SP_STR_IS_ORDER = "IS_ORDER";
-    public static final String SP_STR_NO_MORE_TIPS ="NO_MORE_TIPS";
+    String SP_STR_TITLE_YO_MEMORY = "SP_STR_TITLE_YO_MEMORY";
+    String SP_STR_BTN_EXPLAIN_CLICKED = "BTN_EXPLAIN_CLICKED";
+    String SP_STR_IS_ORDER = "IS_ORDER";
+    String SP_STR_NO_MORE_TIPS ="NO_MORE_TIPS";
 
-    public static final String SP_FAST_R_MANNER = "FAST_R_MANNER";
-    public static final String SP_NO_MORE_R_TIPS ="NO_MORE_R_TIPS";
+    String SP_FAST_R_MANNER = "FAST_R_MANNER";
+    String SP_NO_MORE_R_TIPS ="NO_MORE_R_TIPS";
 //    public static final String SP_;
 //    public static final String SP_;
 

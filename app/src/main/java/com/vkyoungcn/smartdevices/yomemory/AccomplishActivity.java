@@ -235,7 +235,8 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
                 accomplishActivity.handleMessage(msg);
             }
 
-        }};
+        }}
+
     /*
     * 正常学习模式下对应
     * 任务1、LOG信息的更新
@@ -412,7 +413,7 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
             //对items的所有索引值进行判断，如果该索引不在“空词的索引列表”中，则该索引对应的词非空。
             notEmptyItems = new ArrayList<>();
             for(int i=0; i<items.size();i++){
-                if(emptyItemPositions.indexOf((Integer)i)==-1){//已确认，在无此元素时返回-1。
+                if(emptyItemPositions.indexOf(i)==-1){//已确认，在无此元素时返回-1。
                     notEmptyItems.add(items.get(i));//此后，本线程只使用此列表数据集操作即可
                 }//由于全空状态下在进新线程前就被if分支截去了，因而必然有一个非空位置
             }
@@ -535,7 +536,7 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
             //寻找非空的词。将所有非空词加入一个临时列表，用于稍后修改。
             //对items的所有索引值进行判断，如果该索引不在“空词的索引列表”中，则该索引对应的词非空。
             for(int i=0; i<items.size();i++){
-                if(emptyItemPositions.indexOf((Integer)i)==-1){//已确认，在无此元素时返回-1。
+                if(emptyItemPositions.indexOf(i)==-1){//已确认，在无此元素时返回-1。
                     notEmptyItems.add(items.get(i));//此后，本线程只使用此列表数据集操作即可
                 }//由于全空状态下在进新线程前就被if分支截去了，因而必然有一个非空位置
             }
