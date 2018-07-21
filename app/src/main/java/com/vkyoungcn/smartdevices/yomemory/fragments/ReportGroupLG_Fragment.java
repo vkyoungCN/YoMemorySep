@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,13 +30,13 @@ import com.vkyoungcn.smartdevices.yomemory.validatingEditor.ValidatingEditor;
  * email: yangsheng@ouc.edu.cn
  * 2018.08.01
  * */
-【还要制作LM/LC对应的其他两种FG，以及对本fg的排错。】
 public class ReportGroupLG_Fragment extends Fragment implements Constants {
 //* 汇报本次学习的情况（作为Fg嵌入在学习结束页面中部）
 //* 本FG用于LG模式。
 
     private static final String TAG = "ReportGroupLG_Fragment";
 
+    /* 控件 */
     private TextView tv_gInfo;
     private TextView tv_gDvdInfo;
     private TextView tv_wrongInfo;
@@ -50,6 +51,9 @@ public class ReportGroupLG_Fragment extends Fragment implements Constants {
     private TextView tv_msReason;
 
     private TextView tv_expWrong;
+
+
+    /* */
     private boolean isWtvExpanded =false;
 
     private int totalNum=0;
@@ -95,8 +99,9 @@ public class ReportGroupLG_Fragment extends Fragment implements Constants {
             newGroupStr = getArguments().getString(STR_NEW_GROUP);
             wrongNamesStr = getArguments().getString(STR_WRONG_NAMES);
 
-            newRma = getArguments().getInt(STR_NEW_RMA);
-            oldRma =getArguments().getInt(STR_OLD_RMA);
+            newRma = getArguments().getFloat(STR_NEW_RMA);
+            Log.i(TAG, "onCreate: newRma out of Bundle = "+newRma);
+            oldRma =getArguments().getFloat(STR_OLD_RMA);
             newMs = getArguments().getInt(STR_NEW_MS);
             oldMs = getArguments().getInt(STR_OLD_MS);
 

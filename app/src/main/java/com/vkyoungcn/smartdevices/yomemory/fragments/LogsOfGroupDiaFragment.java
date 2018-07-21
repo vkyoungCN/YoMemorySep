@@ -12,11 +12,14 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
+import com.vkyoungcn.smartdevices.yomemory.Constants;
 import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.adapters.LearningLogsOfGroupRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleLearningLog;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /*
  * 作者：杨胜 @中国海洋大学
@@ -25,13 +28,15 @@ import java.util.ArrayList;
  * email: yangsheng@ouc.edu.cn
  * 2018.08.01
  * */
-public class LogsOfGroupDiaFragment extends DialogFragment {
+public class LogsOfGroupDiaFragment extends DialogFragment implements Constants {
 //* 展示分组的全部Logs的对话框，内含一个RecyclerView。
     private static final String TAG = "LogsOfGroupDiaFragment";
     private static final String STRING_LEARNING_LOGS = "LEARNING_LOGS";
     private ArrayList<SingleLearningLog> learningLogs;
+    private ArrayList<String> strLearningTimes = new ArrayList<>();
     private RecyclerView logRv;
 
+    SimpleDateFormat sdFormat = new SimpleDateFormat(STR_DATE_PATTEN_1);
 
     public LogsOfGroupDiaFragment() {
         // Required empty public constructor
@@ -51,6 +56,11 @@ public class LogsOfGroupDiaFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             learningLogs = getArguments().getParcelableArrayList(STRING_LEARNING_LOGS);
+            for (SingleLearningLog sll: learningLogs) {
+                Date dateLearningTime = new Date(sll.getTimeInLong());
+                String strLearningTime = sdFormat.format(dateLearningTime);
+                strLearningTimes.add(strLearningTime);
+            }
         }
     }
 
@@ -76,7 +86,7 @@ public class LogsOfGroupDiaFragment extends DialogFragment {
 
         logRv = rootView.findViewById(R.id.rv_logs_list);
         logRv.setLayoutManager(new LinearLayoutManager(getActivity()));
-        logRv.setAdapter(new LearningLogsOfGroupRvAdapter(learningLogs));
+        logRv.setAdapter(new LearningLogsOfGroupRvAdapter(learningLogs, strLearningTimes));
         logRv.setHasFixedSize(true);
 
         return rootView;

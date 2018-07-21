@@ -41,8 +41,9 @@ public class QueryForMergeDiaFragment extends DialogFragment
         QueryForMergeDiaFragment fragment = new QueryForMergeDiaFragment();
         /*Bundle args = new Bundle();
         args.putInt(STR_POSITION,position);*/
-        fragment.setArguments(data);
-
+        if(data!=null) {
+            fragment.setArguments(data);
+        }
         return fragment;
     }
 

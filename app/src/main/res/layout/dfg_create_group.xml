@@ -6,6 +6,10 @@
     android:orientation="vertical"
     tools:context=".fragments.CreateGroupDiaFragment">
 
+    <!--撑开宽度。如果全用match则宽度实际为最小值-->
+    <TextView
+        android:layout_width="300dp"
+        android:layout_height="1dp" />
     <!--
         分组大小选择
     -->

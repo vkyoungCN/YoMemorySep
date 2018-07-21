@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +35,7 @@ import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteract
  * 2018.08.01
  * */
 public class AccomplishActivity extends AppCompatActivity implements Constants {
+    private static final String TAG = "AccomplishActivity";
     //主要处理逻辑（业务）
     //
     // 空的：
@@ -63,19 +65,36 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
     public static final String STR_FRAG_MERGED_FULL = "完全吞噬";
     public static final String STR_FRAG_MERGE_UN = "未受影响";
 
+
+    /* 控件 */
     private FrameLayout flt_fragment;
     private FrameLayout flt_mask;
     private TextView tv_startTime;
     private TextView tv_usedUpTime;
-//    private TextView tv_finishTime;
     private TextView tv_learningType;
+    private TextView tv_saving;
 
+
+    //    private TextView tv_finishTime;
+
+
+    /* Intent收发*/
     private int learningType;
     private String tableSuffix = "";
     private long startTime = 0;
     private int restMinutes = 0;
     private int restSeconds = 0;
-    private TextView tv_saving;
+
+    private float newRma=0;
+    private float oldRma=0;
+    private int newMs = 0;
+    private int oldMs = 0;
+
+    private int totalNum=0;
+    private int doneNum=0;
+    private int emptyNum=0;
+    private int correctNum=0;
+    private int wrongNum=0;
 
     private ArrayList<Integer> oldFragsSizes;
     private ArrayList<Integer> newFragsSizes;//用于LM下合并提交到DB后各来源组的新容量。
@@ -87,16 +106,7 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
     private boolean isTooFar = false;
     private boolean isDivided = false;//最终是否拆分（仅LG模式下使用）.[LM模式下，如果主组都未完成，则也要拆分，同样会使用本标记]
 //    private RVGroup groupRvNew;//（LG模式下用）DB操作完成后，从DB重新取得分组数据。
-    private float newRma=0;
-    private float oldRma=0;
-    private int newMs = 0;
-    private int oldMs = 0;
 
-    private int totalNum=0;
-    private int doneNum=0;
-    private int emptyNum=0;
-    private int correctNum=0;
-    private int wrongNum=0;
 
     private String newGroupStr="";
     private String wrongNamesStr="";
@@ -138,6 +148,8 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
         restMinutes = getIntent().getIntExtra(STR_REST_MINUTES,0);
         restSeconds = getIntent().getIntExtra(STR_REST_SECONDS,0);
 
+
+
         flt_mask = findViewById(R.id.flt_mask_ACA);
 
         flt_fragment = findViewById(R.id.flt_fragment_AC);
@@ -175,14 +187,14 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
         String tempStr = "";
         if(learningType == LEARNING_GENERAL){
             tempStr=UI_STR_LEARNING_TYPE_G;
-            groupId = getIntent().getIntExtra("GROUP_ID",0);
+            groupId = getIntent().getIntExtra(STR_GROUP_ID,0);
 
             new Thread(new GeneralAccomplishRunnable()).start();         // 用于LG模式下的DB与计算线程
             //fg的加载到消息处理方法完成。
 
         }else if(learningType == LEARNING_AND_MERGE){
             tempStr =UI_STR_LEARNING_TYPE_M;
-            gIdsForMerge = getIntent().getIntegerArrayListExtra("GROUP_ID_FOR_MERGE");
+            gIdsForMerge = getIntent().getIntegerArrayListExtra(STR_GROUP_ID_FOR_MERGE);
 
 //            rv_oldFragsMergeInfo = (RecyclerView)findViewById(R.id.rv_oldFragsChange_ACA);
             new Thread(new MergedAccomplishRunnable()).start();         // 用于LM模式下的DB与计算线程
@@ -190,7 +202,7 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
 
         }else if(learningType == LEARNING_AND_CREATE_RANDOM ||learningType == LEARNING_AND_CREATE_ORDER) {
             tempStr = UI_STR_LEARNING_TYPE_C;
-            missionId = getIntent().getIntExtra("MISSION_ID",0);
+            missionId = getIntent().getIntExtra(STR_MISSION_ID,0);
 
             new Thread(new CreatedAccomplishRunnable()).start();         // 用于LC模式下的DB与计算线程
         }
@@ -263,30 +275,44 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
             //准备存入DB的系列操作
             //一、Logs。
             // 以下数据计算本次学习的时间有效与否
-            byte ms = group.getEffectiveRePickingTimes();
-            float rma = RVGroup.getRMAmount(ms,group.getLastLearningTime());
-            int minutesFarThreshold = RVGroup.minutesTillFarThreshold(ms,rma);
-            int minutesShortThreshold = minutesFarThreshold/5;
+            oldMs = group.getEffectiveRePickingTimes();
+            SingleLearningLog newLearningLog = new SingleLearningLog(startTime, groupId, true);//按开始时间（暂定）
 
-            //判断时间以及MS是否有效（但不论是否有效都需要将本次log写入DB（区别在于isEffective列的值））
-            int minutesSinceLastLog = (int)(startTime-group.getLastLearningTime())/(1000*60);
+            if(oldMs !=0){
+                //不是初次学习时执行
+                //如果==0则是初次学习。此时上次学习是“1970-1-1”无法计算门槛时间，因而无计算必要，直接置true（保留不动）即可
 
-            //构造本次学习对应的单条新log，并判定是否有效【并做全局记录，稍后要将数据传入fg】
-            SingleLearningLog newLearningLog = new SingleLearningLog(startTime,groupId,true);//按开始时间（暂定）
-            if(minutesSinceLastLog<minutesShortThreshold){
-                newLearningLog.setEffective(false);
-                isTooNear = true;
-                isTooLate = false;
-                isMsUp =false;
-            }else if(minutesSinceLastLog>minutesFarThreshold){
-                newLearningLog.setEffective(false);
-                isTooFar = true;
-                isMsUp =false;
-                isTooLate =true;
+                //以下，计算时间门槛，确定本log是否为“有效”
+                oldRma = RVGroup.getRMAmount((byte)oldMs, group.getLastLearningTime());
+                int minutesFarThreshold = RVGroup.minutesTillFarThreshold((byte)oldMs, oldRma);
+                int minutesShortThreshold = minutesFarThreshold / 5;
+//                Log.i(TAG, "run: old ms_1=" + oldMs);
+//                Log.i(TAG, "run: old rma_1=" + rma);
+
+                //判断时间以及MS是否有效（但不论是否有效都需要将本次log写入DB（区别在于isEffective列的值））
+                int minutesSinceLastLog = (int) (startTime - group.getLastLearningTime()) / (1000 * 60);
+
+                //构造本次学习对应的单条新log，并判定是否有效【并做全局记录，稍后要将数据传入fg】
+                if (minutesSinceLastLog < minutesShortThreshold) {
+                    newLearningLog.setEffective(false);
+                    isTooNear = true;
+                    isTooLate = false;
+                    isMsUp = false;
+                } else if (minutesSinceLastLog > minutesFarThreshold) {
+                    newLearningLog.setEffective(false);
+                    isTooFar = true;
+                    isMsUp = false;
+                    isTooLate = true;
+                } else {
+                    newLearningLog.setEffective(true);
+                    isMsUp = true;
+                    isTooLate = false;
+                }
             }else {
+                //初学
                 newLearningLog.setEffective(true);
                 isMsUp = true;
-                isTooLate =false;
+                isTooLate = false;
             }
 
             //【DB操作】：新Log记录提交到DB
@@ -390,13 +416,19 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
             //准备需要向fg发送的信息，先通过全局变量传递到UI线程
             DBGroup groupNew = memoryDbHelper.getGroupById(groupId,tableSuffix);//虽是同一个gid，但此时其log、items(拆分时)均已得到更新；
             RVGroup groupRvNew = new RVGroup(groupNew);
-            newRma = groupRvNew.getRM_Amount();
+            newRma = groupRvNew.getRM_Amount()<100?groupRvNew.getRM_Amount():100;//由于浮点计算，有可能会得到100.8这样的结果
+//            Log.i(TAG, "run: newRma="+newRma);
             newMs = groupNew.getEffectiveRePickingTimes();
-            //分组的旧RMA/ms数据
-            RVGroup groupRvOld = new RVGroup(group);//相应group类持有的lastLearningTime仍然是复习之前的数据
-            oldRma = groupRvOld.getRM_Amount();
-            oldMs = groupRvOld.getMemoryStage();
+//            Log.i(TAG, "run: newMS="+newMs);
 
+            //分组的旧RMA/ms数据
+//            RVGroup groupRvOld = new RVGroup(group);//相应group类持有的lastLearningTime仍然是复习之前的数据【计算出来和新的一样，不对】
+//            oldRma = groupRvOld.getRM_Amount();
+//            Log.i(TAG, "run: oldRma="+oldRma);
+
+//            AccomplishActivity.this.oldMs = groupRvOld.getMemoryStage();
+//            Log.i(TAG, "run: oldMs="+ AccomplishActivity.this.oldMs);
+//            Log.i(TAG, "run: item(0).priority="+items.get(0).getPriority());
             handler.sendMessage(message);
         }
     }
@@ -619,10 +651,12 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
         bundleForFG.putInt("CORRECT_NUM",correctNum);
         bundleForFG.putInt("WRONG_NUM",wrongNum);
 
-        bundleForFG.putFloat("NEW_RMA",newRma);
-        bundleForFG.putFloat("OLD_RMA",oldRma);
-        bundleForFG.putInt("NEW_MS",newMs );
-        bundleForFG.putInt("OLD_MS",oldMs);
+        Log.i(TAG, "handleMessage: newRma before put in Bundle = "+newRma);
+        Log.i(TAG, "handleMessage: oldRma before put in Bundle = "+oldRma);
+        bundleForFG.putFloat(STR_NEW_RMA,newRma);
+        bundleForFG.putFloat(STR_OLD_RMA,oldRma);
+        bundleForFG.putInt(STR_NEW_MS,newMs );
+        bundleForFG.putInt(STR_OLD_MS,oldMs);
 
         bundleForFG.putString("NEW_GROUP",newGroupStr);
         bundleForFG.putString("WRONG_NAMES",wrongNamesStr);

@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
@@ -26,6 +27,11 @@ import java.util.regex.Pattern;
  * 2018.08.01
  * */
 public class ValidatingEditor extends View {
+//* 字体可以根据词的长度动态调整（有一个最大值，当空间不足以容纳时会缩小）
+//* 当前的设计逻辑中单词将在一行内显示完毕。
+//* 如果输入的正确，则背景、下划线呈现绿色，有错的字母则背景呈红色，错字下方的下划线呈现红色；
+//* 每输入一个有效字符可以向监听（自定义）发送消息（携带当前的完整字串），全部输入且正确时发送另一种监听消息；
+
     private static final String TAG = "ValidatingEditor";
     private Context mContext;
 
@@ -39,7 +45,7 @@ public class ValidatingEditor extends View {
     private LimitedStack<Character> characters;
     private BottomLine bottomLines[];
     private int leastWrongPosition = 0;//从1起，0预置。（记录输入的字符之出错的各字符中索引数最小的一个，用于删除改正时的改色逻辑）
-    private int currentPosition = 0;//从1起算。
+    private int currentPosition = 0;//第一个字母的位置是1。
 
     private boolean isDataInitBeInterruptedBecauseOfNoSize = false;
 
@@ -54,8 +60,8 @@ public class ValidatingEditor extends View {
 
     /* 尺寸组 */
     private float padding;
-    private float sectionGapLarge;//4dp
-    private float sectionGapSmall;//2dp
+    private float sectionGapLarge;//6dp【根据模拟器表现调整】
+    private float sectionGapSmall;//4dp
 
     private float bottomLineHeightLarge;//4dp
     private float bottomLineHeightSmall;//2dp
@@ -65,7 +71,6 @@ public class ValidatingEditor extends View {
 
     private float textSize;//【考虑让文字尺寸后期改用和section宽度一致或稍小的直接数据】
     private float textBaseLineBottomGap;
-    private float viewHeight;
 
     int lines = 1;//控件需要按几行显示，根据当前屏幕下控件最大允许宽度和控件字符数（需要的宽度）计算得到。
 
@@ -189,6 +194,7 @@ public class ValidatingEditor extends View {
 
     private void init(AttributeSet attributeset) {
         initSize();
+        initColor();
         initPaint();
         initViewOptions();
     }
@@ -207,17 +213,17 @@ public class ValidatingEditor extends View {
     }
 
     private void initSize() {
-        padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics());
+        padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics());
         maxSectionWidth =  (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics());
 //        maxSectionWidth = getContext().getResources().getDimension(R.dimen.bottomLine_stroke_width);//【旧方法？】查API知此方法自动处理单位转换。
 //        sectionGapLarge = getContext().getResources().getDimension(R.dimen.bottomLine_horizontal_margin);
-        sectionGapLarge = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics());
-        sectionGapSmall = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
+        sectionGapLarge = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, getResources().getDisplayMetrics());
+        sectionGapSmall = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics());
         bottomLineHeightLarge = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics());
         bottomLineHeightSmall = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
-        textBaseLineBottomGap = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics());
+        textBaseLineBottomGap = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics());
 
-        textSize =  (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 18, getResources().getDisplayMetrics());
+        textSize =  (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 34, getResources().getDisplayMetrics());
 //        viewHeight = getContext().getResources().getDimension(R.dimen.view_height);
     }
 
@@ -235,28 +241,31 @@ public class ValidatingEditor extends View {
     private void initPaint() {
         bottomLinePaint = new Paint();
         bottomLinePaint.setColor(bottomLineColor);
-        bottomLinePaint.setStrokeWidth(maxSectionWidth);
+        bottomLinePaint.setStrokeWidth(bottomLineHeightLarge);
         bottomLinePaint.setStyle(android.graphics.Paint.Style.STROKE);
 
         bottomLineErrPaint = new Paint();
         bottomLineErrPaint.setColor(bottomErrColor);
-        bottomLineErrPaint.setStrokeWidth(maxSectionWidth);
+        bottomLineErrPaint.setStrokeWidth(bottomLineHeightLarge);
         bottomLineErrPaint.setStyle(android.graphics.Paint.Style.STROKE);
 
         textPaint = new Paint();
         textPaint.setTextSize(textSize);
+//        textPaint.setStrokeWidth(4);
         textPaint.setColor(textColor);
         textPaint.setAntiAlias(true);
 //        textPaint.setTextAlign(Paint.Align.CENTER);
 
         textErrPaint = new Paint();
         textErrPaint.setTextSize(textSize);
+        textErrPaint.setStrokeWidth(4);
         textErrPaint.setColor(textErrColor);
         textErrPaint.setAntiAlias(true);
 //        textErrPaint.setTextAlign(Paint.Align.CENTER);//如果开启了这个，x坐标就不再是左端起点而是横向上的中点。
 
         textWaitingPaint = new Paint();
         textWaitingPaint.setTextSize(textSize);
+        textWaitingPaint.setStrokeWidth(4);
         textWaitingPaint.setColor(textErrColor);
         textWaitingPaint.setAntiAlias(true);
         textWaitingPaint.setTextAlign(Paint.Align.CENTER);//如果开启了这个，x坐标就不再是左端起点而是横向上的中点。
@@ -264,11 +273,13 @@ public class ValidatingEditor extends View {
 
         backgroundPaint = new Paint();
         backgroundPaint.setStyle(Paint.Style.FILL);
+        backgroundPaint.setStrokeWidth(4);
         backgroundPaint.setAntiAlias(true);
         backgroundPaint.setColor(backgroundColor);
 
         backgroundErrPaint = new Paint();
         backgroundErrPaint.setStyle(Paint.Style.FILL);
+        backgroundErrPaint.setStrokeWidth(4);
         backgroundErrPaint.setAntiAlias(true);
         backgroundErrPaint.setColor(backgroundErrColor);
 
@@ -292,6 +303,7 @@ public class ValidatingEditor extends View {
         // 则需要在此重新对下划线数据进行设置
         if(isDataInitBeInterruptedBecauseOfNoSize){
             isDataInitBeInterruptedBecauseOfNoSize =false;//表示事件/状况已被消耗掉
+//            Log.i(TAG, "onSizeChanged: initBL");
             initBottomLines(w,targetText.length());
         }
 
@@ -349,6 +361,7 @@ public class ValidatingEditor extends View {
             if(currentPosition<leastWrongPosition){
                 leastWrongPosition = 0;
             }
+            Log.i(TAG, "onKeyDown: currentPos="+currentPosition);
             invalidate();//字符改变，重绘
 
             listener.onCodeChanged(getCurrentString());
@@ -385,7 +398,11 @@ public class ValidatingEditor extends View {
             }
             characters.push(character);
 
-            if (characters.size() >= targetText.length() ) {//满了
+            if (characters.size() >= targetText.length() ) {//满了【重绘必须在回调之前，且两分支都要有！（排错小结）】
+                currentPosition = targetText.length();//【这里既不能继续++，也不能保持数字不变，所以Z直接设置为最大值】
+                invalidate();//字符改变，重绘
+                Log.i(TAG, "inputText: currentPos inside VE ="+currentPosition);
+
                 if(getCurrentString().compareTo(targetText) == 0) {
                     if(listener != null) {
                         listener.onCodeChanged(getCurrentString());//需要在onCCA方法前调用，
@@ -395,14 +412,17 @@ public class ValidatingEditor extends View {
                         // 但由于本块代码仍然满足触发条件，因而可能会产生“滑动到某已满卡片后，任意敲入一字符则卡片向后滑动”效果】
                     }
                 }
+
             }else {//还没满（但显然也必须是输入开始后，每次输入（且已成功输入到了characters中后）才会触发）
                 currentPosition++;
-
+                Log.i(TAG, "inputText: currentPos inside VE ="+currentPosition);
                 //记录输入的字符之出错的各字符中，索引值最小的一个。
                 if(Character.compare(character,targetText.charAt(currentPosition-1))!=0){//此位置上字符输入不正确
+
                     if(leastWrongPosition==0){
                         leastWrongPosition = currentPosition;//只需记录一次（最小索引位置）即可
                     }
+
                 }
                 invalidate();//字符改变，重绘
 
@@ -419,7 +439,7 @@ public class ValidatingEditor extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-
+//        Log.i(TAG, "onDraw: characters="+characters.toString());
         if(targetText.isEmpty()) {
             //此时目标字符还未设置，可以只绘制一个背景
             float fromX = padding;
@@ -428,7 +448,6 @@ public class ValidatingEditor extends View {
             float toY = sizeChangedHeight - padding;
 
             canvas.drawRect(fromX,fromY,toX,toY,backgroundPaint);
-            //居中绘制文字“正在初始化”（暂略）
             return;
         }
 
@@ -440,12 +459,13 @@ public class ValidatingEditor extends View {
         }
 
         //绘制背景
-        float fromX = padding;
+        float fromX = padding-8;
         float fromY = padding;
-        float toX = sizeChangedWidth - padding;
+        float toX = sizeChangedWidth - padding+8;
         float toY = sizeChangedHeight - padding;
+//        canvas.drawRect(0,0,600,600,backgroundPaint);
         canvas.drawRect(fromX,fromY,toX,toY,backgroundPaint);
-
+//        Log.i(TAG, "onDraw: background done");
         //绘制下划线和文字
         for (int i = 0; i < bottomLines.length; i++) {
             BottomLine line = bottomLines[i];
@@ -505,16 +525,18 @@ public class ValidatingEditor extends View {
     }
 
     private void initData() {
-        bottomLines = new BottomLine[targetText.length()];
-        characters = new LimitedStack();
-        characters.setTopLimitSize(targetText.length());
-
+        if(!targetText.isEmpty()) {
+            bottomLines = new BottomLine[targetText.length()];
+            characters = new LimitedStack();
+            characters.setTopLimitSize(targetText.length());
+        }
         if(initText!=null){
             //如果初始字串不空，则将其存入数据组；
             char[] chars = initText.toCharArray();
             for (char c: chars){
                 characters.push(c);
             }
+//            Log.i(TAG, "initData: characters="+characters.toString());
         }
 
         //根据初始化了的目标字串来初始化下划线数据
@@ -529,6 +551,14 @@ public class ValidatingEditor extends View {
     }
 
     private void initBottomLines(int viewMaxWidth,int bottomLinesAmount) {
+        bottomLines = new BottomLine[bottomLinesAmount];
+        for(int i=0;i<targetText.length();i++){//必须得这样彻底初始化，如果只有上一句而不进行for循环初始则崩溃。
+            bottomLines[i] = new BottomLine();
+        }
+//        Log.i(TAG, "initBottomLines: targetText.length="+targetText.length());
+//        Log.i(TAG, "initBottomLines: bottomLines="+bottomLines);
+        characters = new LimitedStack();
+        characters.setTopLimitSize(targetText.length());
         //决定只绘制一行
         //可用总长（控件宽扣除两侧缩进）
         float availableTotalWidth = viewMaxWidth - padding*2;
@@ -539,9 +569,12 @@ public class ValidatingEditor extends View {
             for (int i = 0; i < bottomLinesAmount; i++) {
                 bottomLines[i].fromX =padding +(maxSectionWidth+sectionGapLarge)*i;
                 //注意，先确定下方位置再确定上方位置。说明控件是靠下的gravity。
+                bottomLines[i].fromY = sizeChangedHeight-padding;
                 bottomLines[i].toY = sizeChangedHeight-padding;
-                bottomLines[i].fromY =bottomLines[i].toY-bottomLineHeightLarge;
                 bottomLines[i].toX = bottomLines[i].fromX+maxSectionWidth;
+//                Log.i(TAG, "initBottomLines: fx="+bottomLines[i].fromX);
+//                Log.i(TAG, "initBottomLines: fy="+bottomLines[i].fromY);
+
             }
         }else {
             //使用小尺寸间隔以及动态确定的每节长度【字符大小还需另行确定】
@@ -552,10 +585,19 @@ public class ValidatingEditor extends View {
                 bottomLines[i].fromX =padding +(finalLineWidth+sectionGapSmall)*i;
                 //注意，先确定下方位置再确定上方位置。说明控件是靠下的gravity。
                 bottomLines[i].toY = sizeChangedHeight-padding;
-                bottomLines[i].fromY =bottomLines[i].toY-bottomLineHeightSmall;
+                bottomLines[i].fromY =sizeChangedHeight-padding;
                 bottomLines[i].toX = bottomLines[i].fromX+finalLineWidth;
             }
+
+            //改文字画笔的字号大小
+            float smallerTextSize = (textSize/maxSectionWidth)*finalLineWidth;
+            textPaint.setTextSize(smallerTextSize);
+            textWaitingPaint.setTextSize(smallerTextSize);
+            textErrPaint.setTextSize(smallerTextSize);
+
         }
+//        Log.i(TAG, "initBottomLines: invalidate, init="+initText);
+
         invalidate();//完成了目标数据、下划线的初始化后刷新控件。
 
 /*
@@ -579,8 +621,9 @@ public class ValidatingEditor extends View {
     * */
     public void setInitText(String initText) {
         this.initText = initText;
+//        Log.i(TAG, "setInitText: String Received in Ve = "+initText);
 
-        //还应存入数据数组
+        //存入数据数组
         if(initText!=null){
             //先对旧数据清空
             characters.clear();

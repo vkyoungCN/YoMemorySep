@@ -45,10 +45,11 @@ public class LearningCreateOrderDiaFragment extends DialogFragment implements Vi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView =  inflater.inflate(R.layout.dfg_create_group, container, false);
+        View rootView =  inflater.inflate(R.layout.dfg_learning_add_order, container, false);
+        //虽然采用创建分组一致的布局，但最后由本dfg传递不同的dfgType给Activity因而可以。
 
-        tvCancel = (TextView) rootView.findViewById(R.id.btn_cancel_learningAddInOrder);
-        tvConfirm = (TextView) rootView.findViewById(R.id.btn_confirm_learningAddInOrder);
+        tvCancel = (TextView) rootView.findViewById(R.id.btn_cancel_learningAddOrder);
+        tvConfirm = (TextView) rootView.findViewById(R.id.btn_confirm_learningAddOrder);
 
         //部分需要添加事件监听
         tvConfirm.setOnClickListener(this);
@@ -80,10 +81,12 @@ public class LearningCreateOrderDiaFragment extends DialogFragment implements Vi
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.btn_confirm_learningAddInOrder://创建新分组
+            case R.id.btn_confirm_learningAddOrder://创建新分组
                 mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_AND_CREATE_ORDER,null);
+                this.dismiss();
                 break;
-            case R.id.btn_cancel_learningAddInOrder:
+
+            case R.id.btn_cancel_learningAddOrder:
 
                 this.dismiss();
                 break;

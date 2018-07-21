@@ -1,6 +1,8 @@
 package com.vkyoungcn.smartdevices.yomemory.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +11,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vkyoungcn.smartdevices.yomemory.Constants;
+import com.vkyoungcn.smartdevices.yomemory.ItemDetailActivity;
+import com.vkyoungcn.smartdevices.yomemory.ItemsOfMissionActivity;
 import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
 
@@ -21,12 +26,13 @@ import java.util.List;
  * email: yangsheng@ouc.edu.cn
  * 2018.08.01
  * */
-public class ItemsOfMissionRvAdapter extends RecyclerView.Adapter<ItemsOfMissionRvAdapter.ViewHolder> {
+public class ItemsOfMissionRvAdapter extends RecyclerView.Adapter<ItemsOfMissionRvAdapter.ViewHolder>
+        implements Constants {
 //* 用于展示任务所属各Items的RecyclerView的适配器
 //* 纵向列表形式
     private static final String TAG = "ItemsOfMissionRvAdapter";
 
-    private List<SingleItem> items;//数据源
+    private ArrayList<SingleItem> items;//数据源
     private Context context;
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -54,6 +60,10 @@ public class ItemsOfMissionRvAdapter extends RecyclerView.Adapter<ItemsOfMission
                 case R.id.rv_goDetail_itemOfMission:
                     //暂时没有动作
                     Toast.makeText(context, "转到单项状态页，施工中……", Toast.LENGTH_SHORT).show();
+                    Intent intentToItemDetail = new Intent(context,ItemDetailActivity.class);
+                    intentToItemDetail.putExtra(STR_ITEM,items.get(getAdapterPosition()));
+                    ((ItemsOfMissionActivity)context).startActivity(intentToItemDetail);
+
             }
         }
 
@@ -79,7 +89,7 @@ public class ItemsOfMissionRvAdapter extends RecyclerView.Adapter<ItemsOfMission
 
     }
 
-    public ItemsOfMissionRvAdapter(List<SingleItem> items, Context context) {
+    public ItemsOfMissionRvAdapter(ArrayList<SingleItem> items, Context context) {
         this.items = items;
 //        ItemTableNameSuffix = itemTableNameSuffix;
         this.context = context;

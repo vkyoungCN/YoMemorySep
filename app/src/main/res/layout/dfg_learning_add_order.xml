@@ -4,70 +4,75 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".fragments.DeleteGroupDiaFragment">
+    tools:context=".fragments.LearningCreateOrderDiaFragment">
 
     <!--撑开宽度。如果没有具体宽度，即使全用match则宽度也按wrap计算-->
     <TextView
         android:layout_width="300dp"
         android:layout_height="1dp" />
 
-    <!--Title-->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="42dp"
+        android:layout_height="36dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp"
         android:background="#efefef"
-        android:text="@string/confirm_delete"
-        android:textSize="16sp"
         android:gravity="center"
-        />
+        android:paddingEnd="36dp"
+        android:paddingStart="36dp"
+        android:text="@string/title_dfg_learningAddOrder"
+        android:textSize="16sp" />
+
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:padding="32dp"
-        android:text="@string/confirm_delete_2"
+        android:layout_height="220dp"
+        android:layout_margin="2dp"
+        android:ellipsize="marquee"
         android:gravity="center"
-        android:textSize="16sp"
-        android:textColor="#ef5350"
-
-        />
+        android:lines="2"
+        android:paddingEnd="12dp"
+        android:paddingStart="12dp"
+        android:text="@string/explanations_learningAddOrder"
+        android:textColor="#ffe52525" />
 
     <!--横分割线-->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/yo_red"
+        android:layout_height="2dp"
+        android:background="@color/yo_light_green"
         />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:orientation="horizontal"
-        android:layout_marginTop="1dp"
         >
 
         <TextView
-            android:id="@+id/btn_cancel_deleteGroupDfg"
+            android:id="@+id/btn_cancel_learningAddOrder"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="match_parent"
+            android:layout_marginEnd="1dp"
+            android:layout_weight="1"
+            android:background="#f5f5f5"
             android:gravity="center"
-            android:layout_margin="1dp"
             android:text="@string/cancel"
-            android:textSize="16sp"
-            android:background="#efefef"
-            />
+            android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/btn_ok_deleteGroupDfg"
+            android:id="@+id/btn_confirm_learningAddOrder"
             android:layout_width="0dp"
-            android:layout_weight="2"
             android:layout_height="match_parent"
+            android:layout_marginStart="1dp"
+            android:layout_weight="3"
+            android:background="#e0e0e0"
             android:gravity="center"
-            android:layout_margin="1dp"
             android:text="@string/confirm"
             android:textSize="16sp"
-            android:background="#e57373"
+
             />
+
+
     </LinearLayout>
 
 

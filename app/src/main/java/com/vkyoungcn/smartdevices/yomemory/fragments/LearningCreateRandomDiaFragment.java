@@ -83,6 +83,7 @@ public class LearningCreateRandomDiaFragment extends DialogFragment implements V
         switch (view.getId()){
             case R.id.btn_confirm_learningAddRandom://创建新分组
                 mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_AND_CREATE_RANDOM,null);
+                this.dismiss();
                 break;
             case R.id.btn_cancel_learningAddRandom:
 

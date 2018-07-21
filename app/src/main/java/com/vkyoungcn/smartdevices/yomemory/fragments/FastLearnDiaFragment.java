@@ -61,8 +61,8 @@ public class FastLearnDiaFragment extends DialogFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
-            this.defaultManner = savedInstanceState.getInt(STR_DEFAULT_MANNER);
+        if (getArguments() != null) {
+            this.defaultManner = getArguments().getInt(STR_DEFAULT_MANNER);
         }
     }
 

@@ -60,7 +60,7 @@ public class LearningGelDiaFragment extends DialogFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            this.rvGroup = savedInstanceState.getParcelable(STR_GROUP);
+            this.rvGroup = getArguments().getParcelable(STR_GROUP);
         }
 
     }
@@ -139,9 +139,10 @@ public class LearningGelDiaFragment extends DialogFragment
                     //如果使用顺序
                     mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_GENERAL, bundle);
                 }
+                dismiss();
                 break;
 
-            case R.id.btn_cancel_learningAddRandom:
+            case R.id.btn_cancel_learningGel:
 
                 this.dismiss();
                 break;

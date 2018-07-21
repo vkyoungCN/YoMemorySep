@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.vkyoungcn.smartdevices.yomemory.R;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningMerge2DiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.LearningMergeDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMergeGroup;
 
 import java.util.ArrayList;

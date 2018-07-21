@@ -181,8 +181,8 @@ public class GroupDetailActivity extends AppCompatActivity
         }
 
         if(rvGroup.getTotalItemsNum()<5){
-            //4个（含）以内的，触发合并式学习
-            DialogFragment dfg = QueryForMergeDiaFragment.newInstance();
+            //4个（含）以内的，触发合并式学习的询问
+            DialogFragment dfg = QueryForMergeDiaFragment.newInstance(null);
             dfg.show(transaction, FG_STR_QUERY_FOR_MERGE);
         }else {
             //正常容量正常学习。此时只需传递正常的分组信息即可

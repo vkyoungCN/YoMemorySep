@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -27,7 +28,8 @@ import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
+
 /*
  * 作者：杨胜 @中国海洋大学
  * 别名：杨镇时
@@ -79,6 +81,7 @@ public class ItemsOfMissionActivity extends AppCompatActivity
     private ImageView imvSelectBtnOk;
     private ImageView imvSelectBtnCancel;
     private FloatingActionButton fab_More;
+    private ImageView imvBtn_fabExtraLearn;
     private RecyclerView mRv;
     private ItemsOfMissionRvAdapter adapter;//Rv适配器引用
     //另有“任务名称、描述”两个控件（位于页面上部Mission详情区）在onCreate内声明为局部变量。
@@ -109,8 +112,13 @@ public class ItemsOfMissionActivity extends AppCompatActivity
         itemsTotalNumber = findViewById(R.id.numberOfTotalItemsOfMission);
         learnedPercentage = findViewById(R.id.learnedPercentageOfTotalItemsOfMission);
         tvSelectingResult = findViewById(R.id.tv_selectingInfo_IMA);
+        imvBtn_fabExtraLearn = findViewById(R.id.imv_extraRePick_IMA);
+        imvBtn_fabExtraLearn.setOnClickListener(this);
+
         imvSelectBtnOk = findViewById(R.id.imvBtn_selectingOk_IMA);
+        imvSelectBtnOk.setOnClickListener(this);
         imvSelectBtnCancel = findViewById(R.id.imvBtn_selectingCancel_IMA);
+        imvSelectBtnCancel.setOnClickListener(this);
         lltSelectingPanel = findViewById(R.id.llt_selectPanel_IMA);
 
         ckb_3 = findViewById(R.id.ckb_3_AIM);
@@ -175,6 +183,8 @@ public class ItemsOfMissionActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         switch (v.getId()){
+
+
             case R.id.fab_more_IMA:
                 if (!isFabPanelExtracted) {//未展开，要做展开操作
 
@@ -190,6 +200,7 @@ public class ItemsOfMissionActivity extends AppCompatActivity
 
                 break;
             case R.id.rlt_fabFlat_IMA:
+
                 //在板子展开后，点击板子需要能缩回（隐藏）
                 if(isFabPanelExtracted){
                     rltFabPanel.setVisibility(View.GONE);
@@ -212,7 +223,6 @@ public class ItemsOfMissionActivity extends AppCompatActivity
                 //筛选面板展开
                 lltSelectingPanel.setVisibility(View.VISIBLE);
                 isSelectingPanelExtracted = true;
-
                 //默认选中3~9所有优先级词汇
                 Toast.makeText(this, "努力处理数据……", Toast.LENGTH_SHORT).show();
 
@@ -220,14 +230,28 @@ public class ItemsOfMissionActivity extends AppCompatActivity
                     return;
                 }
                 //非空时，对影子数据集进行修剪
-                for (SingleItem si :rvShowingItems) {
-                    if (si.getPriority() < 2) {
+                //要使用Iterator自带的遍历和删除方式，才能正常删除（或者倒序遍历也可）
+                for(Iterator<SingleItem> itemIterator = rvShowingItems.iterator();itemIterator.hasNext();){
+                    if(itemIterator.next().getPriority()<3){
+                        itemIterator.remove();//注意要使用Iterator的删除方法。
+                    };
+                }
+                    /*for (int i = 0; i < rvShowingItems.size(); i++) {
+                        if (rvShowingItems.get(i).getPriority() < 2) {
+                            rvShowingItems.remove(i);
+                        }
+                    }错误，每删一个容量变小索引实际后移，等于隔行删除*/
+
+                /*for (SingleItem si :rvShowingItems) {
+                    if (si.getPriority() <=2) {
                         rvShowingItems.remove(si);
                     }
-                }
+                }错误*/
+//                Log.i(TAG, "onClick: rvShowing.size="+rvShowingItems.size());
                 if(rvShowingItems.size()==0){
-                    Toast.makeText(this, "没有符合指定优先级条件的单词", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "没有符合指定优先级条件的单词.", Toast.LENGTH_SHORT).show();
                 }
+                tvSelectingResult.setText(String.format(getString(R.string.hs_selected_item_amount),rvShowingItems.size()));
                 adapter.notifyDataSetChanged();//数据集改变。
 
                 break;
@@ -458,6 +482,8 @@ public class ItemsOfMissionActivity extends AppCompatActivity
                 break;
 
         }
+//        Log.i(TAG, "onCheckedChanged: size = "+rvShowingItems.size());
+        tvSelectingResult.setText(String.format(getString(R.string.hs_selected_item_amount),rvShowingItems.size()));
     }
 
     private void removeLeveledItemsFromShowingList(int priority){

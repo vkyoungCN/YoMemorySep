@@ -139,10 +139,10 @@ public class LearningMerge2DiaFragment extends DialogFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(getArguments()!=null){
-            this.term_ms = savedInstanceState.getInt(STR_TERM_MS);
-            this.term_amount = savedInstanceState.getInt(STR_TERM_AMOUNT);
-            this.rvMergeGroups = savedInstanceState.getParcelableArrayList(STR_RV_MERGE_GROUP);
-            this.fixedGroupPosition = savedInstanceState.getInt(STR_FIXED_GROUP_POSITION);
+            this.term_ms = getArguments().getInt(STR_TERM_MS);
+            this.term_amount = getArguments().getInt(STR_TERM_AMOUNT);
+            this.rvMergeGroups = getArguments().getParcelableArrayList(STR_RV_MERGE_GROUP);
+            this.fixedGroupPosition = getArguments().getInt(STR_FIXED_GROUP_POSITION);
 //            this.noDataBellowThisAmount = savedInstanceState.getBoolean(STR_NO_DATA_BELLOW_THIS_AMOUNT,false);
 
         }

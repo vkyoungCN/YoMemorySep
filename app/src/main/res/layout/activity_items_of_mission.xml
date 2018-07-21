@@ -271,13 +271,6 @@
         android:translationZ="4dp"
         android:visibility="gone">
 
-        <!--FAB组的解释性文本组，位于FAB下方。其中设置44底边距，以让出下方按键的空间-->
-
-        <!--FAB组底边线。在文本组下方-->
-
-        <!--FAB组的按键组，这里没有使用support.design库，而是直接用了普通的ImageView，
-        本组位于解释文本组上方-->
-
 
         <!--FAB组（上）的底边线。在上文本组的下方-->
         <LinearLayout
@@ -335,7 +328,7 @@
         <!--FAB组的按键组（上）-->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="48dp"
             android:layout_above="@id/fabText_IMA"
             android:layout_marginEnd="4dp"
             android:layout_marginStart="4dp"
@@ -351,7 +344,10 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="3"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
+                android:padding="4dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/enhance" />
 
@@ -368,7 +364,8 @@
         android:alpha="0.9"
         android:background="#222222"
         android:orientation="vertical"
-        android:translationZ="4dp">
+        android:translationZ="4dp"
+        android:visibility="gone">
 
         <TextView
             android:layout_width="match_parent"
@@ -390,8 +387,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:buttonTint="@color/yo_teal"
-                android:text="@string/num_3"
                 android:checked="true"
+                android:text="@string/num_3"
                 android:textColor="#ffffff" />
 
             <CheckBox
@@ -399,8 +396,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="true"
                 android:buttonTint="@color/yo_teal"
+                android:checked="true"
                 android:text="@string/num_4"
                 android:textColor="#ffffff" />
 
@@ -409,8 +406,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="true"
                 android:buttonTint="@color/yo_teal"
+                android:checked="true"
                 android:text="@string/num_5"
                 android:textColor="#ffffff" />
 
@@ -418,9 +415,9 @@
                 android:id="@+id/ckb_6_AIM"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:checked="true"
                 android:layout_weight="1"
                 android:buttonTint="@color/yo_teal"
+                android:checked="true"
                 android:text="@string/num_6"
                 android:textColor="#ffffff" />
 
@@ -437,10 +434,10 @@
             <CheckBox
                 android:id="@+id/ckb_8_AIM"
                 android:layout_width="0dp"
-                android:checked="true"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:buttonTint="@color/yo_teal"
+                android:checked="true"
                 android:text="@string/num_8"
                 android:textColor="#ffffff" />
 
@@ -448,9 +445,9 @@
                 android:id="@+id/ckb_9_AIM"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:checked="true"
                 android:layout_weight="1"
                 android:buttonTint="@color/yo_teal"
+                android:checked="true"
                 android:text="@string/num_9"
                 android:textColor="#ffffff" />
 
@@ -477,17 +474,18 @@
                 android:paddingStart="12dp"
                 android:text="@string/hs_selected_item_amount"
                 android:textColor="@color/yo_orange" />
+
             <ImageView
                 android:id="@+id/imvBtn_selectingCancel_IMA"
                 android:layout_width="84dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="end"
+                android:layout_toStartOf="@+id/imvBtn_selectingOk_IMA"
                 android:paddingEnd="8dp"
                 android:paddingStart="6dp"
                 android:paddingTop="6dp"
-                android:src="@drawable/cancel_3"
-                android:layout_toStartOf="@+id/imvBtn_selectingOk_IMA"
-                />
+                android:src="@drawable/cancel_3" />
+
             <ImageView
                 android:id="@+id/imvBtn_selectingOk_IMA"
                 android:layout_width="84dp"

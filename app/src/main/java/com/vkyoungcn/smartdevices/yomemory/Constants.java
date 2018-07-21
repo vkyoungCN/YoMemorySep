@@ -39,6 +39,7 @@ public interface Constants {
     String STR_IDS_GROUPS_READY_TO_MERGE = "IDS_GROUPS_READY_TO_MERGE";
     String STR_IS_FIRST_LAUNCH = "STR_IS_FIRST_LAUNCH";
     String STR_IS_ORDER = "IS_ORDER";
+    String STR_ITEM = "ITEM";
     String STR_ITEMS = "ITEMS";
     String STR_ITEMS_FOR_LEARNING = "ITEMS_FOR_LEARNING";
 

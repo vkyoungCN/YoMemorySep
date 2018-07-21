@@ -31,7 +31,6 @@ import static com.vkyoungcn.smartdevices.yomemory.fragments.FastRePickDiaFragmen
  * email: yangsheng@ouc.edu.cn
  * 2018.08.01
  * */
-【计划在某合适页面增加功能：跨分组/按词汇优先级复习（该复习活动属额外复习，不增加MS值）】
 public class MissionDetailsActivity extends AppCompatActivity
         implements OnGeneralDfgInteraction,Constants {
 //    private static final String TAG = "MissionDetailsActivity";

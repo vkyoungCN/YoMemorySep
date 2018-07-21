@@ -40,8 +40,8 @@ public class GiveExplanationDiaFragment extends DialogFragment implements View.O
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
+        /*if (getArguments() != null) {
+        }*/
     }
 
     @Override

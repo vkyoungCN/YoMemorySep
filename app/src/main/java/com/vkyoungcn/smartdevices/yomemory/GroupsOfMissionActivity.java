@@ -23,7 +23,6 @@ import com.vkyoungcn.smartdevices.yomemory.fragments.LearningCreateOrderDiaFragm
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningCreateRandomDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningGelDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningMerge2DiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.fragments.LearningMergeDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMergeGroup;
@@ -402,12 +401,12 @@ public class GroupsOfMissionActivity extends AppCompatActivity
 
     public void learnAndAddInOrder(View view) {
         //启动DFG，在dfg中点击了确认后，再交互到本Activity下的onLDfgInteraction方法，然后再生成Intent跳转。
-        // 启动“边学边建”，按顺序建组
+        // 启动“创建式学习”，按顺序建组
         // 传递“顺序/随机”二选一；其余不传递
         // 由LearningActivity负责拉取36个资源，记录学习位置，最后在完成Activity对已学部分生成新组。
         // 学习中的暂停、非正常终止、正常终止逻辑都由LA负责。
         // （关于组内乱序：新建时还是按顺序学习比较好，不提供此选项）
-        Toast.makeText(self, "按学习数量建立分组（顺序）", Toast.LENGTH_SHORT).show();
+        Toast.makeText(self, "启动创建式学习（顺序）", Toast.LENGTH_SHORT).show();
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         Fragment prev = getFragmentManager().findFragmentByTag(FG_STR_LEARNING_ADD_IN_ORDER);
@@ -422,8 +421,8 @@ public class GroupsOfMissionActivity extends AppCompatActivity
     }
 
     public void learnAndAddRandom(View view) {
-        //启动“边学边建”，随机顺序。
-        Toast.makeText(self, "施工中，边学边建。", Toast.LENGTH_SHORT).show();
+        //启动“创建式学习”，随机顺序。
+        Toast.makeText(self, "启动创建式学习（随机）", Toast.LENGTH_SHORT).show();
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         Fragment prev = getFragmentManager().findFragmentByTag(FG_STR_LEARNING_ADD_RANDOM);
@@ -519,6 +518,13 @@ public class GroupsOfMissionActivity extends AppCompatActivity
 
             case LEARNING_GENERAL_INNER_RANDOM://LG但是开启组内乱序
                 //已从LG的dfg确认返回（并且选择了开启组内乱序），紧接着要跳转到LPA并进一步开始LG学习
+
+                //还要把FAB面板关闭（如果DFG中点取消直接返回则不需取消，点确认应当取消）
+                if(isFabPanelExtracted){
+                    rltFabPanel.setVisibility(View.GONE);
+                    isFabPanelExtracted = false;
+                }
+
                 intentToLPA.putExtra(STR_LEARNING_TYPE, LEARNING_GENERAL_INNER_RANDOM);
                 intentToLPA.putExtra(STR_BUNDLE_FOR_GENERAL, data);
                 this.startActivity(intentToLPA);
@@ -526,6 +532,13 @@ public class GroupsOfMissionActivity extends AppCompatActivity
             case LEARNING_AND_CREATE_ORDER:
                 //已从LCO的dfg确认返回，并紧接着要开始LCO学习
                 //需要传递标记
+
+                //还要把FAB面板关闭（如果DFG中点取消直接返回则不需取消，点确认应当取消）
+                if(isFabPanelExtracted){
+                    rltFabPanel.setVisibility(View.GONE);
+                    isFabPanelExtracted = false;
+                }
+
                 intentToLPA.putExtra(STR_LEARNING_TYPE, LEARNING_AND_CREATE_ORDER);
                 intentToLPA.putExtra(STR_MISSION_ID, missionFromIntent.getId());//在最后完成页生成新组时需要本字段信息。
                 this.startActivity(intentToLPA);

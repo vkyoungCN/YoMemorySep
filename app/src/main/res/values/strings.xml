@@ -60,8 +60,9 @@
     <string name="translation02">释义</string>
     <string name="str_pleaseRePickIn_xxTime">请在xx天xx小时xx分钟内完成复习</string>
     <string name="str_merge">将MS相同的若干小分组合并起来复习，生成为一个较大的分组</string>
-    <string name="title_dfg_learningAddRandom">边学边建（随机）</string>
-    <string name="explanations_learningAddRandom">将随机选取一定数量的词汇，根据最终的识记数量生成分组</string>
+    <string name="title_dfg_learningAddRandom">创建式学习（随机）</string>
+    <string name="explanations_learningAddRandom">将随机选取一定数量的词汇开始学习，根据最终识记的数量生成分组</string>
+    <string name="explanations_learningAddOrder">将选取一定数量的词汇开始学习，根据最终识记的数量生成分组</string>
     <string name="title_dfg_start_learning">开始学习</string>
     <string name="str_total_items">已选总量：xx</string>
     <string name="str_choseCategory_dfgLearningMerge">←选择类别</string>
@@ -230,4 +231,7 @@
     <string name="finish_not_will_be_divided">*若有未完成词汇，则将拆分分组</string>
     <string name="finish_will_be_created">将根据完成部分生成新分组</string>
     <string name="finish_extra_with_no_records">额外学习不会产生学习记录</string>
+    <string name="YouMemoryEn">YoMemory!</string>
+    <string name="item_detail">单项资源详情</string>
+    <string name="title_dfg_learningAddOrder">创建式学习（顺序）</string>
 </resources>

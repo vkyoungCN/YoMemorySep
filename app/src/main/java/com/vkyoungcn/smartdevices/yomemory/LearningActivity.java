@@ -11,6 +11,7 @@ import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -262,6 +263,8 @@ public class LearningActivity extends AppCompatActivity
                 //本页VE缓存（如果有）设置给VE
                 if(veFillings.get(position)!=null){//若为空串""则是可以设置的。
                     try {
+                        Log.i(TAG, "onPageSelected: String setTo VE ="+veFillings.get(position)+", position="+position);
+
                         ValidatingEditor vdEt = ((LearningViewPrAdapter)viewPager.getAdapter()).currentFragment.getView().findViewById(R.id.ve_singleItemLearning);
                         vdEt.setInitText(veFillings.get(position));
                     } catch (Exception e) {
@@ -292,6 +295,8 @@ public class LearningActivity extends AppCompatActivity
                     fab_finish.setVisibility(View.VISIBLE);
                     isFabShowing = true;
                 }
+//                Log.i(TAG, "onPageSelected: currentPos="+currentPagePosition+",oldPos="+oldPagePosition);
+//                Log.i(TAG, "onPageSelected: veFillings.get(cP)="+veFillings.get(currentPagePosition)+"veFillings.get(oP)="+veFillings.get(oldPagePosition));
             }
         });
 
@@ -456,6 +461,7 @@ public class LearningActivity extends AppCompatActivity
                 intentToAccomplishActivity.putExtra(STR_REST_MINUTES,restMinutes);
                 intentToAccomplishActivity.putExtra(STR_REST_SECONDS,restSeconds);
 
+
                 //各状态下的不同数据
                 if(learningType == LEARNING_GENERAL){
                     intentToAccomplishActivity.putExtra(STR_GROUP_ID,groupId);
@@ -466,11 +472,14 @@ public class LearningActivity extends AppCompatActivity
                 }
 
 
+
                 this.startActivity(intentToAccomplishActivity);
                 this.finish();
                 break;
 
             case LEARNING_FINISH_DFG_BACK:
+                Log.i(TAG, "BACK from DFG. onPageSelected: currentPos="+currentPagePosition+",oldPos="+oldPagePosition);
+
                 //恢复计时，设置时间tv的正确值
                 llt_timeCount.setVisibility(View.VISIBLE);
 
@@ -498,8 +507,10 @@ public class LearningActivity extends AppCompatActivity
 
         //此时已填入正确单词，（如果允许自动滑动则）自动向下一页滑动。
         if(AutoSliding) {
-            viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
-            //
+            if(viewPager.getCurrentItem()<items.size()-1) {//【索引？】
+                viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
+                //
+            }
         }
     }
 
