@@ -445,7 +445,6 @@ public class GroupsOfMissionActivity extends AppCompatActivity
         // 否则若第二遍没有时间进行，那么处理逻辑可就很麻烦了。
         //
         // 关于“组内乱序”，合并式操作不宜采用。
-        Toast.makeText(self, "合并学习，正在准备数据，马上就好。", Toast.LENGTH_SHORT).show();
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         Fragment prev = getFragmentManager().findFragmentByTag(FG_STR_READY_TO_LEARN_MERGE);
@@ -479,6 +478,7 @@ public class GroupsOfMissionActivity extends AppCompatActivity
             Toast.makeText(self, "所有分组的容量都大于12，没有合并的必要。", Toast.LENGTH_SHORT).show();
             //不执行实际动作
         }else {
+            Toast.makeText(self, "合并式学习，请选择要合并的分组。", Toast.LENGTH_SHORT).show();
             //确定有数据，启动dfg
             data.putInt(STR_TERM_MS, autoSetMsTerm);
             data.putInt(STR_TERM_AMOUNT, maxAmountTerm);

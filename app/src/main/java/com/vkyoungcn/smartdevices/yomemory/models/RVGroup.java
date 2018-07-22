@@ -81,6 +81,10 @@ public class RVGroup implements Parcelable ,Cloneable{
 
         //获取当前时间和最后一条Log之间的时间间隔(这个只需要值最大的一条即可，不必管什么有效不有效)
         long timeIntervalInLong = System.currentTimeMillis()-lastLearningTime;
+        if(timeIntervalInLong<1000*60){
+            return 100f;//第一分钟内就返回100就好了，否则好像会计算得出100.8这种诡异结果
+        }
+
         int timeInterval = (int) (timeIntervalInLong/(1000*60));
 
         //代入函数计算得记忆存量。

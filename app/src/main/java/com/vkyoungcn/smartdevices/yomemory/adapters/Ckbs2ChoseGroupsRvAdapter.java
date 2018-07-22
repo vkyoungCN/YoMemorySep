@@ -222,6 +222,7 @@ public class Ckbs2ChoseGroupsRvAdapter extends RecyclerView.Adapter<Ckbs2ChoseGr
         this.choseAmount =0;
         this.howManyGroupsChecked =0;
         this.idsList.clear();
+        dfg.changeTotalChoseNumTvStr(choseAmount);
     }
 
     //版本2：当减小amount限制导致数据源集合减小，根据保留的数据源重新计算记录数据
@@ -239,6 +240,9 @@ public class Ckbs2ChoseGroupsRvAdapter extends RecyclerView.Adapter<Ckbs2ChoseGr
                 idsList.add(rm.getId());
             }
         }
+
+        dfg.changeTotalChoseNumTvStr(choseAmount);//且要改变外部dfg数据。
+
     }
 
     //保持发起组选定，不可取消

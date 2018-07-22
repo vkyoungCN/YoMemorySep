@@ -143,7 +143,8 @@ public class PrepareForLearningActivity extends AppCompatActivity implements Con
                 //合并模式下额外传入的数据是一个ArrayList。
                 Bundle bundleForMerge = getIntent().getBundleExtra(STR_BUNDLE_FOR_MERGE);
                 if(bundleForMerge!=null){
-                    gIdsForMerge = (ArrayList<Integer>) bundleForMerge.getSerializable(STR_IDS_GROUPS_READY_TO_MERGE);
+                    gIdsForMerge =  bundleForMerge.getIntegerArrayList(STR_IDS_GROUPS_READY_TO_MERGE);
+                    Log.i(TAG, "onCreate: gidsForMerge.size in LPA ="+gIdsForMerge.size());
                     //合并模式下额外传入的数据是一个ArrayList。
                 }
                 //下面为合并模式准备数据List<Item>。

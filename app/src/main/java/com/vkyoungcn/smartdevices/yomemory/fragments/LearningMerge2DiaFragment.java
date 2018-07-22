@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import com.vkyoungcn.smartdevices.yomemory.adapters.Ckbs2ChoseGroupsRvAdapter;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMergeGroup;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 @SuppressWarnings("all")
 /*
@@ -142,7 +144,7 @@ public class LearningMerge2DiaFragment extends DialogFragment
             this.term_ms = getArguments().getInt(STR_TERM_MS);
             this.term_amount = getArguments().getInt(STR_TERM_AMOUNT);
             this.rvMergeGroups = getArguments().getParcelableArrayList(STR_RV_MERGE_GROUP);
-            this.fixedGroupPosition = getArguments().getInt(STR_FIXED_GROUP_POSITION);
+            this.fixedGroupPosition = getArguments().getInt(STR_FIXED_GROUP_POSITION,-1);
 //            this.noDataBellowThisAmount = savedInstanceState.getBoolean(STR_NO_DATA_BELLOW_THIS_AMOUNT,false);
 
         }
@@ -173,7 +175,6 @@ public class LearningMerge2DiaFragment extends DialogFragment
         recyclerView = rootView.findViewById(R.id.rv_groupsForSelect_dfgLM);
         tv_maskWaiting = rootView.findViewById(R.id.tv_prepareData_dfgLM);
         tv_maskNodata = rootView.findViewById(R.id.tv_noGroupMatch_dfgLM);
-        ckbAllCheck = (CheckBox) rootView.findViewById(R.id.ckb_all_DfgLearningMerge);
 
         tvCancel = (TextView) rootView.findViewById(R.id.btn_cancel_dfgLearningMerge);
         tvConfirm = (TextView) rootView.findViewById(R.id.btn_confirm_dfgLearningMerge);
@@ -200,15 +201,19 @@ public class LearningMerge2DiaFragment extends DialogFragment
             public void afterTextChanged(Editable s) {
                 //文本发生改变后，获取文本，转换；发送给调用方获取新数据源
                 //【存在一点可能的问题：输入两位数的第一位后显然可能就已触发，此时如果丢失焦点则两位数无法输入】
-                term_ms = Integer.parseInt(et_MS.getText().toString());//xml已设置了只允许输入数字。
-                Bundle data =  new Bundle();
-                data.putInt(STR_NEW_MS_FOR_FETCH,term_ms);
+                if(!et_MS.getText().toString().isEmpty()) {
+                    term_ms = Integer.parseInt(et_MS.getText().toString());//xml已设置了只允许输入数字。
+                    Bundle data = new Bundle();
+                    data.putInt(STR_NEW_MS_FOR_FETCH, term_ms);
 
-                tv_maskNodata.setVisibility(View.GONE);
-                tv_maskWaiting.setVisibility(View.VISIBLE);//可以叠加显示。
-                //rv无论显隐皆可，不做额外调整
+                    tv_maskNodata.setVisibility(View.GONE);
+                    tv_maskWaiting.setVisibility(View.VISIBLE);//可以叠加显示。
+                    //rv无论显隐皆可，不做额外调整
 
-                mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.FETCH_NEW_GROUPS_INFO_FOR_MERGE,data);
+                    mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.FETCH_NEW_GROUPS_INFO_FOR_MERGE, data);
+                }else {
+                    Toast.makeText(getContext(), "MS的值应当大于0", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -244,7 +249,7 @@ public class LearningMerge2DiaFragment extends DialogFragment
                     minTermAmount = rvMergeGroups.get(fixedGroupPosition).getSize();
                     tvMsMinus.setClickable(false);
                     tvMsAdd.setClickable(false);
-                    et_MS.setClickable(false);
+                    et_MS.setFocusable(false);
                     //通过这种不让限制改变数据源的方式使发起组保持留在rv中，同时要对adapter进行设置，不允许取消
 
                     //将主数据源中的符合≤term_amount的数据加入到groupsUFA列表中，作为下方适配器的真正数据源
@@ -380,7 +385,8 @@ public class LearningMerge2DiaFragment extends DialogFragment
                             }
                         }
                         //通知数据集改变
-                        adapter.notifyItemRangeInserted((groupsUnderFixedAmount.size()-1-count),count);
+                        adapter.notifyDataSetChanged();
+//                        adapter.notifyItemRangeInserted((groupsUnderFixedAmount.size()-1-count),count);
                         //增加记录时，adpter的原有记录数据可以不清空
 
                     }else {
@@ -399,13 +405,20 @@ public class LearningMerge2DiaFragment extends DialogFragment
                         //最小可设为1。
                         int count = 0;//记录移除了多少项目
                         //将旧上限对应数据移除
+                        for(Iterator<RvMergeGroup> rmgIterator = groupsUnderFixedAmount.iterator(); rmgIterator.hasNext();){
+                            if(rmgIterator.next().getSize() ==term_amount){
+                                rmgIterator.remove();//注意要使用Iterator的删除方法。
+                                count++;
+                            }
+                        }
+                        /* 不能采用这种方式移除，同步修改错误
                         for (RvMergeGroup g :groupsUnderFixedAmount) {
                             if (g.getSize() == term_amount) {
                                 //上限（即允许小于+等于该值的所有项目）+1，只需将等于该值的项目加入即可
                                 groupsUnderFixedAmount.remove(g);
                                 count++;
                             }
-                        }
+                        }*/
 
                         //操作完成后，条件数值一致化。
                         term_amount--;
@@ -413,7 +426,10 @@ public class LearningMerge2DiaFragment extends DialogFragment
                         tv_Amount.setText(String.valueOf(term_amount));
 
                         //通知数据集改变
-                        adapter.notifyItemRangeRemoved((groupsUnderFixedAmount.size()),count);//移除点之后起算吗？【暂未查API】
+                        adapter.notifyDataSetChanged();
+//                        adapter.notifyItemRangeRemoved((groupsUnderFixedAmount.size()),count);//移除点之后起算吗？【暂未查API】
+                        //测试出各种奇异表现，逻辑稍复杂，决定以完全的dataSC替代。
+
                         //重置adapter中的记录数据（版本2：按当前保留列表计算）
                         adapter.resetRecords();
 
@@ -461,9 +477,10 @@ public class LearningMerge2DiaFragment extends DialogFragment
 
             case R.id.btn_confirm_dfgLearningMerge:
                 Bundle bundle = new Bundle();
-                bundle.putSerializable(STR_IDS_GROUPS_READY_TO_MERGE,(adapter.getIdsList()));
-
+                bundle.putIntegerArrayList(STR_IDS_GROUPS_READY_TO_MERGE,(adapter.getIdsList()));
+                Log.i(TAG, "onClick: gidList's SIZE in starting DFG="+adapter.getIdsList().size());
                 mListener.onButtonClickingDfgInteraction(OnGeneralDfgInteraction.LEARNING_AND_MERGE,bundle);
+                this.dismiss();//如果没有dismiss则从目标Activity返回后该dfg会还在。
                 break;
 
             case R.id.btn_cancel_dfgLearningMerge:
@@ -552,7 +569,7 @@ public class LearningMerge2DiaFragment extends DialogFragment
 
             tv_maskWaiting.setVisibility(View.GONE);
             recyclerView.setVisibility(View.GONE);
-            tv_maskNodata.setText(View.VISIBLE);
+            tv_maskNodata.setVisibility(View.VISIBLE);
 
         }else {
             //有数据

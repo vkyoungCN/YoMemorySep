@@ -1529,7 +1529,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
         String selectQuery = "SELECT * FROM "+ YoMemoryContract.ItemBasic.TABLE_NAME+tableNameSuffix
                 +" WHERE "+ YoMemoryContract.ItemBasic.COLUMN_GROUP_ID +" IN ( "+sbd.toString()+")"
-                +" ORDER BY "+YoMemoryContract.ItemBasic.COLUMN_GROUP_ID + "ASC";
+                +" ORDER BY "+YoMemoryContract.ItemBasic.COLUMN_GROUP_ID + " ASC";
 
         getReadableDatabaseIfClosedOrNull();
         Cursor cursor = mSQLiteDatabase.rawQuery(selectQuery,null);

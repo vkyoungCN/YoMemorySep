@@ -27,7 +27,7 @@
     <string name="time_up1">很遗憾，时间到！</string>
     <string name="preparing_data_please_wait">正在准备数据，请稍候……</string>
     <string name="YouMemoryCN">优记</string>
-    <string name="alpha_testing_string">（工程测试α-0.7.5）</string>
+    <string name="alpha_testing_string">（工程测试α-0.7.9）</string>
     <string name="resource_list">资源列表</string>
     <string name="number_of_items">资源数量：</string>
     <string name="picked_percentage">已识记：</string>
@@ -234,4 +234,5 @@
     <string name="YouMemoryEn">YoMemory!</string>
     <string name="item_detail">单项资源详情</string>
     <string name="title_dfg_learningAddOrder">创建式学习（顺序）</string>
+    <string name="authorInfo">作者：Victor Young（杨胜/杨镇时）\n@中国海洋大学</string>
 </resources>

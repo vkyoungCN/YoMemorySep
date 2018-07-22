@@ -36,22 +36,23 @@ import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteract
  * */
 public class AccomplishActivity extends AppCompatActivity implements Constants {
     private static final String TAG = "AccomplishActivity";
-    //主要处理逻辑（业务）
-    //
-    // 空的：
-    // LG下：已学的维持原组，（原组的Logs正常+1处理），未学的要成立新组（items的gid统一变更为新组），
-    // 新组的成立时间是current，但旧复习记录保留不删（所以成立时间晚于学习时间，无所谓）
-    //
-    // LC下：空的无所谓
-    // LM下：已完成的合并到主组（items改gid，【Nw：原分组/原分组Log记录保留】），部分完成的来源组拆分（同lg）
-    // 未进行到的组不处理； 如果完成数量连主组容量都未达到则类同LG,拆分。
-    //
-    // 错误的（首先错误的肯定是在已完成部分）
-    // 由于数据源是引用形式，所以估计其错误记录数已随卡片翻阅中的操作一并更改，直接随items新状态存入db
-    //
-    // logs记录：按开始时间处理较为容易（结束时间涉及精准度问题，中间需计算且也不是特别有道理；
-    // 既然都没特别充分的道理，就按简单且精确的来吧）
+//* 主要处理逻辑（业务）
+//
+//* 空的：
+//* LG下：已学的维持原组，（原组的Logs正常+1处理），未学的要成立新组（items的gid统一变更为新组），
+//* 新组的成立时间是current，但旧复习记录保留不删（所以成立时间晚于学习时间，无所谓）
+//
+//* LC下：空的无所谓
+//* LM下：已完成的合并到主组（items改gid，【Nw：原分组/原分组Log记录保留】），部分完成的来源组拆分（同lg）
+//* 未进行到的组不处理； 如果完成数量连主组容量都未达到则类同LG,拆分。
+//
+//* 错误的（首先错误的肯定是在已完成部分）
+//* 由于数据源是引用形式，所以估计其错误记录数已随卡片翻阅中的操作一并更改，直接随items新状态存入db
+//
+//* logs记录：按开始时间处理较为容易（结束时间涉及精准度问题，中间需计算且也不是特别有道理；
+//* 既然都没特别充分的道理，就按简单且精确的来吧）
 
+    /* 常量*/
     public static final String UI_STR_LEARNING_TYPE_G = "普通";
     public static final String UI_STR_LEARNING_TYPE_M = "合并";
     public static final String UI_STR_LEARNING_TYPE_C = "创建";
@@ -79,12 +80,23 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
 
 
     /* Intent收发*/
+    /* 传来*/
     private int learningType;
     private String tableSuffix = "";
+    private ArrayList<SingleItem> items;//之前几页的主数据源，配合上两个位置列表进行修改。
+    private ArrayList<Integer> emptyItemPositions;
+    private ArrayList<Integer> wrongItemPositions;
+
+    private int groupId;//仅在LG模式下随intent传来。
+    private int missionId;//仅在LCO/LCR模式下随intent传来。
+    private ArrayList<Integer> gIdsForMerge;//仅在LM模式下随intent传来。
+
+
     private long startTime = 0;
-    private int restMinutes = 0;
+    private int restMinutes = 0;//用于在本页显示已用时间
     private int restSeconds = 0;
 
+    /* 以下数据用于report_fg中的数据显示*/
     private float newRma=0;
     private float oldRma=0;
     private int newMs = 0;
@@ -96,33 +108,29 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
     private int correctNum=0;
     private int wrongNum=0;
 
+
+
+    private boolean isMsUp =false;//report_fg中根据isMsUp+isTooLate的配合来确定是“升级、未升级-太早、未升级-太晚”三者之哪一个。
+    private boolean isTooLate = false;
+
+    /* 业务变量*/
     private ArrayList<Integer> oldFragsSizes;
     private ArrayList<Integer> newFragsSizes;//用于LM下合并提交到DB后各来源组的新容量。
     private ArrayList<String> oldFragsMergedResultStrings;
 
     private ArrayList<SingleItem> notEmptyItems;//在LC及LM模式下，需要把非空词组成一个临时items数据集。然后不应再操作items主集。
 
-    private boolean isTooNear = false;//本次复习（的开始时间）距上次复习的时间是否太近（从而MS不提升）
-    private boolean isTooFar = false;
+//    private boolean isTooNear = false;//本次复习（的开始时间）距上次复习的时间是否太近（从而MS不提升）
+//    private boolean isTooFar = false;
     private boolean isDivided = false;//最终是否拆分（仅LG模式下使用）.[LM模式下，如果主组都未完成，则也要拆分，同样会使用本标记]
+
+
+
 //    private RVGroup groupRvNew;//（LG模式下用）DB操作完成后，从DB重新取得分组数据。
 
 
     private String newGroupStr="";
     private String wrongNamesStr="";
-
-
-    private boolean isMsUp =false;
-    private boolean isTooLate = false;
-
-
-    private ArrayList<Integer> emptyItemPositions;
-    private ArrayList<Integer> wrongItemPositions;
-    private int groupId;//仅在LG模式下随intent传来。
-    private int missionId;//仅在LCO/LCR模式下随intent传来。
-    private ArrayList<Integer> gIdsForMerge;//仅在LM模式下随intent传来。
-    private ArrayList<SingleItem> items;//之前几页的主数据源，配合上两个位置列表进行修改。
-    private String strForTvErrItems = "";//用于底端错词信息tv条的显示。
 
     private Handler handler = new AccomplishActivityHandler(this);//涉及弱引用，通过其发送消息。
 
@@ -295,12 +303,12 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
                 //构造本次学习对应的单条新log，并判定是否有效【并做全局记录，稍后要将数据传入fg】
                 if (minutesSinceLastLog < minutesShortThreshold) {
                     newLearningLog.setEffective(false);
-                    isTooNear = true;
+//                    isTooNear = true;
                     isTooLate = false;
                     isMsUp = false;
                 } else if (minutesSinceLastLog > minutesFarThreshold) {
                     newLearningLog.setEffective(false);
-                    isTooFar = true;
+//                    isTooFar = true;
                     isMsUp = false;
                     isTooLate = true;
                 } else {
@@ -651,8 +659,8 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
         bundleForFG.putInt("CORRECT_NUM",correctNum);
         bundleForFG.putInt("WRONG_NUM",wrongNum);
 
-        Log.i(TAG, "handleMessage: newRma before put in Bundle = "+newRma);
-        Log.i(TAG, "handleMessage: oldRma before put in Bundle = "+oldRma);
+//        Log.i(TAG, "handleMessage: newRma before put in Bundle = "+newRma);
+//        Log.i(TAG, "handleMessage: oldRma before put in Bundle = "+oldRma);
         bundleForFG.putFloat(STR_NEW_RMA,newRma);
         bundleForFG.putFloat(STR_OLD_RMA,oldRma);
         bundleForFG.putInt(STR_NEW_MS,newMs );
