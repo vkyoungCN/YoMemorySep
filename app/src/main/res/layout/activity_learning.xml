@@ -53,6 +53,17 @@
         </android.support.v4.view.ViewPager>
 
 
+        <!--正误符号图标，和计时器llt基本位于同一高度，稍高-->
+        <!--<ImageView
+            android:id="@+id/imv_rightOrWrong"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:scaleType="centerInside"
+            android:layout_marginBottom="135dp"
+            android:layout_gravity="center_horizontal|bottom"
+            android:src="@drawable/effective_1"
+            />
+-->
         <!-- 计时组件群，位于fab上方 -->
         <LinearLayout
             android:id="@+id/llt_timeCountGroup"
@@ -101,27 +112,27 @@
             android:id="@+id/finish_fab_learningActivity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:fabSize="normal"
             android:layout_gravity="end|bottom"
-            android:layout_marginEnd="8dp"
             android:layout_marginBottom="72dp"
-            android:src="@drawable/finish"
-            android:scaleType="centerCrop"
-            android:visibility="gone"
+            android:layout_marginEnd="8dp"
             android:onClick="handyFinish"
+            android:scaleType="centerCrop"
+            android:src="@drawable/finish"
             android:translationZ="2dp"
-            />
+            android:visibility="gone"
+            app:fabSize="normal" />
+
         <TextView
             android:id="@+id/finish_tv_learningActivity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/click_and_over"
             android:layout_gravity="end|bottom"
-            android:layout_marginEnd="58dp"
-            android:visibility="gone"
-            android:textSize="12sp"
-            android:layout_marginBottom="72dp"
-            />
+            android:layout_marginBottom="75dp"
+            android:layout_marginEnd="62dp"
+            android:text="@string/click_and_over"
+            android:textSize="16sp"
+            android:textColor="@color/yo_orange"
+            android:visibility="gone" />
 
 
 

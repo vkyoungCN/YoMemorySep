@@ -144,7 +144,7 @@ public class PrepareForLearningActivity extends AppCompatActivity implements Con
                 Bundle bundleForMerge = getIntent().getBundleExtra(STR_BUNDLE_FOR_MERGE);
                 if(bundleForMerge!=null){
                     gIdsForMerge =  bundleForMerge.getIntegerArrayList(STR_IDS_GROUPS_READY_TO_MERGE);
-                    Log.i(TAG, "onCreate: gidsForMerge.size in LPA ="+gIdsForMerge.size());
+//                    Log.i(TAG, "onCreate: gidsForMerge.size in LPA ="+gIdsForMerge.size());
                     //合并模式下额外传入的数据是一个ArrayList。
                 }
                 //下面为合并模式准备数据List<Item>。
@@ -260,7 +260,8 @@ public class PrepareForLearningActivity extends AppCompatActivity implements Con
                 intentToLearningActivity_LM.putExtra(STR_LEARNING_TYPE,LEARNING_AND_MERGE);
                 intentToLearningActivity_LM.putExtra(STR_TABLE_NAME_SUFFIX,tableNameSuffix);
                 intentToLearningActivity_LM.putParcelableArrayListExtra(STR_ITEMS_FOR_LEARNING,items);
-                intentToLearningActivity_LM.putIntegerArrayListExtra(STR_GIDS_FOR_MERGE,gIdsForMerge);
+                intentToLearningActivity_LM.putIntegerArrayListExtra(STR_GROUP_ID_FOR_MERGE,gIdsForMerge);
+
 
                 intentToLearningActivity_LM.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);//要求不记录
                 this.startActivity(intentToLearningActivity_LM);

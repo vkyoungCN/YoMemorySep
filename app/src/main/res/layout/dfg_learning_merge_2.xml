@@ -14,7 +14,7 @@
     <!--标题-->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="36dp"
+        android:layout_height="32dp"
         android:background="#e0e0e0"
         android:gravity="center"
         android:paddingEnd="24dp"
@@ -27,7 +27,7 @@
     <!--标题-->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="26dp"
+        android:layout_height="24dp"
         android:background="#efefef"
         android:gravity="center"
         android:paddingEnd="24dp"
@@ -238,49 +238,91 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="18dp" />
+        android:layout_height="8dp" />
 
     <!--符合条件的备选组列表区-->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="28dp"
+        android:layout_height="24dp"
         android:background="#f5f5f5"
         android:gravity="center"
         android:paddingEnd="24dp"
         android:paddingStart="12dp"
         android:text="@string/groups_under_term" />
 
+    <!--列表的标题。不要竖分割线，因为和表内的列宽度不对应-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/id" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="@string/description_of_group" />
+
+
+        <!--数量-->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/size_of_group" />
+
+        <!--选择-->
+        <TextView
+            android:layout_width="42dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/chose" />
+
+
+    </LinearLayout>
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#efefef"
+        />
+
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="165dp">
+        android:layout_height="155dp">
         <!--三者显示其一-->
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_groupsForSelect_dfgLM"
             android:layout_width="match_parent"
-            android:layout_height="165dp"/>
+            android:layout_height="match_parent" />
 
         <!--正在准备数据-->
         <TextView
             android:id="@+id/tv_prepareData_dfgLM"
             android:layout_width="match_parent"
             android:layout_height="36dp"
-            android:background="#efefef"
-            android:text="@string/preparing_data_please_wait"
-            android:gravity="center"
             android:layout_gravity="center"
-            android:visibility="gone"
-            />
+            android:background="#efefef"
+            android:gravity="center"
+            android:text="@string/preparing_data_please_wait"
+            android:visibility="gone" />
 
         <!--没有合适的分组-->
         <TextView
             android:id="@+id/tv_noGroupMatch_dfgLM"
             android:layout_width="match_parent"
             android:layout_height="36dp"
-            android:text="@string/no_group_matches"
-            android:gravity="center"
             android:layout_gravity="center"
-            android:visibility="gone"
-            />
+            android:gravity="center"
+            android:text="@string/no_group_matches"
+            android:visibility="gone" />
     </FrameLayout>
 
     <!--横分割线-->
@@ -312,10 +354,23 @@
     <TextView
         android:id="@+id/tv_bottomInfo2_dfgLM"
         android:layout_width="match_parent"
-        android:layout_height="22dp"
+        android:layout_height="20dp"
+        android:background="#f5f5f5"
+        android:textSize="12sp"
+        android:textColor="@color/yo_orange"
+        android:gravity="start|center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="8dp"
+
+        />
+    <!--底部附属信息2区-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="#f5f5f5"
         android:gravity="center"
-        />
+        android:text="@string/lm_ms_no_add"
+        android:textSize="12sp" />
     <!--底部横分割线-->
     <TextView
         android:layout_width="match_parent"
@@ -326,9 +381,8 @@
     <!--底部按钮区-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:orientation="horizontal"
-        >
+        android:layout_height="42dp"
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/btn_cancel_dfgLearningMerge"

@@ -204,6 +204,7 @@ public class Ckbs2ChoseGroupsRvAdapter extends RecyclerView.Adapter<Ckbs2ChoseGr
             holder.getCheckBox().setChecked(group.isChecked());
         }
         holder.getgIndex().setText(String.valueOf(group.getId()));
+        holder.getgDescription().setText(group.getDescription());
         holder.getSize().setText(String.valueOf(group.getSize()));
     }
 

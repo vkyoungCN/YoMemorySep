@@ -32,6 +32,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:background="#f5f5f5"
+                android:textStyle="bold"
                 android:padding="8dp"
                 android:text="@string/mission_name_default"
                 android:textSize="16sp" />

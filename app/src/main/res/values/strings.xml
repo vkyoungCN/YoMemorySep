@@ -88,7 +88,7 @@
     <string name="learning_stating_time">开始时间：%1$d-%2$d-%3$d %4$d:%5$d:%6$d</string>
     <string name="learning_starting_time_str">开始时间：%1$s</string>
     <string name="learning_usd_up_time">学习耗时：%1$d分%2$d秒</string>
-    <string name="learningType">学习类型：%1$s</string>
+    <string name="hs_learningType">类型：%1$s</string>
     <string name="hold_on_a_moment_2">正在努力地处理数据，马上呈现…</string>
     <string name="plus">+</string>
     <string name="reserved_btn">预留按键</string>
@@ -108,8 +108,8 @@
     <string name="introduction_here">此处详细说明</string>
     <string name="first_running">首次运行，正在准备数据……</string>
     <string name="to_mission_details">任务详情</string>
-    <string name="go_items">查看资源</string>
-    <string name="go_groups">查看分组</string>
+    <string name="go_items">所有单词</string>
+    <string name="go_groups">所有分组</string>
     <string name="for_more_missions">点击获取更多任务↓</string>
     <string name="get_more">更多+</string>
     <string name="scroll_right">向右滑动查看其他任务……</string>
@@ -188,11 +188,11 @@
     <string name="merge_changes">各来源分组合并情况</string>
     <string name="source_group_name">来源组</string>
     <string name="index">序号</string>
-    <string name="source_group_size">原容量</string>
-    <string name="merge_size">并入量</string>
-    <string name="result_1">处理</string>
-    <string name="lc_info_ac">共完成%1$d个词汇</string>
-    <string name="created_1">新分组#%1$s#生成</string>
+    <string name="source_group_size">容量</string>
+    <string name="merge_size">合并</string>
+    <string name="result_1">结果</string>
+    <string name="hs_lc_info_ac">共完成%1$d个词汇</string>
+    <string name="created_1">生成新分组：#%1$s#</string>
     <string name="saving_1">--=正在写入数据，请不要强行退出=--</string>
     <string name="down_ward">﹀</string>
     <string name="horizontal_bar">--</string>
@@ -227,12 +227,20 @@
     <string name="select_by_priority">按优先级筛选</string>
     <string name="hs_selected_item_amount">已选数量：%1$d</string>
     <string name="hs_end_report">共有%1$d个单词，其中正确填写%2$d个，错误填写%3$d，空余%4$d个。</string>
-    <string name="finish_will_be_merged">*完成部分将被合并</string>
+    <string name="finish_will_be_merged">*完成部分将合并到新分组。被吞噬分组将被删除</string>
     <string name="finish_not_will_be_divided">*若有未完成词汇，则将拆分分组</string>
-    <string name="finish_will_be_created">将根据完成部分生成新分组</string>
+    <string name="finish_will_be_created">*将根据完成部分生成新分组</string>
     <string name="finish_extra_with_no_records">额外学习不会产生学习记录</string>
     <string name="YouMemoryEn">YoMemory!</string>
     <string name="item_detail">单项资源详情</string>
     <string name="title_dfg_learningAddOrder">创建式学习（顺序）</string>
-    <string name="authorInfo">作者：Victor Young（杨胜/杨镇时）\n@中国海洋大学</string>
+    <string name="authorInfo"> Created by 杨镇时(Victor Young)\n杨胜(yangsheng@ouc.edu.cn)</string>
+    <string name="description_of_group">分组描述</string>
+    <string name="size_of_group">分组容量</string>
+    <string name="chose">选择</string>
+    <string name="lm_ms_no_add">*合并式学习模式下，记忆等级维持不变。</string>
+    <string name="size_before_merge">合并前</string>
+    <string name="size_after_merge">合并后</string>
+    <string name="dot">·</string>
+    <string name="NA_default">N/A</string>
 </resources>

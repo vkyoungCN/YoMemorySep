@@ -7,11 +7,14 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vkyoungcn.smartdevices.yomemory.fragments.ReportGroupLC_Fragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.ReportGroupLG_Fragment;
+import com.vkyoungcn.smartdevices.yomemory.fragments.ReportGroupLM_Fragment;
 import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
@@ -116,7 +119,8 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
     /* 业务变量*/
     private ArrayList<Integer> oldFragsSizes;
     private ArrayList<Integer> newFragsSizes;//用于LM下合并提交到DB后各来源组的新容量。
-    private ArrayList<String> oldFragsMergedResultStrings;
+//    private ArrayList<String> oldFragsMergedResultStrings;//使用新旧数量对比可以代替结果字段
+    ArrayList<String> gpDescriptions;
 
     private ArrayList<SingleItem> notEmptyItems;//在LC及LM模式下，需要把非空词组成一个临时items数据集。然后不应再操作items主集。
 
@@ -166,7 +170,7 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
         tv_usedUpTime = findViewById(R.id.tv_usedUpTime_ACA);
 
         tv_learningType = findViewById(R.id.tv_learningType_ACA);
-        tv_saving = findViewById(R.id.tv_saving_AC);
+        tv_saving = findViewById(R.id.tv_saving_donStop_AC);
 
 
         SimpleDateFormat sdf = new SimpleDateFormat(STR_DATE_PATTEN_1);
@@ -202,6 +206,7 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
 
         }else if(learningType == LEARNING_AND_MERGE){
             tempStr =UI_STR_LEARNING_TYPE_M;
+//            gIdsForMerge = new ArrayList<>();。
             gIdsForMerge = getIntent().getIntegerArrayListExtra(STR_GROUP_ID_FOR_MERGE);
 
 //            rv_oldFragsMergeInfo = (RecyclerView)findViewById(R.id.rv_oldFragsChange_ACA);
@@ -214,7 +219,7 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
 
             new Thread(new CreatedAccomplishRunnable()).start();         // 用于LC模式下的DB与计算线程
         }
-        tv_learningType.setText(String.format(getResources().getString(R.string.learningType),tempStr));
+        tv_learningType.setText(String.format(getResources().getString(R.string.hs_learningType),tempStr));
 
         //各种模式下，都会传递错词记录表；因而可以统一处理【放在分线程后面可能能利用线程空余提升效率（待？）】
 
@@ -449,26 +454,32 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
 
             memoryDbHelper = YoMemoryDbHelper.getInstance(getApplicationContext());
 
+
+
+            //一、生成新组（空组）
             //寻找非空的词。将所有非空词加入一个临时列表，用于稍后修改。
             //对items的所有索引值进行判断，如果该索引不在“空词的索引列表”中，则该索引对应的词非空。
             notEmptyItems = new ArrayList<>();
             for(int i=0; i<items.size();i++){
                 if(emptyItemPositions.indexOf(i)==-1){//已确认，在无此元素时返回-1。
-                    notEmptyItems.add(items.get(i));//此后，本线程只使用此列表数据集操作即可
+                    notEmptyItems.add(items.get(i));//此后，本线程只使用此列表数据集操作即可(实际上指向的元素仍是同一套资源)
                 }//由于全空状态下在进新线程前就被if分支截去了，因而必然有一个非空位置
             }
+            Log.i(TAG, "run: emptyIPList.size="+emptyItemPositions.size()+"notEmpList.size="+notEmptyItems.size());
+
+            //一个都没学时，在onCreate方法已经截至，所以这里一定是有数据的
 
             String gDescription = notEmptyItems.get(0).getName()+"等"+notEmptyItems.size()+"个[合并创建]";
             newGroupStr=gDescription;//还要给fg发送一套。
 
-            //下面这个类只用于生成空的分组，不生成ms记录相关内容，可以留0。
+            //下面这个类只用于生成空的分组，不生成ms记录相关内容，gid可以留0。
             DBGroup groupToBeCreate = new DBGroup(0,gDescription,missionId,System.currentTimeMillis(),startTime,(byte) 0,(short) 0);
 
-            //生成新组【DB操作】（但是只生成了group表的记录）
+            //生成新组【DB操作】在group表的记录
             int gid = memoryDbHelper.createEmptyGroup(groupToBeCreate);
 //            Log.i(TAG, "run: LM下生成的新空组gid="+groupId);
 
-            //准备Logs（复习时间采用开始时间）
+            //二、准备Logs（复习时间采用开始时间）
             SingleLearningLog singleLearningLog = new SingleLearningLog(startTime,gid,false);
             //【DB操作，生成log】
             long lineForLogs = memoryDbHelper.createSingleLog(singleLearningLog);
@@ -495,20 +506,17 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
             }//至此，分组的真假日志DB操作均完毕。
 
 
-
-
-            //〇、提前进行items的错词处理【在LA需要保证逻辑上wrong和empty不能有交集】
+            //三、提前进行items的错词处理【在LA需要保证逻辑上wrong和empty不能有交集】
             //将Items中有出错的词，其错误记录数+1【需要位于各分线程之前（因为需要在提交到DB之前准备好数据）】
             //修改错词
-            //将Items中有出错的词，其错误记录数+1
             //并生成错误字串
             StringBuilder sbdr = new StringBuilder();
             if(!wrongItemPositions.isEmpty()) {
                 for (int i : wrongItemPositions) {
-                    items.get(i).failSpellingSelfAddOne();
+                    items.get(i).failSpellingSelfAddOne();//由于位置是对应到items集合的，所以需要对items操作。
                     sbdr.append(items.get(i).getName());
                     sbdr.append(", ");
-                }
+                }//考虑到实际引用到同一元素因而非空列表应该也得到了修改。
                 sbdr.deleteCharAt(sbdr.length()-2);
             }
             wrongNamesStr = sbdr.toString();
@@ -523,18 +531,31 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
             for (int i : gIdsForMerge) {
                 oldFragsSizes.add(memoryDbHelper.getSubItemsNumOfGroup(i,tableSuffix));
             }
-            oldFragsMergedResultStrings = new ArrayList<>();//用于记录源碎片组是否被删除，用于rv直接显示【1.合并删除、2.合并拆分、3.未合并】
+//            oldFragsMergedResultStrings = new ArrayList<>();//用于记录源碎片组是否被删除，用于rv直接显示【1.合并删除、2.合并拆分、3.未合并】
 
             //目前，非空词已完成状态修改（gid、err、优先级），可以提交。【DB操作，items保存①】
             memoryDbHelper.updateItemsTri(tableSuffix,notEmptyItems);
 
-            //取得合并后的各分组容量列表（以下列表都需按顺序添加和比较，才能满足逻辑）
+            //用于合并的各分组的描述
+            gpDescriptions = new ArrayList<>();
+            for (int i : gIdsForMerge) {
+                gpDescriptions.add(memoryDbHelper.getGroupDescriptionById(i));
+            }
+
+            //取得合并后的各分组容量列表,并删除已空组。
             newFragsSizes = new ArrayList<>();
             for (int i : gIdsForMerge) {
-                newFragsSizes.add(memoryDbHelper.getSubItemsNumOfGroup(i,tableSuffix));
-                oldFragsMergedResultStrings.add("");//完全初始化
+                int size = -1;
+                size = memoryDbHelper.getSubItemsNumOfGroup(i,tableSuffix);
+                newFragsSizes.add(size);
+
+                if(size == 0){
+                    memoryDbHelper.deleteGroupById(i,tableSuffix);
+                }
+//                oldFragsMergedResultStrings.add("");//完全初始化
             }
-            for(int i=0;i<gIdsForMerge.size();i++){
+
+            /*for(int i=0;i<gIdsForMerge.size();i++){
                 if(newFragsSizes.get(i)==0){
                     //该组已被完全吞噬
                     oldFragsMergedResultStrings.set(i, STR_FRAG_MERGED_FULL);
@@ -545,7 +566,11 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
                     //该位置上的来源分组未被吞噬，保留原样
                     oldFragsMergedResultStrings.set(i, STR_FRAG_MERGE_UN);
                 }
-            }
+            }*/
+
+
+            //最后需要把oldSizes、newSizes、gpDescriptions三个列表全部传给dfg的rv适配器
+            // 这三个列表均是按gidFm的顺序。
 
 
             Message messageForMergeDone = new Message();
@@ -637,12 +662,17 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
             newMs = groupRVNew.getMemoryStage();
             newRma = groupRVNew.getRM_Amount();
 
+            handler.sendMessage(messageForLC);
+
         }
     }
 
 
 
     void handleMessage(Message msg) {
+        //“请勿强行退出”的提示取消
+        tv_saving.setText("<存储完成>");
+
         //数据和DB存储已处理完成，可以加载fg部分
         FragmentTransaction transaction = (getFragmentManager().beginTransaction());
         Fragment prev = (getFragmentManager().findFragmentByTag("REPORT_GROUP"));
@@ -680,15 +710,25 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
                 break;
 
             case DB_DONE_LM_ACA:
-                Fragment fgLM = ReportGroupLG_Fragment.newInstance(bundleForFG);
+                bundleForFG.putStringArrayList(STR_GP_DESCRIPTIONS,gpDescriptions);
+                bundleForFG.putIntegerArrayList(STR_OLD_SIZES,oldFragsSizes);
+                bundleForFG.putIntegerArrayList(STR_NEW_SIZES,newFragsSizes);
+
+                Fragment fgLM = ReportGroupLM_Fragment.newInstance(bundleForFG);
                 transaction.add(R.id.flt_fragment_AC, fgLM, "REPORT_GROUP").commit();
 
                 break;
             case DB_DONE_LC_ACA:
-                Fragment fgLC = ReportGroupLG_Fragment.newInstance(bundleForFG);
+                Log.i(TAG, "handleMessage: DB_DONE_LC_ACA");
+                Fragment fgLC = ReportGroupLC_Fragment.newInstance(bundleForFG);
                 transaction.add(R.id.flt_fragment_AC, fgLC, "REPORT_GROUP").commit();
 
                 break;
         }
     }
+
+    public void allFinishGoBack(View view){
+        this.finish();
+    }
+
 }

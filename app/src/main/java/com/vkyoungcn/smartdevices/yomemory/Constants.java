@@ -86,6 +86,9 @@ public interface Constants {
     String STR_FIXED_GROUP_POSITION = "FIXED_CHOSED_GROUP";
     String STR_NO_DATA_BELLOW_THIS_AMOUNT = "NO_DATA_BELLOW_THIS_AMOUNT" ;
 
+    String STR_GP_DESCRIPTIONS = "GP_DESCRIPTIONS";
+    String STR_OLD_SIZES = "OLD_SIZES";
+    String STR_NEW_SIZES = "NEW_SIZES";
 
 
     /* Date类Pattern字串 */

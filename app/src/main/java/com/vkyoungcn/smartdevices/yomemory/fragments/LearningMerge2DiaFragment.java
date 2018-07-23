@@ -424,7 +424,7 @@ public class LearningMerge2DiaFragment extends DialogFragment
                         term_amount--;
                         //tv显示同步改变
                         tv_Amount.setText(String.valueOf(term_amount));
-
+                        Log.i(TAG, "onClick: list size="+groupsUnderFixedAmount.size());
                         //通知数据集改变
                         adapter.notifyDataSetChanged();
 //                        adapter.notifyItemRangeRemoved((groupsUnderFixedAmount.size()),count);//移除点之后起算吗？【暂未查API】
@@ -493,6 +493,7 @@ public class LearningMerge2DiaFragment extends DialogFragment
     /* 根据指定的amount条件调整实际数据源集合 */
     private void getGroupsUnderFixedAmount(int term_amount){
         groupsUnderFixedAmount.clear();
+
         for (RvMergeGroup g :rvMergeGroups) {
             if (g.getSize() <= term_amount) {
                 groupsUnderFixedAmount.add(g);
@@ -521,6 +522,7 @@ public class LearningMerge2DiaFragment extends DialogFragment
                     f.setChecked(true);//其中各项设为选中
                      totalNum = totalNum + f.getSize();//计算数量
                 }
+                Log.i(TAG, "onCheckedChanged: total Num = "+totalNum);
                 totalChoseNum = totalNum;//要保持数据和选择一致。
                 adapter.notifyDataSetChanged();//通过改变数据集的方式使Rv中的显示改变（可能是最省力的方式）
 
@@ -559,10 +561,18 @@ public class LearningMerge2DiaFragment extends DialogFragment
 
     /* 外部Activity根据本dfg的请求按新ms组织好新数据源后，通过本方法传入*/
     public void changetListAsMsChanged(ArrayList<RvMergeGroup> newList){
+        //不管新数据集如何，为了逻辑能保持一致，改变MS则必须取消全选
+        ckbAllCheck.setChecked(false);
+        totalChoseNum = 0;
+//        Log.i(TAG, "changetListAsMsChanged: totalCNum="+totalChoseNum);
+        tvInfos.setText(String.format(getResources().getString(R.string.hs_totalNum), totalChoseNum));
+
         if(newList.isEmpty()){
             //无符合条件的数据
             rvMergeGroups.clear();//直接清空
             adapter.notifyDataSetChanged();
+            //仍然要调用对groupsUFA进行设置的方法，否则gUFA不会重置、清空。
+            getGroupsUnderFixedAmount(Integer.parseInt(tv_Amount.getText().toString()));
 
             //要将适配器中的记录变量清空以保持一致。
             adapter.initRecords();
@@ -579,7 +589,7 @@ public class LearningMerge2DiaFragment extends DialogFragment
             rvMergeGroups = newList;
             //根据新数据源，及既定的term_amount设置用于列表显示的实际数据源
             getGroupsUnderFixedAmount(Integer.parseInt(tv_Amount.getText().toString()));
-
+//            Log.i(TAG, "changetListAsMsChanged: list size="+groupsUnderFixedAmount.size());
             //由于数据源换新，记录变量要清空。
             adapter.initRecords();
 

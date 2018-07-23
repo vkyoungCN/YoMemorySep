@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -456,12 +457,16 @@ public class GroupsOfMissionActivity extends AppCompatActivity
         Bundle data = new Bundle();
         //应当保证在自动发起的模式下，必然先展示有数据的条件设置
         //【注意，dfg的设计规则是传入同MS的所有(小于amount最大上限)分组，然后在dfg内按amount限制再二次区分】
-        int autoSetMsTerm = 0;
+        int autoSetMsTerm = -1;//【原0，测试排错后改-1】
         int maxAmountTerm = 12;
         ArrayList<RvMergeGroup> groupsForLmSelecting = new ArrayList<>();
         for (RVGroup rg :rvGroups) {
+            if(rg.getMemoryStage()==0){
+                continue;//MS==0的直接跳过（MS==0的是尚未初学的组，不应开启合并学习）
+            }//【排错后】
+
             if (rg.getTotalItemsNum()<= maxAmountTerm) {
-                if(autoSetMsTerm == 0) {
+                if(autoSetMsTerm == -1) {
                     //找到第一个符合“碎片”尺寸的分组，获取其ms
                     autoSetMsTerm = rg.getMemoryStage();
                     groupsForLmSelecting.add(new RvMergeGroup(rg));
@@ -661,7 +666,7 @@ public class GroupsOfMissionActivity extends AppCompatActivity
                         }//如无符合者，则结果是空组
                     }
                 }   //如果要求MS=0时，传递空组即可。
-
+                Log.i(TAG, "onButtonClickingDfgInteraction: list size before send ="+newList.size());
                 //数据准备好【？】，通知传入及后续操作
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
                 Fragment prev = getFragmentManager().findFragmentByTag(FG_STR_READY_TO_LEARN_MERGE);

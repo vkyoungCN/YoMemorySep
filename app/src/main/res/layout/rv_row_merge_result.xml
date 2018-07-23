@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="36dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:orientation="horizontal">
+
+        <!--序号-->
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/dot" />
+        <!--分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefef" />
+
+        <!--来源组-->
+        <TextView
+            android:id="@+id/tv_desp_rvLMRP"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="@string/sharp_x5_default" />
+
+        <!--分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefef" />
+        <!--原容量-->
+        <TextView
+            android:id="@+id/tv_oldSize_rvLMRP"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/sharp_x2_default"
+            android:textSize="12sp" />
+        <!--分割线-->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#efefef" />
+        <!--合并后容量-->
+        <TextView
+            android:id="@+id/tv_newSize_rvLMRP"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/sharp_x2_default"
+            android:textSize="12sp" />
+
+        <!--处理-->
+
+
+    </LinearLayout>
+
+    <!--图片横线-->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:scaleType="centerCrop"
+        android:layout_gravity="bottom"
+        android:src="@drawable/vertical_bars_blue_720x8" />
+</LinearLayout>

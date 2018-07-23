@@ -148,7 +148,7 @@ public class LogoPageActivity extends AppCompatActivity implements Constants {
     * 否则程序崩溃，提示大致为“新线程触碰了UI线程，不应这样做”】
     * */
     public void setNewPercentNum(int percentageNum){
-        Log.i(TAG, "setNewPercentNum:"+percentageNum);
+//        Log.i(TAG, "setNewPercentNum:"+percentageNum);
         Message msgForNum = new Message();
         msgForNum.what = MESSAGE_NEW_PERCENTAGE_NUMBER;
         msgForNum.arg1 = percentageNum;

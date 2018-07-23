@@ -13,6 +13,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -91,6 +92,7 @@ public class LearningActivity extends AppCompatActivity
     private TextView tv_finish;
     private StripeProgressBar spb_bar;
     private FloatingActionButton fab_finish;
+//    private ImageView imv_fillingRight;
 
     /* 控件附属变量*/
     private boolean isFabShowing = false;//fab按钮是否处于显示状态，用于避免多次触发展开条件（滑到指定卡片）时都设一遍显示。
@@ -174,7 +176,7 @@ public class LearningActivity extends AppCompatActivity
             //在剩余两种模式是LCO/LCR时有效。如果增加了其他新模式，则本逻辑必须修改。
             missionId = getIntent().getIntExtra(STR_MISSION_ID,0);
         }//在后来新增的LEX模式不需获取任何额外数据没有操作
-
+//        Log.i(TAG, "onCreate: gidFM.size="+gIdsForMerge.size());
 
 
     //获取各控件
@@ -193,6 +195,9 @@ public class LearningActivity extends AppCompatActivity
 
         tv_finish = findViewById(R.id.finish_tv_learningActivity);
         fab_finish = findViewById(R.id.finish_fab_learningActivity);
+
+//        imv_fillingRight = findViewById(R.id.imv_rightOrWrong);
+//        imv_fillingRight.setVisibility(View.GONE);//初始不显示。
 
         veFillings = new ArrayList<>();//只这样初始化是不够的，后面按索引位置设置值时会提示越界错误
         restChances = new ArrayList<>();
@@ -276,6 +281,22 @@ public class LearningActivity extends AppCompatActivity
                     veCacheString = "";//列表内无缓存时置空
                 }
 
+               /* //设置页面下半部的正误符号
+                //进入页面后默认不显示。如果该页存在缓存则显示
+                //且在填写完成正确和滑动前显示（这种逻辑下可能只需要显示正确符号）
+                if(!veCacheString.isEmpty()){
+                    imv_fillingRight.setVisibility(View.VISIBLE);
+                    if(veCacheString.equals(items.get(currentPagePosition).getName())){
+                        imv_fillingRight.setImageDrawable(getResources().getDrawable(R.drawable.effective_1));
+                    }else {
+                        imv_fillingRight.setImageDrawable(getResources().getDrawable(R.drawable.wrong));
+                    }
+                }else {
+                    imv_fillingRight.setVisibility(View.GONE);
+                }*/
+
+
+
                 //任务四，重设UI。
                 // 本任务位于任务三修改字串列表之后。因为需要基于字串列表来修改状态。
                 spb_bar.resetStripeAt(oldPagePosition,position);
@@ -291,10 +312,16 @@ public class LearningActivity extends AppCompatActivity
                     }*/
 
                     //所有模式下，第二页开始显示结束按钮；
-                    tv_finish.setVisibility(View.VISIBLE);
                     fab_finish.setVisibility(View.VISIBLE);
                     isFabShowing = true;
                 }
+
+                if(currentPagePosition == items.size()-1){
+                    //最后一页显示finish按钮的说明文字
+                    tv_finish.setVisibility(View.VISIBLE);
+                    //【否则在滑动到最后一页时没有任何提示性机制，人机工程不好。】
+                }
+
 //                Log.i(TAG, "onPageSelected: currentPos="+currentPagePosition+",oldPos="+oldPagePosition);
 //                Log.i(TAG, "onPageSelected: veFillings.get(cP)="+veFillings.get(currentPagePosition)+"veFillings.get(oP)="+veFillings.get(oldPagePosition));
             }
@@ -505,6 +532,9 @@ public class LearningActivity extends AppCompatActivity
     @Override
     public void onCodeCorrectAndReady() {
 
+//        imv_fillingRight.setVisibility(View.VISIBLE);//显示正确符号
+        //在自动滑动之前。（如果在最后一页是没有自动滑动的，正好）
+
         //此时已填入正确单词，（如果允许自动滑动则）自动向下一页滑动。
         if(AutoSliding) {
             if(viewPager.getCurrentItem()<items.size()-1) {//【索引？】
@@ -652,8 +682,7 @@ public class LearningActivity extends AppCompatActivity
         totalAmount =items.size();
         emptyAmount = 0;
         wrongAmount =0;
-        finishAmount = totalAmount-emptyAmount;
-        correctAmount = finishAmount-wrongAmount;
+
 
         //对“填写记录”列表逐项判断,计数并记录索引列表。
         for (int i =0; i<totalAmount;i++){
@@ -665,6 +694,10 @@ public class LearningActivity extends AppCompatActivity
                 wrongPositions.add(i);
             }
         }//旧版的统计职能由spb兼顾，现改由本Activity负责（职能划分更清晰，且不必强制spb的最后更新了）
+
+        //注意要在empty有实际数据后计算
+        finishAmount = totalAmount-emptyAmount;
+        correctAmount = finishAmount-wrongAmount;
     }
 
 

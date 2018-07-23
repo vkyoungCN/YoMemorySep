@@ -303,7 +303,7 @@ public class ItemsOfMissionActivity extends AppCompatActivity
             items = (ArrayList<SingleItem>) memoryDbHelper.getAllItemsOfMission(tableItemSuffix);
             int learnedNumOfItems = memoryDbHelper.getLearnedNumOfItemsOfMission(tableItemSuffix);
             float percentage = (float) learnedNumOfItems/(float)items.size();
-
+//            Log.i(TAG, "run: percentage="+percentage);
             //因为后期要根据筛选来变更数据显示，所以使用一个指针（影子）数据集
             //注意影子集不能直接“指向”主集，那样对影子作的修改都会直接作用到主集上
             rvShowingItems.addAll(items);//这样影子集是持有了另一套对全部对象的引用，修改将是安全的
@@ -312,9 +312,9 @@ public class ItemsOfMissionActivity extends AppCompatActivity
             message.what = MESSAGE_ITEMS_DB_PRE_FETCHED;
 
             //百分比限定两位小数
-            DecimalFormat decimalFormat = new DecimalFormat("###.#");
+            DecimalFormat decimalFormat = new DecimalFormat("###.##");
             Bundle bundleForFloat = new Bundle();
-            bundleForFloat.putString("STR_PERCENTAGE",decimalFormat.format(percentage)+"%");
+            bundleForFloat.putString(STR_STR_PERCENTAGE,decimalFormat.format(percentage*100)+"%");
             message.setData(bundleForFloat);
 
             handler.sendMessage(message);
@@ -489,9 +489,9 @@ public class ItemsOfMissionActivity extends AppCompatActivity
     private void removeLeveledItemsFromShowingList(int priority){
         if(priority>2&&priority<10) {
             //从影子数据集中移除本优先级数据
-            for (SingleItem si : rvShowingItems) {
-                if (si.getPriority() == priority) {
-                    rvShowingItems.remove(si);
+            for (Iterator<SingleItem> rvsIterator = rvShowingItems.iterator();rvsIterator.hasNext();) {
+                if (rvsIterator.next().getPriority() == priority) {
+                    rvsIterator.remove();
                 }
             }
             if (rvShowingItems.size() == 0) {

@@ -877,6 +877,31 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     }
 
 
+    /* 获取分组的描述字段*/
+    public String getGroupDescriptionById(int groupId){
+        String selectGdQuery = "SELECT "+
+                YoMemoryContract.Group.COLUMN_DESCRIPTION+" FROM "+
+                YoMemoryContract.Group.TABLE_NAME+" WHERE "+
+                YoMemoryContract.Group._ID+" = "+groupId;
+
+        getWritableDatabaseIfClosedOrNull();
+        Cursor cursor = mSQLiteDatabase.rawQuery(selectGdQuery,null);
+
+        String strDesp = "";
+        if(cursor.moveToFirst()){
+            strDesp = cursor.getString(0);
+        }
+
+        try {
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        mSQLiteDatabase.close();
+        return strDesp;
+    }
+
     public DBGroup getGroupById(int groupId,String tableSuffix){
         DBGroup group = new DBGroup();
         String selectQuery = "SELECT * FROM "+ YoMemoryContract.Group.TABLE_NAME+

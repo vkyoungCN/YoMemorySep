@@ -16,7 +16,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         SingleItem item = getIntent().getParcelableExtra(Constants.STR_ITEM);
         TextView tvItemInfo = findViewById(R.id.tv_singleItemInfo);
 
-        StringBuilder sbd = new StringBuilder();
+        /*StringBuilder sbd = new StringBuilder();
         sbd.append("分组情况：id=[");
         sbd.append(item.getId());
         sbd.append("], name=[");
@@ -30,9 +30,9 @@ public class ItemDetailActivity extends AppCompatActivity {
         sbd.append("], errTime=[");
         sbd.append(item.getFailedSpelling_times());
         sbd.append("], priority=[");
-        sbd.append(item.getPriority());
+        sbd.append(item.getPriority());*/
 
-        tvItemInfo.setText(sbd.toString());
+        tvItemInfo.setText(item.printSelf());
 
     }
 }

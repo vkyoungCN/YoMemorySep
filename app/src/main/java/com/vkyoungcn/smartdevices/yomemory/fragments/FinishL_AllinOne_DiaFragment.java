@@ -50,7 +50,8 @@ public class FinishL_AllinOne_DiaFragment extends DialogFragment
     private TextView tvEmptyInfo;
     private TextView tvRestTimeInfo;
     private TextView btn_Confirm;
-    private TextView tvBottomInfo;
+    private TextView tvBottomInfo;//根据学习种类进行描述（LG：*如有未完成会对分组进行拆分；
+    // LC：*按完成部分生成新分组；LM：*完成部分合并到新分组，被吞噬分组将删除）
 
     private OnGeneralDfgInteraction mListener;
 
@@ -58,7 +59,7 @@ public class FinishL_AllinOne_DiaFragment extends DialogFragment
         // Required empty public constructor
     }
 
-    public static FinishL_AllinOne_DiaFragment newInstance(int totalAmount, int emptyAmount, int correctAmount, int wrongAmount, int restMinutes, int restSeconds, int learningType) {
+    public static FinishL_AllinOne_DiaFragment newInstance(int totalAmount, int emptyAmount, int correctAmount, int wrongAmount, int restMinutes, int restSeconds,int learningType) {
         FinishL_AllinOne_DiaFragment fragment = new FinishL_AllinOne_DiaFragment();
         Bundle args = new Bundle();
         args.putInt(STR_TOTAL_AMOUNT,totalAmount);

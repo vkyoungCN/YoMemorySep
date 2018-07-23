@@ -115,6 +115,21 @@ public class SingleItem implements Parcelable {
         this.failedSpelling_times++;
     }
 
+    public String printSelf(){
+        String isChoseInStr = isChose?"是":"否";
+        String isLearnedInStr = isLearned?"是":"否";
+        return "id:"+id+", "+
+                "名称："+name+", \n"+
+                "发音："+phonetic+", \n"+
+                "汉义："+translations+", \n\n"+
+                "是否已被选取："+isChoseInStr+", \n"+
+                "属于哪个分组(id)："+groupId+", \n"+
+                "是否已学习："+isLearnedInStr+", \n"+
+                "优先级(2级为默认)："+priority+", \n"+
+                "错误次数："+failedSpelling_times;
+    }
+
+
     /*
      * 以下是Parcelable要求的内容
      * */

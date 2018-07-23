@@ -6,19 +6,20 @@
     <!--标题栏-->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="36dp"
+        android:layout_height="32dp"
         android:background="#efefef"
         android:gravity="center"
         android:text="@string/report_1"
         android:textSize="16sp" />
     <!--空词信息·全完成、部分完成-->
     <TextView
+        android:id="@+id/tv_groupInfo_lc_AC"
         android:layout_width="match_parent"
         android:layout_height="32dp"
         android:gravity="center_vertical"
         android:paddingEnd="16dp"
         android:paddingStart="16dp"
-        android:text="@string/lc_info_ac" />
+        android:text="@string/hs_lc_info_ac" />
 
     <!--分割线-->
     <TextView
@@ -30,7 +31,9 @@
         android:layout_width="match_parent"
         android:layout_height="32dp"
         android:orientation="horizontal">
+
         <TextView
+            android:id="@+id/tv_wrongInfo_lc_AC"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
@@ -48,15 +51,47 @@
             />
         <!--向下展开的按键-->
         <TextView
+            android:id="@+id/tvBtn_wrongWordslc_lc"
             android:layout_width="42dp"
             android:layout_height="match_parent"
             android:layout_gravity="end"
-            android:paddingTop="12dp"
             android:gravity="center"
-            android:text="@string/down_ward"
-            />
+            android:paddingTop="12dp"
+            android:text="@string/down_ward" />
 
     </FrameLayout>
+
+    <!--分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#e0e0e0" />
+
+    <TextView
+        android:id="@+id/tv_expandedWrongInfo_lc_AC"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp"
+        android:text="@string/hs_wrong_items_names"
+        android:visibility="gone" />
+
+    <!--横分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#e0e0e0" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:background="#f5f5f5"
+        android:gravity="center"
+        android:paddingEnd="12dp"
+        android:paddingStart="16dp"
+        android:text="@string/created_1"
+        android:textColor="@color/yo_orange" />
     <!--分割线-->
     <TextView
         android:layout_width="match_parent"
@@ -67,8 +102,9 @@
     <!--新旧状态组件群-->
     <!--群内顶部标题-->
     <TextView
+        android:id="@+id/tv_newGroup_lc"
         android:layout_width="match_parent"
-        android:layout_height="28dp"
+        android:layout_height="32dp"
         android:background="#efefef"
         android:gravity="center"
         android:text="@string/status_changes" />
@@ -119,9 +155,9 @@
                     android:layout_width="48dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="@string/bar_x2_default"
+                    android:text="@string/NA_default"
                     android:textColor="@color/yo_orange"
-                    android:textSize="20sp" />
+                    android:textSize="16sp" />
 
                 <TextView
                     android:layout_width="48dp"
@@ -132,7 +168,8 @@
                     android:textSize="20sp" />
 
                 <TextView
-                    android:layout_width="48dp"
+                    android:id="@+id/tv_rmaChangeNew_fc_AC"
+                    android:layout_width="64dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="@string/sharp_x2_default"
@@ -182,13 +219,12 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/tv_msChangeOld_fg_AC"
                     android:layout_width="48dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="@string/bar_x2_default"
+                    android:text="@string/NA_default"
                     android:textColor="@color/yo_orange"
-                    android:textSize="20sp" />
+                    android:textSize="16sp" />
 
                 <TextView
                     android:layout_width="48dp"
@@ -199,7 +235,7 @@
                     android:textSize="20sp" />
 
                 <TextView
-                    android:id="@+id/tv_msChangeNew_fg_AC"
+                    android:id="@+id/tv_msChangeNew_fc_AC"
                     android:layout_width="48dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
@@ -218,20 +254,6 @@
         </LinearLayout>
 
     </LinearLayout>
-    <!--横分割线-->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#e0e0e0" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:gravity="center"
-        android:paddingEnd="12dp"
-        android:paddingStart="16dp"
-        android:text="@string/created_1"
-        android:background="#f5f5f5"
-        android:textColor="@color/yo_orange" />
 
 </LinearLayout>

@@ -7,13 +7,14 @@
     <!--域标题栏-->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="36dp"
+        android:layout_height="32dp"
         android:background="#efefef"
         android:gravity="center"
         android:text="@string/group_report"
         android:textSize="16sp" />
     <!--空词信息·全完成、部分完成-->
     <TextView
+        android:id="@+id/tv_groupInfo_fm_AC"
         android:layout_width="match_parent"
         android:layout_height="32dp"
         android:gravity="center_vertical"
@@ -26,19 +27,8 @@
         android:layout_height="1dp"
         android:background="#e0e0e0" />
     <!--拆分信息·如未拆分则text留空即可-->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:gravity="center_vertical"
-        android:paddingEnd="16dp"
-        android:paddingStart="16dp"
-        android:textColor="@color/yo_orange"
-        android:text="@string/hs_merge_part" />
-    <!--分割线-->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#e0e0e0" />
+
+
     <!--错词信息·全对、部分对-->
     <FrameLayout
         android:layout_width="match_parent"
@@ -46,8 +36,8 @@
         android:orientation="horizontal">
 
 
-
         <TextView
+            android:id="@+id/tv_wrongInfo_fmLM_AC"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
@@ -65,44 +55,64 @@
             />
         <!--向下展开的按键-->
         <TextView
+            android:id="@+id/tvBtn_wrongWordsLm"
             android:layout_width="42dp"
             android:layout_height="match_parent"
             android:layout_gravity="end"
-            android:paddingTop="12dp"
             android:gravity="center"
-            android:text="@string/down_ward"
-            />
+            android:paddingTop="12dp"
+            android:text="@string/down_ward" />
 
     </FrameLayout>
-
     <!--分割线-->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#e0e0e0" />
-
+    <TextView
+        android:id="@+id/tv_groupMC_fm_AC"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:gravity="center_vertical"
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp"
+        android:text="@string/hs_merge_part"
+        android:textColor="@color/yo_orange" />
+    <!--分割线-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#e0e0e0" />
+    <TextView
+        android:id="@+id/tv_expandedWrongInfo_fm_AC"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp"
+        android:text="@string/hs_wrong_items_names"
+        android:visibility="gone"
+        />
 
     <!--新旧状态组件群-->
     <!--群内顶部标题-->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="28dp"
+        android:layout_height="32dp"
         android:background="#efefef"
         android:gravity="center"
         android:text="@string/merge_changes" />
     <!--rv区域题头-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="28dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         >
 
         <!--序号-->
         <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="32dp"
             android:layout_height="match_parent"
-            android:text="@string/index"
             android:gravity="center"
             />
         <!--分割线-->
@@ -119,47 +129,39 @@
             android:text="@string/source_group_name"
             android:gravity="center"
             />
+
         <!--分割线-->
         <TextView
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:background="#efefef" />
-
         <!--原容量-->
         <TextView
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="@string/source_group_size"
+            android:layout_marginStart="4dp"
+            android:text="@string/size_before_merge"
             android:gravity="center"
+            android:textSize="12sp"
             />
         <!--分割线-->
         <TextView
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:background="#efefef" />
-        <!--并入量-->
+        <!--合并后容量-->
         <TextView
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:text="@string/merge_size"
-            android:gravity="center"
-            />
-        <!--分割线-->
-        <TextView
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="#efefef" />
-        <!--处理-->
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="2"
-            android:layout_height="match_parent"
-            android:text="@string/result_1"
+            android:layout_marginStart="4dp"
+            android:text="@string/size_after_merge"
+            android:textSize="12sp"
             android:gravity="center"
             />
 
+        <!--处理-->
 
 
     </LinearLayout>
@@ -183,10 +185,10 @@
             android:background="#efefef" />
         <!--源分组（碎片）的改变状态（合并（主）、合并（删）、拆（合并）、拆（无变化）、无变化）-->
         <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_mergeResult_LMRP"
             android:layout_width="match_parent"
-            android:layout_height="120dp"
 
-            />
+            android:layout_height="160dp" />
     </LinearLayout>
 
     <!--横分割线-->

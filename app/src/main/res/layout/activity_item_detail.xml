@@ -22,21 +22,20 @@
         android:layout_height="2dp"
         android:background="@color/yo_light_green"
         />
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="200dp" />
+
     <TextView
         android:id="@+id/tv_singleItemInfo"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:padding="16dp"
+        android:textSize="16sp"
         android:gravity="center"
         />
     <!--横分割线-->
-    <TextView
+   <!-- <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#efefef"
-        />
+        />-->
 
 </LinearLayout>
