@@ -1,6 +1,8 @@
 package com.vkyoungcn.smartdevices.yomemory;
 
+import android.animation.AnimatorSet;
 import android.content.Context;
+import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.animation.Animator;
@@ -12,7 +14,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AnimationSet;
 import android.view.animation.LinearInterpolator;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -38,6 +42,9 @@ public class LogoPageActivity extends AppCompatActivity implements Constants {
     private TextView logoStrCn;
     private HorizontalProgressBar hpb_progress;//需要传入百分比的分子数值。
     private LinearLayout llt_firstRun;
+    private ImageView imv_du_1;
+    private ImageView imv_du_2;
+
     private Context context = this;
 
     @Override
@@ -48,6 +55,9 @@ public class LogoPageActivity extends AppCompatActivity implements Constants {
         logoStrCn = findViewById(R.id.logo_cn);
         hpb_progress = findViewById(R.id.hpb_LPA);
         llt_firstRun = findViewById(R.id.llt_forFirstRun_LPA);
+        imv_du_1 = findViewById(R.id.imv_du_1);
+        imv_du_2 = findViewById(R.id.imv_du_2);
+
 
         SharedPreferences sharedPreferences=getSharedPreferences(SP_STR_TITLE_YO_MEMORY, MODE_PRIVATE);
         boolean isFirstLaunch=sharedPreferences.getBoolean(STR_IS_FIRST_LAUNCH, true);
@@ -112,26 +122,43 @@ public class LogoPageActivity extends AppCompatActivity implements Constants {
 
 //    动画
     private void startAnimator(){
-         ValueAnimator CenterLogoAnimator = ValueAnimator.ofFloat(0,80,90,100);
-                CenterLogoAnimator.setDuration(1200);
-                CenterLogoAnimator.addUpdateListener(new LogoDisAnimatorListener());
-                CenterLogoAnimator.setInterpolator(new LinearInterpolator());
-                CenterLogoAnimator.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
-                        super.onAnimationStart(animation);
-                    }
+        AnimatorSet animationSet = new AnimatorSet();
 
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        super.onAnimationEnd(animation);
+        ValueAnimator CenterLogoAnimator = ValueAnimator.ofFloat(0,80,90,100);
 
-                            Intent intent= new Intent(LogoPageActivity.this,MainActivity.class);
-                            startActivity(intent);
+//        CenterLogoAnimator.setDuration(1200);
+        CenterLogoAnimator.addUpdateListener(new LogoDisAnimatorListener());
+        CenterLogoAnimator.setInterpolator(new LinearInterpolator());
+        CenterLogoAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+            }
 
-                    }
-                });
-                CenterLogoAnimator.start();
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+
+                Intent intent= new Intent(LogoPageActivity.this,MainActivity.class);
+                startActivity(intent);
+
+            }
+        });
+
+        ValueAnimator Du_Animator_1 = ValueAnimator.ofFloat(0,100,100,100);
+//        Du_Animator_1.setDuration(1200);
+        Du_Animator_1.addUpdateListener(new DuDuAnimatorListener_1());
+        Du_Animator_1.setInterpolator(new LinearInterpolator());
+
+        ValueAnimator Du_Animator_2 = ValueAnimator.ofFloat(0,0,0,100,100);
+//        Du_Animator_2.setDuration(1200);
+        Du_Animator_2.addUpdateListener(new DuDuAnimatorListener_2());
+        Du_Animator_2.setInterpolator(new LinearInterpolator());
+
+        animationSet.setDuration(1500);
+        animationSet.playTogether(CenterLogoAnimator,Du_Animator_1,Du_Animator_2);
+        animationSet.start();
+
     }
 
     private class LogoDisAnimatorListener implements ValueAnimator.AnimatorUpdateListener {
@@ -139,6 +166,20 @@ public class LogoPageActivity extends AppCompatActivity implements Constants {
         public void onAnimationUpdate(ValueAnimator valueanimator) {
             float value = (Float)valueanimator.getAnimatedValue();
             logoStrCn.setAlpha(value/100);
+        }
+    }
+    private class DuDuAnimatorListener_1 implements ValueAnimator.AnimatorUpdateListener {
+
+        public void onAnimationUpdate(ValueAnimator valueanimator) {
+            float value = (Float)valueanimator.getAnimatedValue();
+            imv_du_1.setAlpha(value/100);
+        }
+    }
+   private class DuDuAnimatorListener_2 implements ValueAnimator.AnimatorUpdateListener {
+
+        public void onAnimationUpdate(ValueAnimator valueanimator) {
+            float value = (Float)valueanimator.getAnimatedValue();
+            imv_du_2.setAlpha(value/100);
         }
     }
 

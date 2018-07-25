@@ -27,6 +27,7 @@
     <string name="time_up1">很遗憾，时间到！</string>
     <string name="preparing_data_please_wait">正在准备数据，请稍候……</string>
     <string name="YouMemoryCN">优记</string>
+    <string name="YouMemoryDuDu_CN">优记嘟嘟</string>
     <string name="alpha_testing_string">（工程测试α-0.7.9）</string>
     <string name="resource_list">资源列表</string>
     <string name="number_of_items">资源数量：</string>
@@ -234,7 +235,8 @@
     <string name="YouMemoryEn">YoMemory!</string>
     <string name="item_detail">单项资源详情</string>
     <string name="title_dfg_learningAddOrder">创建式学习（顺序）</string>
-    <string name="authorInfo"> Created by 杨镇时(Victor Young)\n杨胜(yangsheng@ouc.edu.cn)</string>
+    <string name="authorInfo_1"> Created by 杨镇时(Victor Young)</string>
+    <string name="authorInfo_2"> Created by 杨镇时(Victor Young)\n杨胜(yangsheng@ouc.edu.cn)</string>
     <string name="description_of_group">分组描述</string>
     <string name="size_of_group">分组容量</string>
     <string name="chose">选择</string>
@@ -243,4 +245,16 @@
     <string name="size_after_merge">合并后</string>
     <string name="dot">·</string>
     <string name="NA_default">N/A</string>
+    <string name="explanations_2">说明</string>
+    <string name="thanks">赞赏！</string>
+    <string name="gratitude">赞赏页</string>
+    <string name="author_and_cash">一个喜爱技术的年轻人(而且很穷)，做了一些应用！
+        \n如果您觉得这款应用还不错，帮助了您记住了单词，那么希望您能赞赏一下。(*^▽^*)</string>
+    <string name="author_Info_0">作者简介</string>
+    <string name="open_VE">打开输入框练习拼写</string>
+    <string name="close_VE">关闭输入框</string>
+    <string name="click_card_to_VE_1">*点击卡片打开输入框</string>
+    <string name="click_card_to_VE_2">*正确拼写以完成词条学习</string>
+    <string name="quit_query">确认退出</string>
+    <string name="confirm_quit">点击确认后将退出！！</string>
 </resources>

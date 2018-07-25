@@ -57,7 +57,7 @@ public class RvMission implements Parcelable {
         switch (starType){
             case 0:
                 this.startResourceId = R.drawable.star_gray;
-                this.headerColorId = 0;
+                this.headerColorId = R.color.mission_card_gray;
                 break;
             case 1:
                 this.startResourceId = R.drawable.star_blue;

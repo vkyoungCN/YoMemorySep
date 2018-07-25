@@ -12,6 +12,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import com.vkyoungcn.smartdevices.yomemory.adapters.LearningViewPrAdapter;
 import com.vkyoungcn.smartdevices.yomemory.fragments.FinishL_AllinOne_DiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
+import com.vkyoungcn.smartdevices.yomemory.fragments.QuitQueryDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
 import com.vkyoungcn.smartdevices.yomemory.customUI.StripeProgressBar;
 import com.vkyoungcn.smartdevices.yomemory.validatingEditor.ValidatingEditor;
@@ -195,6 +197,11 @@ public class LearningActivity extends AppCompatActivity
 
         tv_finish = findViewById(R.id.finish_tv_learningActivity);
         fab_finish = findViewById(R.id.finish_fab_learningActivity);
+        if(items.size()==1){
+            //如果数据集只有1个词（只有一张卡片，不会触发滑动监听）则应直接显示fab按钮从而可以结束
+            fab_finish.setVisibility(View.VISIBLE);
+            tv_finish.setVisibility(View.VISIBLE);
+        }
 
 //        imv_fillingRight = findViewById(R.id.imv_rightOrWrong);
 //        imv_fillingRight.setVisibility(View.GONE);//初始不显示。
@@ -211,76 +218,102 @@ public class LearningActivity extends AppCompatActivity
 //            itemIds.add(si.getgIndex());//【其实这样一来可能就不必传递Merge时的itemsId了。待】
         }
         spb_bar.initNecessaryData(targetCodes);
-
-        spb_bar.setCurrentCodes(veFillings);
+        spb_bar.setCurrentCodes(veFillings);//tC、vF二者比较，绘制spb状态UI
 
         viewPager = findViewById(R.id.viewPager_ItemLearning);
-
-        LearningViewPrAdapter learningVpAdapter = new LearningViewPrAdapter(getSupportFragmentManager(), items,restChances);
+        LearningViewPrAdapter learningVpAdapter = new LearningViewPrAdapter(getSupportFragmentManager(),
+                items,restChances,veFillings);//最初veFillings显然是全空的。后期修改后，再次加载卡片时可随引用改变。
         viewPager.setAdapter(learningVpAdapter);
 
         //给Vpr设置监听
-        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+        viewPager.addOnPageChangeListener(new OnPageChange());//自定义，在下方。
 
+
+        startingTimeMillis = System.currentTimeMillis();//记录学习开始的时间
+
+        //启动计时器（每秒、分更改一次数字）
+        timingThread = new Thread(new TimingRunnable());
+        timingThread.start();
+
+    }
+
+
+    /* VPR的监听器实现*/
+    private class OnPageChange extends ViewPager.SimpleOnPageChangeListener{
             /*@Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 //【本方法有问题，log.i测试表明会持续输出多次旧索引但是最后会输出一个新索引！简直有病】
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels);
                 oldPagePosition = position;//获取滑动开始时的页面索引
-                Log.i(TAG, "onPageScrolled: oldPageIndex="+oldPagePosition);
-            }*/
+                Log.i(TAG, "onPageScrolled: oldPageIndex="+oldPagePosition);}*/
 
 
-            /*
-            * 本方法中需要完成的任务：
-            * 0,获取当前卡片索引位置
-            * ①设置页脚数字
-            * ②判断并设置最大已滑动值
-            * ③（由于刚进入新页）将VE缓存（对应上一页内容）存入String列表；并检测本页对应位置上是否有值，有则传入。
-            * ④给自定义进度条UI传递当前页面数【待】
-            * ⑤理论上，每滑动一页，就应将上一页的正误情况存入记录列表。
-            *
-            * （注意反向滑动下的特殊逻辑）
-            * */
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-                oldPagePosition = currentPagePosition;
-                //据文档，本方法调用时，滑动已经完成。
-                currentPagePosition = position;//其他方法需使用
+        /*
+         * 本方法中需要完成的任务：
+         * 0,获取当前卡片索引位置
+         * ①设置页脚数字
+         * ②判断并设置最大已滑动值
+         * ③（滑入新卡片时的VE缓存载入VE的任务交给FG负责（fg主动申请、再下传给VE）；VE填对一次后，VE对应的String列表将持续持有正确项目不再改动
+         * ④给自定义进度条UI传递当前页面数【待】
+         * ⑤理论上，每滑动一页，就应将上一页的正误情况存入记录列表。
+         *
+         * （注意反向滑动下的逻辑）
+         * */
+        @Override
+        public void onPageSelected(int position) {
+            super.onPageSelected(position);
+            oldPagePosition = currentPagePosition;
+            //据文档，本方法调用时，滑动已经完成。
+            currentPagePosition = position;//其他方法需使用
 //                Log.i(TAG, "onPageSelected: currentPageIndex = "+currentPagePosition);
 
-                //任务一：
-                //设置底端页码显示逻辑
-                //当页面滑动时为下方的textView设置当前页数，但是只在开始滑动后才有效果，初始进入时需要手动XML设为1
-                tv_currentPageNum.setText(String.valueOf(position + 1));//索引从0起需要加1
-                //【旧版中，因为有伪数据尾页，在滑到最后一页时需要各种特殊的逻辑和判断】
+            //任务一：
+            //设置底端页码显示逻辑
+            //当页面滑动时为下方的textView设置当前页数，但是只在开始滑动后才有效果，初始进入时需要手动XML设为1
+            tv_currentPageNum.setText(String.valueOf(position + 1));//索引从0起需要加1
+            //【旧版中，因为有伪数据尾页，在滑到最后一页时需要各种特殊的逻辑和判断】
 
-                //任务二：
-                //记录已滑动的上限值（注意只增不减）【但上限不包括伪数据尾页，所以位于任务一的if内】
-                if(maxLearnedAmount <position+1){
-                    maxLearnedAmount = position+1;//只加不减
-                }
+            //任务二：
+            //记录已滑动的上限值（注意只增不减）【但上限不包括伪数据尾页，所以位于任务一的if内】
+            if(maxLearnedAmount <position+1){
+                maxLearnedAmount = position+1;//只加不减
+            }
 
-                //任务三：
-                //将上一页的（用于记录输入信息的）临时字串存入List，临时字串清空备用。
+            //任务三：
+            //将上一页的（用于记录输入信息的）临时字串存入List，临时字串清空备用。
+//            boolean thisCardHasUltimateTips = false;
+           /* if(restChances.get(position)== -2){
+                thisCardHasUltimateTips = true;
+            }*/
+//            boolean lastCardHasUltimateTips = false;
+            if(restChances.get(oldPagePosition)!=-2){
+//                lastCardHasUltimateTips = true;
+                //上一页尚未“正确填写一次”。
+                //如果上一页“已正确填写过一次”则，ve列表保持“已正确填写”的字串即可，不再变更。对VE
+                //的最后一次修改由onCCR或onCC方法负责。
+
+                //将上一页对应的字串存入整体字串列表。
                 veFillings.set(oldPagePosition, veCacheString);
-                //本页VE缓存（如果有）设置给VE
-                if(veFillings.get(position)!=null){//若为空串""则是可以设置的。
-                    try {
-                        Log.i(TAG, "onPageSelected: String setTo VE ="+veFillings.get(position)+", position="+position);
+            }
+            if(restChances.get(position)!= -2) {
+                //本页尚未“正确填写过一次”，需要保持缓存和显示一致，以便接下来VE继续输入而做修改。
+                veCacheString = veFillings.get(position);//缓存要保持一致，否则（比如非空VE而cache置空的话）第三次滑到时内容就删除了【？】。
+            }//但已“正确填写过一次”后，每次滑入新卡，会加载正确输入的字串，且不再发送字符变更消息，因而不需再记录缓存字串。
 
-                        ValidatingEditor vdEt = ((LearningViewPrAdapter)viewPager.getAdapter()).currentFragment.getView().findViewById(R.id.ve_singleItemLearning);
-                        vdEt.setInitText(veFillings.get(position));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    veCacheString = veFillings.get(position);//缓存要保持一致，否则（比如非空VE而cache置空的话）第三次滑到时内容就删除了。
-
-                }else {
-                    veCacheString = "";//列表内无缓存时置空
+            Log.i(TAG, "onPageSelected: veFelling.get(currentPagePs)="+veFillings.get(currentPagePosition));
+            // 本页VE缓存已不需在此设置给VE（而是由FG的构造器直接负责（vpr也持有Activity中整体缓存列表的副本，直接设置当前项目给fg））
+            /*if(veFillings.get(position)!=null){//若为空串""则是可以设置的。
+                try {
+//                    Log.i(TAG, "onPageSelected: String setTo VE ="+veFillings.get(position)+", position="+position);
+                    ValidatingEditor vdEt = ((LearningViewPrAdapter)viewPager.getAdapter()).currentFragment.getView().findViewById(R.id.ve_singleItemLearning);
+                    vdEt.setInitText(veFillings.get(position));
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
+            }else {
+                veCacheString = "";//列表内无缓存时置空
+            }*/
                /* //设置页面下半部的正误符号
                 //进入页面后默认不显示。如果该页存在缓存则显示
                 //且在填写完成正确和滑动前显示（这种逻辑下可能只需要显示正确符号）
@@ -297,12 +330,13 @@ public class LearningActivity extends AppCompatActivity
 
 
 
-                //任务四，重设UI。
-                // 本任务位于任务三修改字串列表之后。因为需要基于字串列表来修改状态。
-                spb_bar.resetStripeAt(oldPagePosition,position);
+            //任务四，重设UI。
+            // 本任务位于任务三修改字串列表之后。因为需要基于字串列表来修改状态。
+            spb_bar.resetStripeAt(oldPagePosition,position);
 
 
-                if(!isFabShowing){
+            //任务五，第二页后显示fab
+            if(!isFabShowing){
                     /*if(learningType!=LEARNING_GENERAL||position==items.size()-1) {
                         // 普通模式下滑到最后一张时将结束按钮显示出来。 【回滑不应隐藏】
                         //其他模式下，第二页开始显示结束按钮；
@@ -311,33 +345,23 @@ public class LearningActivity extends AppCompatActivity
                         isFabShowing = true;
                     }*/
 
-                    //所有模式下，第二页开始显示结束按钮；
-                    fab_finish.setVisibility(View.VISIBLE);
-                    isFabShowing = true;
-                }
+                //所有模式下，第二页开始显示结束按钮；
+                fab_finish.setVisibility(View.VISIBLE);
+                isFabShowing = true;
+            }
 
-                if(currentPagePosition == items.size()-1){
-                    //最后一页显示finish按钮的说明文字
-                    tv_finish.setVisibility(View.VISIBLE);
-                    //【否则在滑动到最后一页时没有任何提示性机制，人机工程不好。】
-                }
+            if(currentPagePosition == items.size()-1){
+                //最后一页显示finish按钮的说明文字
+                tv_finish.setVisibility(View.VISIBLE);
+                //【否则在滑动到最后一页时没有任何提示性机制，人机工程不好。】
+            }
 
 //                Log.i(TAG, "onPageSelected: currentPos="+currentPagePosition+",oldPos="+oldPagePosition);
 //                Log.i(TAG, "onPageSelected: veFillings.get(cP)="+veFillings.get(currentPagePosition)+"veFillings.get(oP)="+veFillings.get(oldPagePosition));
-            }
-        });
-
-
-        //后期增加：①items可选顺序随机；
-
-
-        startingTimeMillis = System.currentTimeMillis();//记录学习开始的时间
-
-        //启动计时器（每秒、分更改一次数字）
-        timingThread = new Thread(new TimingRunnable());
-        timingThread.start();
+        }
 
     }
+
 
     final static class LearningActivityHandler extends Handler {
         private final WeakReference<LearningActivity> activity;
@@ -533,8 +557,14 @@ public class LearningActivity extends AppCompatActivity
     public void onCodeCorrectAndReady() {
 
 //        imv_fillingRight.setVisibility(View.VISIBLE);//显示正确符号
-        //在自动滑动之前。（如果在最后一页是没有自动滑动的，正好）
+        //将当前卡片设置为无限翻转模式
+        ((LearningViewPrAdapter)viewPager.getAdapter()).currentFragment.setTipLimitingFree(true);
+        //持有的对全局所有卡片的剩余次数记录也要修改。
+        restChances.set(currentPagePosition,(byte)-2);//【目前暂时使用-2代表无限次数。所有的判断暂时也均按是否==-2进行】
+        veFillings.set(currentPagePosition,veCacheString);//由于onCC调用早于onCCR因而目前的veCS已经是正确的（？）
+        //onCCR方法下负责修改全局列表上本卡对应位置的记录（而页面滑动onPageChange方法下只对“未正确填满”的卡片做记录）
 
+        //在自动滑动之前。（如果在最后一页是没有自动滑动的，正好）
         //此时已填入正确单词，（如果允许自动滑动则）自动向下一页滑动。
         if(AutoSliding) {
             if(viewPager.getCurrentItem()<items.size()-1) {//【索引？】
@@ -710,5 +740,26 @@ public class LearningActivity extends AppCompatActivity
 
     }
 
+
+    /*
+     * 学习页的back一定要提示。
+     */
+    @Override
+    public boolean onKeyDown(int keyCode,KeyEvent event){
+        if(keyCode==KeyEvent.KEYCODE_BACK){
+            FragmentTransaction transaction = (getFragmentManager().beginTransaction());
+            Fragment prev = (getFragmentManager().findFragmentByTag(FG_STR_QUIT_QUERY));
+
+            if (prev != null) {
+                Toast.makeText(this, "Old Dfg still there, removing...", Toast.LENGTH_SHORT).show();
+                transaction.remove(prev);
+            }
+            DialogFragment dfg = QuitQueryDiaFragment.newInstance();
+            dfg.show(transaction,FG_STR_QUIT_QUERY);
+
+            return true;//不执行父类点击事件
+        }
+        return super.onKeyDown(keyCode, event);//继续执行父类其他点击事件
+    }
 
 }

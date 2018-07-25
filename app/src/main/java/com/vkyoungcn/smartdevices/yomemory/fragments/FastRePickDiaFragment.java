@@ -44,6 +44,7 @@ public class FastRePickDiaFragment extends DialogFragment
 
     private TextView tvCancel;
     private TextView tvConfirm;
+//    private TextView tvClockDown;
     private CheckBox ckb_setAsDefault;
     private CheckBox ckb_NoMoreTip;
     private RadioGroup rgp_Manners;
@@ -82,6 +83,7 @@ public class FastRePickDiaFragment extends DialogFragment
 
         tvCancel = (TextView) rootView.findViewById(R.id.btn_cancel_dfgFRP);
         tvConfirm = (TextView) rootView.findViewById(R.id.btn_ok_dfgFRP);
+//        tvClockDown = rootView.findViewById(R.id.tv_clockDown_FRP);
         rgp_Manners = (RadioGroup) rootView.findViewById(R.id.rg_manner_dfgFRP);
         rbn_ms = (RadioButton)rootView.findViewById(R.id.rb_ms_first_dfgFRP);
         rbn_rma = (RadioButton)rootView.findViewById(R.id.rb_rma_first_dfgFRP);

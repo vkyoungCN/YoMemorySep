@@ -112,7 +112,7 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
                             case 0:
                                 missions.get(position).setStarType(0);
                                 missions.get(position).setStartResourceId(R.drawable.star_gray);
-                                missions.get(position).setHeaderColorId(0);
+                                missions.get(position).setHeaderColorId(R.color.mission_card_gray);
                                 break;
                             case 1:
                                 missions.get(position).setStarType(1);
@@ -125,7 +125,7 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
                                 missions.get(position).setHeaderColorId(R.color.mission_card_red);
                                 break;
                         }
-                        ((MainActivity)context).changeRvStar(position);
+                        ((MainActivity)context).changeRvStarAndSave(position);
 
 
                 }
@@ -136,7 +136,7 @@ public class AllMissionRvAdapter extends RecyclerView.Adapter<AllMissionRvAdapte
     }
 
     public interface ChangeStar{
-        void changeRvStar(int position);
+        void changeRvStarAndSave(int position);
     }
 
 

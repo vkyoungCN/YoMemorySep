@@ -20,8 +20,8 @@
             android:layout_weight="1"
             android:layout_gravity="center"
             android:gravity="bottom|center_horizontal"
-            android:textSize="30sp"
-            android:text="@string/YouMemoryCN"
+            android:textSize="20sp"
+            android:text="@string/YouMemoryDuDu_CN"
             android:alpha="0.6"
             />
 
@@ -55,6 +55,27 @@
     </LinearLayout>
 
 
+    <ImageView
+        android:id="@+id/imv_du_1"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/du"
+        android:layout_gravity="bottom|start"
+        android:layout_marginBottom="96dp"
+        android:layout_marginStart="96dp"
+        android:alpha="0"
+        />
+    <ImageView
+        android:id="@+id/imv_du_2"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/du"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="96dp"
+        android:layout_marginEnd="96dp"
+        android:alpha="0"
+        />
+
     <!--作者信息-->
     <TextView
         android:layout_width="match_parent"
@@ -62,7 +83,7 @@
         android:layout_gravity="bottom"
         android:gravity="center"
         android:textSize="12sp"
-        android:text="@string/authorInfo"
+        android:text="@string/authorInfo_1"
         />
 
     <!--下方放置HBP和一个提示tv-->

@@ -22,17 +22,19 @@ public class LearningViewPrAdapter extends FragmentStatePagerAdapter {
     //    private static final String TAG = "LearningViewPrAdapter";
     private List<SingleItem> singleItems;
     private ArrayList<Byte> restChances;//各卡片对应的提示次数（学习业务中的一个业务逻辑）
+    private ArrayList<String> initTextList;//各卡片对应的“初始”（加载时应预先显示的词）
     public SingleItemLearningFragment currentFragment;
 
-    public LearningViewPrAdapter(FragmentManager fm, List<SingleItem> singleItems, ArrayList<Byte> restChances) {
+    public LearningViewPrAdapter(FragmentManager fm, List<SingleItem> singleItems, ArrayList<Byte> restChances, ArrayList<String> initTextList) {
         super(fm);
         this.singleItems = singleItems;
         this.restChances = restChances;
+        this.initTextList = initTextList;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return SingleItemLearningFragment.newInstance(singleItems.get(position),restChances.get(position));
+        return SingleItemLearningFragment.newInstance(singleItems.get(position),restChances.get(position),initTextList.get(position));
     }
 
     @Override

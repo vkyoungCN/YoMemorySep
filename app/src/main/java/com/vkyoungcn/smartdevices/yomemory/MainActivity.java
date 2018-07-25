@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity
             rvMissions = new ArrayList<>();
             for (Mission m :missions) {
                 rvMissions.add(new RvMission(getApplicationContext(),m));
+//                Log.i(TAG, "run: Mission.starType="+m.getStarType());
             }
 
             Message message = new Message();
@@ -162,25 +164,25 @@ public class MainActivity extends AppCompatActivity
     //当RV-Adp中点击了星标后，会调用此回调方法，通知新的星标类型。
     //在本页退出时，应当存入DB。
     @Override
-    public void changeRvStar(int position) {
+    public void changeRvStarAndSave(int position) {
             allMissionRvAdapter.notifyItemChanged(position);
+//        Log.i(TAG, "changeRvStarAndSave: rvMissions.get().starType="+rvMissions.get(position).getStarType());
+//            starClickedPositions.remove((Integer)position);//先删再提交，避免重复。
+//            starClickedPositions.add(position);//这些位置上发生过点击，应该提交到DB更新
+        int affectRows = memoryDbHelper.updateMissionStart(rvMissions.get(position));
+        if (affectRows == 0) {
+            Toast.makeText(this, "星标有点击，但DB没改变。", Toast.LENGTH_SHORT).show();
+        }
 
-            starClickedPositions.remove((Integer)position);//先删再提交，避免重复。
-            starClickedPositions.add(position);//这些位置上发生过点击，应该提交到DB更新
-        // （其新值应已在adapter中设置好了，毕竟是引用类型）
-        //点击最后不一定改变了值，但是判断逻辑估计较复杂，从略、只要点击了就全存。
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         //如果星标位置上发生过点击，则最终会产生向DB的提交（但不一定真的有改变，毕竟星标是循环设置的）
-        if(starClickedPositions!=null && !starClickedPositions.isEmpty()) {//【实测在此若不检测null则崩溃】
-            int affectRows = memoryDbHelper.updateMissionStartInBatches(rvMissions, starClickedPositions);
-            if (affectRows == 0) {
-                Toast.makeText(this, "星标有点击，但DB没改变。", Toast.LENGTH_SHORT).show();
-            }
-        }
+        /*if(starClickedPositions!=null && !starClickedPositions.isEmpty()) {//【实测在此若不检测null则崩溃】
+
+        }*/
     }
 
     /*
@@ -244,6 +246,12 @@ public class MainActivity extends AppCompatActivity
 
         this.startActivity(intent);
 
+    }
+
+    public void toGratitudePage(View view){
+        //跳转到赞赏码页
+        Intent intent = new Intent(this,GratitudeActivity.class);
+        this.startActivity(intent);
     }
 
 }

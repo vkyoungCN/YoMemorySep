@@ -31,6 +31,7 @@ public class ValidatingEditor extends View {
 //* 当前的设计逻辑中单词将在一行内显示完毕。
 //* 如果输入的正确，则背景、下划线呈现绿色，有错的字母则背景呈红色，错字下方的下划线呈现红色；
 //* 每输入一个有效字符可以向监听（自定义）发送消息（携带当前的完整字串），全部输入且正确时发送另一种监听消息；
+//* 正确填写一次后，允许进行无记录加练。
 
     private static final String TAG = "ValidatingEditor";
     private Context mContext;
@@ -46,6 +47,8 @@ public class ValidatingEditor extends View {
     private BottomLine bottomLines[];
     private int leastWrongPosition = 0;//从1起，0预置。（记录输入的字符之出错的各字符中索引数最小的一个，用于删除改正时的改色逻辑）
     private int currentPosition = 0;//第一个字母的位置是1。
+    private boolean hasCorrectOnce = false;//当有过一次填写正确时，逻辑有大改变：①仍然可以继续输入，但是最终不能再记录入Activity
+    // 的输入记录列表；（考虑取消onCode单个改变的监听）②
 
     private boolean isDataInitBeInterruptedBecauseOfNoSize = false;
 
@@ -361,10 +364,13 @@ public class ValidatingEditor extends View {
             if(currentPosition<leastWrongPosition){
                 leastWrongPosition = 0;
             }
-            Log.i(TAG, "onKeyDown: currentPos="+currentPosition);
+//            Log.i(TAG, "onKeyDown: currentPos="+currentPosition);
             invalidate();//字符改变，重绘
 
-            listener.onCodeChanged(getCurrentString());
+            if(!hasCorrectOnce) {
+                //尚未完整正确输入过一次，改变字符的监听仍然在
+                listener.onCodeChanged(getCurrentString());
+            }
         }
         return super.onKeyDown(keyCode, keyevent);
     }
@@ -374,6 +380,7 @@ public class ValidatingEditor extends View {
      */
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent keyevent) {
+
         String text = KeyEvent.keyCodeToString(keyCode);//返回的一定是KEYCODE_开头（已知字符）或数字1001（未知字符）
 
         if(!keyevent.isCapsLockOn()) {
@@ -401,9 +408,12 @@ public class ValidatingEditor extends View {
             if (characters.size() >= targetText.length() ) {//满了【重绘必须在回调之前，且两分支都要有！（排错小结）】
                 currentPosition = targetText.length();//【这里既不能继续++，也不能保持数字不变，所以Z直接设置为最大值】
                 invalidate();//字符改变，重绘
-                Log.i(TAG, "inputText: currentPos inside VE ="+currentPosition);
+//                Log.i(TAG, "inputText: currentPos inside VE ="+currentPosition);
 
-                if(getCurrentString().compareTo(targetText) == 0) {
+                if(getCurrentString().compareTo(targetText) == 0 && !hasCorrectOnce) {
+                    //必须是尚未正确输入过的状态才能触发两个监听方法
+                    hasCorrectOnce = true;//修改标记为已经（有过一次）完整正确输入。
+
                     if(listener != null) {
                         listener.onCodeChanged(getCurrentString());//需要在onCCA方法前调用，
                         // 实测如果放在下一方法后，则最后一个字符无法传出。可能原因如下，
@@ -415,7 +425,7 @@ public class ValidatingEditor extends View {
 
             }else {//还没满（但显然也必须是输入开始后，每次输入（且已成功输入到了characters中后）才会触发）
                 currentPosition++;
-                Log.i(TAG, "inputText: currentPos inside VE ="+currentPosition);
+//                Log.i(TAG, "inputText: currentPos inside VE ="+currentPosition);
                 //记录输入的字符之出错的各字符中，索引值最小的一个。
                 if(Character.compare(character,targetText.charAt(currentPosition-1))!=0){//此位置上字符输入不正确
 
@@ -425,8 +435,10 @@ public class ValidatingEditor extends View {
 
                 }
                 invalidate();//字符改变，重绘
-
-                listener.onCodeChanged(getCurrentString());
+                if(!hasCorrectOnce) {
+                    //有这个监听的地方必须先判断当前的状态是“初次（正确之前）的填写”还是“已正确后的无记录加练”
+                    listener.onCodeChanged(getCurrentString());
+                }
             }
 
             return true;
@@ -517,8 +529,9 @@ public class ValidatingEditor extends View {
     /*
     * 方法由程序调用，动态设置目标字串
     * */
-    public void setTargetText(String targetText){
+    public void setTargetAndInitText(String targetText,String initText){
         this.targetText = targetText;
+        this.initText = initText;
 
         //由于要根据目标字串的字符数量来绘制控件，所以所有需要用到该数量的初始化动作都只能在此后进行
         initData();
@@ -533,9 +546,11 @@ public class ValidatingEditor extends View {
         if(initText!=null){
             //如果初始字串不空，则将其存入数据组；
             char[] chars = initText.toCharArray();
+            characters.clear();//先清空
             for (char c: chars){
                 characters.push(c);
             }
+            invalidate();
 //            Log.i(TAG, "initData: characters="+characters.toString());
         }
 

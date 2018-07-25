@@ -89,6 +89,8 @@ public interface Constants {
     String STR_GP_DESCRIPTIONS = "GP_DESCRIPTIONS";
     String STR_OLD_SIZES = "OLD_SIZES";
     String STR_NEW_SIZES = "NEW_SIZES";
+    String STR_LA = "LA";
+
 
 
     /* Date类Pattern字串 */
@@ -100,6 +102,7 @@ public interface Constants {
     String FG_STR_FAST_RE_PICK ="FAST_RE_PICK";
     String FG_STR_GIVE_EXPLANATION = "GIVE_EXPLANATION";
     String FG_STR_HANDY_FINISH = "HANDY_FINISH";
+    String FG_STR_QUIT_QUERY = "STR_QUIT_QUERY";
 
     String FG_STR_LEARNING_ADD_IN_ORDER="LEARNING_ADD_IN_ORDER";
     String FG_STR_LEARNING_ADD_RANDOM = "LEARNING_ADD_RANDOM";

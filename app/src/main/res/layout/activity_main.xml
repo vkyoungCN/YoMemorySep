@@ -94,7 +94,7 @@
 
 
         <!--次底部的提示条-->
-        <TextView
+        <!--<TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingEnd="12dp"
@@ -107,11 +107,11 @@
             android:gravity="end"
             android:layout_marginBottom="58dp"
             android:translationZ="1dp"
-            />
+            />-->
         <!--底部横向按键栏-->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="50dp"
             android:background="#efefef"
             android:orientation="horizontal"
             android:padding="1dp"
@@ -123,7 +123,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="8"
-                android:text="@string/explanations_1"
+                android:text="@string/explanations_2"
                 android:padding="8dp"
                 android:gravity="center"
                 android:onClick="toExplanation"
@@ -156,12 +156,12 @@
             <!--底部·第3个按键-->
             <TextView
                 android:layout_width="0dp"
-                android:layout_weight="9"
+                android:layout_weight="8"
                 android:layout_height="match_parent"
                 android:padding="8dp"
-                android:textSize="18sp"
-                android:text="@string/plus"
+                android:text="@string/thanks"
                 android:gravity="center"
+                android:onClick="toGratitudePage"
                 />
 
             <!--小横分割线-->
@@ -173,11 +173,11 @@
             <!--底部·第4个按键-->
             <TextView
                 android:layout_width="0dp"
-                android:layout_weight="10"
+                android:layout_weight="8"
                 android:layout_height="match_parent"
                 android:background="@drawable/new_for_btn_2"
                 android:padding="8dp"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:text="@string/get_more"
                 android:gravity="center"
                 />

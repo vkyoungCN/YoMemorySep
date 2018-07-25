@@ -27,7 +27,7 @@ import java.util.List;
  * 2018.08.01
  * */
 public class YoMemoryDbHelper extends SQLiteOpenHelper {
-    private static final String TAG = "YoMemory-DbHelper";
+//    private static final String TAG = "YoMemory-DbHelper";
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "YoMemory.db";
@@ -137,7 +137,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         //根据API，本方法在初次使用数据库时（比如初次请求生成mSQLiteDatabase）自动调用
         //此情景下，执行如下任务.
-
+//        Log.i(TAG, "onCreate: be");
         //建表
         db.execSQL(SQL_CREATE_MISSION);
         db.execSQL(SQL_CREATE_GROUP);
@@ -158,7 +158,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
         //向Mission表增加默认记录
         String detail_13531 = context.getResources().getString(R.string.introduction_Mission13531);
-        Mission defaultMission  = new Mission("EnglishWords13531","螺旋式背单词",detail_13531,DEFAULT_ITEM_SUFFIX,1);
+        Mission defaultMission  = new Mission("EnglishWords13531","螺旋式背单词",detail_13531,DEFAULT_ITEM_SUFFIX,2);
         createMission(db,defaultMission);//传入db是避免调用getDataBase，后者（会调用onCreate）导致递归调用错误
 
         //Item_default13531表数据导入
@@ -314,6 +314,30 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         return affectedRows;
     }
 
+    /* 修改单项的星标 */
+    public int updateMissionStart(RvMission rvMission){
+        int affectedRows = 0;
+        getReadableDatabaseIfClosedOrNull();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(YoMemoryContract.Mission.COLUMN_STAR,rvMission.getStarType());
+
+        affectedRows = mSQLiteDatabase.update(YoMemoryContract.Mission.TABLE_NAME,contentValues,
+                YoMemoryContract.Mission._ID+" = ? ",new String[]{String.valueOf(rvMission.getId())} );
+//        Log.i(TAG, "updateMissionStart: rvm.starType="+rvMission.getStarType()+", affected　rows="+affectedRows);
+        /*String tempStr = "SELECT "+YoMemoryContract.Mission.COLUMN_STAR+" FROM "
+                +YoMemoryContract.Mission.TABLE_NAME+" WHERE "+YoMemoryContract.Mission._ID+" = "+rvMission.getId();
+        Cursor cursor =mSQLiteDatabase.rawQuery(tempStr,null);
+        int startType = -1;
+        if(cursor.moveToFirst()){
+            startType = cursor.getInt(0);
+        }
+        Log.i(TAG, "updateMissionStart: startType just re-got in DB="+startType);*/
+
+        closeDB();
+        return affectedRows;
+    }
+
     /*public Mission getMissionById(long mission_id){
         Mission mission = new Mission();
         String selectQuery = "SELECT * FROM "+ YoMemoryContract.Mission.TABLE_NAME+
@@ -355,7 +379,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
                 mission.setSimpleDescription(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_DESCRIPTION)));
                 mission.setDetailDescriptions(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_DETAIL_DESCRIPTION)));
                 mission.setTableItem_suffix(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_TABLE_ITEM_SUFFIX)));
-
+                mission.setStarType(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_STAR)));
                 missions.add(mission);
             }while (cursor.moveToNext());
         }

@@ -8,9 +8,11 @@
     <color name="yo_light_green">#b2ff59</color>
     <color name="yo_red">#dd2c00</color>
     <color name="yo_teal">#1de9b6</color>
+    <color name="yo_cyan">#26c6da</color>
 
     <color name="mission_card_blue">#bbdefb</color>
     <color name="mission_card_red">#ffccbc</color>
+    <color name="mission_card_gray">#efefef</color>
 
 
 
@@ -45,7 +47,6 @@
     <color name="pieChart_empty_out">#ffffff</color>
     <color name="picChart_line">#212121</color>
     <color name="picChart_text">#616161</color>
-
 
 
 </resources>

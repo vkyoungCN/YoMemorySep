@@ -25,7 +25,8 @@
         <activity android:name=".PrepareForLearningActivity" />
         <activity android:name=".MissionDetailsActivity" />
         <activity android:name=".ConfigurationActivity" />
-        <activity android:name=".ItemDetailActivity"></activity>
+        <activity android:name=".ItemDetailActivity" />
+        <activity android:name=".GratitudeActivity"></activity>
     </application>
 
 </manifest>

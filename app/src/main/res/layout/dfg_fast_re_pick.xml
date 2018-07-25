@@ -28,11 +28,12 @@
         android:background="#efefef"
         />
     <TextView
+        android:id="@+id/tv_clockDown_FRP"
         android:layout_width="match_parent"
         android:layout_height="36dp"
         android:gravity="center"
-        android:text="@string/hs_clock_down"
         />
+    <!--   上一tv使用这个文本 android:text="@string/hs_clock_down"-->
 
     <!--横分割线-->
     <TextView
