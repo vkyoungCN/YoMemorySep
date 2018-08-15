@@ -55,27 +55,6 @@
     </LinearLayout>
 
 
-    <ImageView
-        android:id="@+id/imv_du_1"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:src="@drawable/du"
-        android:layout_gravity="bottom|start"
-        android:layout_marginBottom="96dp"
-        android:layout_marginStart="96dp"
-        android:alpha="0"
-        />
-    <ImageView
-        android:id="@+id/imv_du_2"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:src="@drawable/du"
-        android:layout_gravity="bottom|end"
-        android:layout_marginBottom="96dp"
-        android:layout_marginEnd="96dp"
-        android:alpha="0"
-        />
-
     <!--作者信息-->
     <TextView
         android:layout_width="match_parent"

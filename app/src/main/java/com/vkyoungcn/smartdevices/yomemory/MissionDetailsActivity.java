@@ -18,7 +18,6 @@ import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMission;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
 
-import static com.vkyoungcn.smartdevices.yomemory.LogoPageActivity.SP_STR_TITLE_YO_MEMORY;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.FastLearnDiaFragment.DEFAULT_MANNER_ORDER;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.FastLearnDiaFragment.DEFAULT_MANNER_RANDOM;
 import static com.vkyoungcn.smartdevices.yomemory.fragments.FastRePickDiaFragment.DEFAULT_MANNER_TT;

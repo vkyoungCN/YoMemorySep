@@ -139,7 +139,7 @@ public class GroupsOfMissionRvAdapter extends RecyclerView.Adapter<GroupsOfMissi
                     //后页需要group_id、tableSuffix
                     Intent intentToGD = new Intent(context, GroupDetailActivity.class);
                     intentToGD.putExtra(STR_GROUP,groups.get(getAdapterPosition()));
-                    Log.i(TAG, "onClick: clickd group.ms:"+groups.get(getAdapterPosition()).getMemoryStage());
+                    Log.i(TAG, "onClick: clicked group.ID:"+groups.get(getAdapterPosition()).getId());
                     intentToGD.putExtra(STR_TABLE_SUFFIX,tableSuffix);
 
                     context.startActivity(intentToGD);

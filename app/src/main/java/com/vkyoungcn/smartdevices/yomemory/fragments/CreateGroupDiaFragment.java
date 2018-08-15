@@ -10,15 +10,9 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.Constants;
 import com.vkyoungcn.smartdevices.yomemory.R;
-import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
-import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 
 import static com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction.CREATE_GROUP;
 /*

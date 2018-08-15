@@ -6,19 +6,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.vkyoungcn.smartdevices.yomemory.Constants;
 import com.vkyoungcn.smartdevices.yomemory.R;
-import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
-import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 /*
  * 作者：杨胜 @中国海洋大学
  * 别名：杨镇时

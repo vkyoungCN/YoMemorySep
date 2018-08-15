@@ -27,7 +27,7 @@ import java.util.List;
  * 2018.08.01
  * */
 public class YoMemoryDbHelper extends SQLiteOpenHelper {
-//    private static final String TAG = "YoMemory-DbHelper";
+    private static final String TAG = "YoMemory-DbHelper";
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "YoMemory.db";
@@ -144,6 +144,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_LEARNING_LOGS);
 
         //建立items基础资源表并导入默认items数据
+
         dataInitialization(db);
     }
 
@@ -563,7 +564,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
                 items.add(item);
             }while (cursor.moveToNext());
-//            Log.i(TAG, "getItemsByGroupId: cursor ok.");
+            Log.i(TAG, "getItemsByGroupId: cursor ok.");
         }else{
             return null;
         }
@@ -646,6 +647,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         if(cursor.moveToFirst()){
             gid = cursor.getInt(0);
         }
+        Log.i(TAG, "createEmptyGroup: gid="+gid);
         try {
             cursor.close();
         } catch (Exception e) {

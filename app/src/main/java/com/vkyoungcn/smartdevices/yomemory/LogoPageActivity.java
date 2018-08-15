@@ -42,8 +42,8 @@ public class LogoPageActivity extends AppCompatActivity implements Constants {
     private TextView logoStrCn;
     private HorizontalProgressBar hpb_progress;//需要传入百分比的分子数值。
     private LinearLayout llt_firstRun;
-    private ImageView imv_du_1;
-    private ImageView imv_du_2;
+//    private ImageView imv_du_1;
+//    private ImageView imv_du_2;
 
     private Context context = this;
 
@@ -55,8 +55,8 @@ public class LogoPageActivity extends AppCompatActivity implements Constants {
         logoStrCn = findViewById(R.id.logo_cn);
         hpb_progress = findViewById(R.id.hpb_LPA);
         llt_firstRun = findViewById(R.id.llt_forFirstRun_LPA);
-        imv_du_1 = findViewById(R.id.imv_du_1);
-        imv_du_2 = findViewById(R.id.imv_du_2);
+//        imv_du_1 = findViewById(R.id.imv_du_1);
+//        imv_du_2 = findViewById(R.id.imv_du_2);
 
 
         SharedPreferences sharedPreferences=getSharedPreferences(SP_STR_TITLE_YO_MEMORY, MODE_PRIVATE);
@@ -145,7 +145,7 @@ public class LogoPageActivity extends AppCompatActivity implements Constants {
             }
         });
 
-        ValueAnimator Du_Animator_1 = ValueAnimator.ofFloat(0,100,100,100);
+        /*ValueAnimator Du_Animator_1 = ValueAnimator.ofFloat(0,100,100,100);
 //        Du_Animator_1.setDuration(1200);
         Du_Animator_1.addUpdateListener(new DuDuAnimatorListener_1());
         Du_Animator_1.setInterpolator(new LinearInterpolator());
@@ -153,10 +153,10 @@ public class LogoPageActivity extends AppCompatActivity implements Constants {
         ValueAnimator Du_Animator_2 = ValueAnimator.ofFloat(0,0,0,100,100);
 //        Du_Animator_2.setDuration(1200);
         Du_Animator_2.addUpdateListener(new DuDuAnimatorListener_2());
-        Du_Animator_2.setInterpolator(new LinearInterpolator());
+        Du_Animator_2.setInterpolator(new LinearInterpolator());*/
 
-        animationSet.setDuration(1500);
-        animationSet.playTogether(CenterLogoAnimator,Du_Animator_1,Du_Animator_2);
+        animationSet.setDuration(1200);
+        animationSet.playTogether(CenterLogoAnimator);
         animationSet.start();
 
     }
@@ -168,7 +168,7 @@ public class LogoPageActivity extends AppCompatActivity implements Constants {
             logoStrCn.setAlpha(value/100);
         }
     }
-    private class DuDuAnimatorListener_1 implements ValueAnimator.AnimatorUpdateListener {
+   /* private class DuDuAnimatorListener_1 implements ValueAnimator.AnimatorUpdateListener {
 
         public void onAnimationUpdate(ValueAnimator valueanimator) {
             float value = (Float)valueanimator.getAnimatedValue();
@@ -181,7 +181,7 @@ public class LogoPageActivity extends AppCompatActivity implements Constants {
             float value = (Float)valueanimator.getAnimatedValue();
             imv_du_2.setAlpha(value/100);
         }
-    }
+    }*/
 
     /*
     * 此方法在DB的填充逻辑中调用，用于根据填充的进度修改进度条的显示

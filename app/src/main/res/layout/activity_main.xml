@@ -44,7 +44,7 @@
         android:background="#e0e0e0"
         />
 
-    <!--下方区域安排横向Rv即底部按钮栏-->
+    <!--下方区域安排横向Rv及底部按钮栏-->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

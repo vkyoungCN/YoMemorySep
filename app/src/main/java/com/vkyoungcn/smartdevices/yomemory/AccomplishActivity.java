@@ -465,7 +465,7 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
                     notEmptyItems.add(items.get(i));//此后，本线程只使用此列表数据集操作即可(实际上指向的元素仍是同一套资源)
                 }//由于全空状态下在进新线程前就被if分支截去了，因而必然有一个非空位置
             }
-            Log.i(TAG, "run: emptyIPList.size="+emptyItemPositions.size()+"notEmpList.size="+notEmptyItems.size());
+//            Log.i(TAG, "run: emptyIPList.size="+emptyItemPositions.size()+"notEmpList.size="+notEmptyItems.size());
 
             //一个都没学时，在onCreate方法已经截至，所以这里一定是有数据的
 
@@ -477,6 +477,7 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
 
             //生成新组【DB操作】在group表的记录
             int gid = memoryDbHelper.createEmptyGroup(groupToBeCreate);
+            Log.i(TAG, "run: new Group gid="+gid);
 //            Log.i(TAG, "run: LM下生成的新空组gid="+groupId);
 
             //二、准备Logs（复习时间采用开始时间）

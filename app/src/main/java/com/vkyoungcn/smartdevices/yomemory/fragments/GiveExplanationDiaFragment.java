@@ -1,7 +1,6 @@
 package com.vkyoungcn.smartdevices.yomemory.fragments;
 
 import android.app.DialogFragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,10 +8,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.vkyoungcn.smartdevices.yomemory.R;
-import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 /*
  * 作者：杨胜 @中国海洋大学
  * 别名：杨镇时
