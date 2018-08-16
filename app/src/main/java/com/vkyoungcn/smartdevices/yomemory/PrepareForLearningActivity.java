@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
+import com.vkyoungcn.smartdevices.yomemory.models.Group;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
 import com.vkyoungcn.smartdevices.yomemory.sqlite.YoMemoryDbHelper;
@@ -312,11 +312,11 @@ public class PrepareForLearningActivity extends AppCompatActivity implements Con
 
         @Override
         public void run() {
-            ArrayList<DBGroup> groups = memoryDbHelper.getAllGroupsByMissionId(missionId, tableNameSuffix);
+            ArrayList<Group> groups = memoryDbHelper.getAllGroupsByMissionId(missionId, tableNameSuffix);
             //取到数据后，准备按各组的RMA或MS，或者由此二项数据计算的时间值来进行排序筛选（只取最前项即可）
             //转换到RVGroup才能得到相关字段
             ArrayList<RVGroup> rvGroups = new ArrayList<>();
-            for (DBGroup d : groups) {
+            for (Group d : groups) {
                 rvGroups.add(new RVGroup(d));
             }
             //按指定条件prioritySetting对rvGroups集合进行筛选，选择其最小项目

@@ -18,7 +18,7 @@ import com.vkyoungcn.smartdevices.yomemory.fragments.LearningMerge2DiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LogsOfGroupDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
 import com.vkyoungcn.smartdevices.yomemory.fragments.QueryForMergeDiaFragment;
-import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
+import com.vkyoungcn.smartdevices.yomemory.models.Group;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMergeGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
@@ -72,7 +72,7 @@ public class GroupDetailActivity extends AppCompatActivity
         tableSuffix = getIntent().getStringExtra(STR_TABLE_SUFFIX);
 
 
-//        DBGroup dbGroup = memoryDbHelper.getGroupById(group,tableSuffix);
+//        Group dbGroup = memoryDbHelper.getGroupById(group,tableSuffix);
 
         if (this.rvGroup !=null) {
             //从DB获取本组所属的items
@@ -217,12 +217,12 @@ public class GroupDetailActivity extends AppCompatActivity
                 //接下来的操作可能耗时，所以提示一下
                 Toast.makeText(this, "正在努力准备数据……", Toast.LENGTH_SHORT).show();
 
-                ArrayList<DBGroup> dbGroups = memoryDbHelper.getAllGroupsByMissionId(rvGroup.getMission_id(),tableSuffix);
+                ArrayList<Group> dbGroups = memoryDbHelper.getAllGroupsByMissionId(rvGroup.getMission_id(),tableSuffix);
                 ArrayList<RvMergeGroup> rvMergeGroups = new ArrayList<>();
                 int positionKeep = 0;
                 boolean couldSkip = false;//找到就能跳过后续
 
-                for (DBGroup dbg :dbGroups) {
+                for (Group dbg :dbGroups) {
                     if(dbg.getEffectiveRePickingTimes() == rvGroup.getMemoryStage()){
                         rvMergeGroups.add(new RvMergeGroup(dbg));
                         if(dbg.getId() == rvGroup.getId() && !couldSkip){
@@ -286,8 +286,8 @@ public class GroupDetailActivity extends AppCompatActivity
                 int msForFetch = data.getInt(STR_NEW_MS_FOR_FETCH,0);
                 ArrayList<RvMergeGroup> newList = new ArrayList<>();//用于传给dfg的新数据源
                 if(msForFetch!=0) {
-                    ArrayList<DBGroup> dbGroups1 = memoryDbHelper.getAllGroupsByMissionId(rvGroup.getMission_id(),tableSuffix);
-                    for (DBGroup dbg :dbGroups1) {
+                    ArrayList<Group> dbGroups1 = memoryDbHelper.getAllGroupsByMissionId(rvGroup.getMission_id(),tableSuffix);
+                    for (Group dbg :dbGroups1) {
                         if(dbg.getEffectiveRePickingTimes() == msForFetch){
                             //符合条件的组，转换后加入
                             newList.add(new RvMergeGroup(dbg));

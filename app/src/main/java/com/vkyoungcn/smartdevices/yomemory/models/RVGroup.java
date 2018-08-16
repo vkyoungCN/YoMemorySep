@@ -2,10 +2,9 @@ package com.vkyoungcn.smartdevices.yomemory.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+
 /*
  * 作者：杨胜 @中国海洋大学
  * 别名：杨镇时
@@ -13,7 +12,7 @@ import java.util.ArrayList;
  * email: yangsheng@ouc.edu.cn
  * 2018.08.01
  * */
-public class RVGroup implements Parcelable ,Cloneable{
+public class RVGroup extends Group implements Parcelable ,Cloneable{
 //* 本类用于减轻RecyclerView在数据显示过程中的负担，提前将需要转换的数据计算出来，直接提供显示资源
 //* 本类还提供有一些公共静态计算方法，用于计算指定分组的MS/RMA/限制时间等数据
 
@@ -21,52 +20,45 @@ public class RVGroup implements Parcelable ,Cloneable{
 
     /* 字段 */
     //group表提供
-    private int id = 0;//DB列
-    private String description="";//DB列。默认填入该组“起始-末尾”词汇
-    private int mission_id=0;//属于哪个任务。
-    private long settingUptimeInLong = 0;//初学时间。默认0.
-    private long lastLearningTime = 0;//分组的复习/学习记录中最新的一条，默认值为0，是出错。
+//    private int id = 0;//DB列
+//    private String description="";//DB列。默认填入该组“起始-末尾”词汇
+//    private int mission_id=0;//属于哪个任务。
+//    private long settingUptimeInLong = 0;//初学时间。默认0.
+//    private long lastLearningTime = 0;//分组的复习/学习记录中最新的一条，默认值为0，是出错。
 
     //以下两项是需要在Rv中展示且需要计算的来的值（对于在详情页中才进行展示的信息，不需单列字段）
-    private float RM_Amount = 0;//记忆存量（Retaining Memory Amount）
-    private byte memoryStage = 0;//记忆级别，记忆级别越高，衰减越缓慢。等于DBGroup中的effectiveRePickingTime,二者相互等价，字段只设其一。
+    float RM_Amount = 0;//记忆存量（Retaining Memory Amount）
+    byte memoryStage = super.getEffectiveRePickingTimes();//实际与有效学习次数一致
 
     //以下一项是Item表提供给DBGroup的
-    private short totalItemsNum= 0;//本组所属资源总量
+//    private short totalItemsNum= 0;//本组所属资源总量
 
     public RVGroup() {
     }
 
-    public RVGroup(int id, String description, int mission_id, long settingUptimeInLong, long lastLearningTime, float RM_Amount, byte memoryStage, short totalItemsNum) {
-        this.id = id;
-        this.description = description;
-        this.mission_id = mission_id;
-        this.settingUptimeInLong = settingUptimeInLong;
-
-        this.lastLearningTime = lastLearningTime;
-        this.RM_Amount = RM_Amount;
-        this.memoryStage = memoryStage;
-
-        this.totalItemsNum = totalItemsNum;
-    }
 
     /*
     * 根据DBGroup数据计算得到RvGroup；
     * 其中记忆存量和记忆级别需要计算
     * */
-    public RVGroup(DBGroup dbGroup){
-        this.id = dbGroup.getId();
-        this.description = dbGroup.getDescription();
-        this.mission_id = dbGroup.getMission_id();
-        this.settingUptimeInLong = dbGroup.getSettingUptimeInLong();
-        this.lastLearningTime = dbGroup.getLastLearningTime();//后面会使用，注意顺序哦。
-        this.memoryStage = dbGroup.getEffectiveRePickingTimes() ;//后一句会使用，注意顺序哦。
+    public RVGroup(Group group){
+        this.id = group.getId();
+        this.description = group.getDescription();
+        this.mission_id = group.getMission_id();
+        this.settingUptimeInLong = group.getSettingUptimeInLong();
+        this.lastLearningTime = group.getLastLearningTime();//后面会使用，注意顺序哦。
+        this.memoryStage = group.getEffectiveRePickingTimes() ;//后一句会使用，注意顺序哦。
+        this.totalItemsNum = group.getTotalItemsNum();
 
         this.RM_Amount = getCurrentRMAmount();//需要计算。需要使用刚刚获取的lastLearningTime、memoryStage数据。
-        this.totalItemsNum = dbGroup.getTotalItemNum();
 
     }
 
+    public RVGroup(int id, String description, int mission_id, long settingUptimeInLong, long lastLearningTime, byte effectiveRePickingTimes, short totalItemsNum, float RM_Amount, byte memoryStage) {
+        super(id, description, mission_id, settingUptimeInLong, lastLearningTime, effectiveRePickingTimes, totalItemsNum);
+        this.RM_Amount = RM_Amount;
+        this.memoryStage = memoryStage;
+    }
 
     /*
     * 用于为当前分组（当前分组的Logs记录），计算当前时点下的记忆存量
@@ -200,45 +192,6 @@ public class RVGroup implements Parcelable ,Cloneable{
         }
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getMission_id() {
-        return mission_id;
-    }
-
-    public void setMission_id(int mission_id) {
-        this.mission_id = mission_id;
-    }
-
-    public long getSettingUptimeInLong() {
-        return settingUptimeInLong;
-    }
-
-    public void setSettingUptimeInLong(long settingUptimeInLong) {
-        this.settingUptimeInLong = settingUptimeInLong;
-    }
-
-    public long getLastLearningTime() {
-        return lastLearningTime;
-    }
-
-    public void setLastLearningTime(long lastLearningTime) {
-        this.lastLearningTime = lastLearningTime;
-    }
 
     public float getRM_Amount() {
         return RM_Amount;
@@ -256,13 +209,6 @@ public class RVGroup implements Parcelable ,Cloneable{
         this.memoryStage = memoryStage;
     }
 
-    public short getTotalItemsNum() {
-        return totalItemsNum;
-    }
-
-    public void setTotalItemsNum(short totalItemsNum) {
-        this.totalItemsNum = totalItemsNum;
-    }
 
     @Override
     public Object clone() {

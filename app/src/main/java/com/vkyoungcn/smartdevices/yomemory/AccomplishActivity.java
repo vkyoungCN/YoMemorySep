@@ -15,7 +15,7 @@ import android.widget.Toast;
 import com.vkyoungcn.smartdevices.yomemory.fragments.ReportGroupLC_Fragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.ReportGroupLG_Fragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.ReportGroupLM_Fragment;
-import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
+import com.vkyoungcn.smartdevices.yomemory.models.Group;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleItem;
 import com.vkyoungcn.smartdevices.yomemory.models.SingleLearningLog;
@@ -139,7 +139,7 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
     private Handler handler = new AccomplishActivityHandler(this);//涉及弱引用，通过其发送消息。
 
     private YoMemoryDbHelper memoryDbHelper;
-    private DBGroup group;
+    private Group group;
 
 
     @Override
@@ -363,7 +363,7 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
                 //有未学习的数据，需拆分【此逻辑仅LG适用】
                 isDivided=true;
                 //以下是拆分逻辑
-                DBGroup newGroupForSplitting = new DBGroup();//新组用于未学到的各item
+                Group newGroupForSplitting = new Group();//新组用于未学到的各item
 
                 //生成新组的描述字串【暂时只需三项字段。其余字段在group建立后再生成】
                 String strForDescription = "拆分生成-"
@@ -427,7 +427,7 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
             correctNum = doneNum - wrongNum;
 
             //准备需要向fg发送的信息，先通过全局变量传递到UI线程
-            DBGroup groupNew = memoryDbHelper.getGroupById(groupId,tableSuffix);//虽是同一个gid，但此时其log、items(拆分时)均已得到更新；
+            Group groupNew = memoryDbHelper.getGroupById(groupId,tableSuffix);//虽是同一个gid，但此时其log、items(拆分时)均已得到更新；
             RVGroup groupRvNew = new RVGroup(groupNew);
             newRma = groupRvNew.getRM_Amount()<100?groupRvNew.getRM_Amount():100;//由于浮点计算，有可能会得到100.8这样的结果
 //            Log.i(TAG, "run: newRma="+newRma);
@@ -473,7 +473,7 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
             newGroupStr=gDescription;//还要给fg发送一套。
 
             //下面这个类只用于生成空的分组，不生成ms记录相关内容，gid可以留0。
-            DBGroup groupToBeCreate = new DBGroup(0,gDescription,missionId,System.currentTimeMillis(),startTime,(byte) 0,(short) 0);
+            Group groupToBeCreate = new Group(0,gDescription,missionId,System.currentTimeMillis(),startTime,(byte) 0,(short) 0);
 
             //生成新组【DB操作】在group表的记录
             int gid = memoryDbHelper.createEmptyGroup(groupToBeCreate);
@@ -491,7 +491,7 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
 
 
             //【DB操作：新生成分组】的日志批量拷贝
-            DBGroup groupForMS = memoryDbHelper.getGroupById(gIdsForMerge.get(0),tableSuffix);
+            Group groupForMS = memoryDbHelper.getGroupById(gIdsForMerge.get(0),tableSuffix);
             int msAmount = groupForMS.getEffectiveRePickingTimes();//为保证今后该分组的rma正确计算，
             // 需要构造若干条伪“有效”logs记录
             ArrayList<SingleLearningLog> fakeLogs = new ArrayList<>();
@@ -609,7 +609,7 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
             String gDescription = notEmptyItems.get(0).getName()+"等"+notEmptyItems.size()+"个[学习创建]";
             newGroupStr=gDescription;//还要给fg发送一套。
 
-            DBGroup groupToBeCreate = new DBGroup(0,gDescription,missionId,System.currentTimeMillis(),startTime,(byte) 0,(short) 0);
+            Group groupToBeCreate = new Group(0,gDescription,missionId,System.currentTimeMillis(),startTime,(byte) 0,(short) 0);
 
             //生成新组【DB操作】（但是只生成了group表的记录）
             int groupId = memoryDbHelper.createEmptyGroup(groupToBeCreate);
@@ -658,7 +658,7 @@ public class AccomplishActivity extends AppCompatActivity implements Constants {
 
 
 
-            DBGroup groupDbNew = memoryDbHelper.getGroupById(groupId,tableSuffix);
+            Group groupDbNew = memoryDbHelper.getGroupById(groupId,tableSuffix);
             RVGroup groupRVNew = new RVGroup(groupDbNew);
             newMs = groupRVNew.getMemoryStage();
             newRma = groupRVNew.getRM_Amount();

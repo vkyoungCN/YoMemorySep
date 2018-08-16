@@ -25,7 +25,7 @@ import com.vkyoungcn.smartdevices.yomemory.fragments.LearningCreateRandomDiaFrag
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningGelDiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.LearningMerge2DiaFragment;
 import com.vkyoungcn.smartdevices.yomemory.fragments.OnGeneralDfgInteraction;
-import com.vkyoungcn.smartdevices.yomemory.models.DBGroup;
+import com.vkyoungcn.smartdevices.yomemory.models.Group;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMergeGroup;
 import com.vkyoungcn.smartdevices.yomemory.models.RvMission;
 import com.vkyoungcn.smartdevices.yomemory.models.RVGroup;
@@ -177,12 +177,12 @@ public class GroupsOfMissionActivity extends AppCompatActivity
         @Override
         public void run() {
             //获取各分组原始数据
-            ArrayList<DBGroup> dbGroupsOrigin = memoryDbHelper.getAllGroupsByMissionId(missionFromIntent.getId(), tableItemSuffix);
+            ArrayList<Group> dbGroupsOrigin = memoryDbHelper.getAllGroupsByMissionId(missionFromIntent.getId(), tableItemSuffix);
             //将各分组原始数据转换为UI所需数据，比较耗时。不适宜在UI线程操作，更不适合在Rv适配器内进行。
 
             ArrayList<RVGroup> tempRVGroups = new ArrayList<>();
             //排序。暂时按记忆级别排序
-            for (DBGroup dbg : dbGroupsOrigin) {
+            for (Group dbg : dbGroupsOrigin) {
                 RVGroup rvGroup = new RVGroup(dbg);
                 tempRVGroups.add(rvGroup);
                 //尝试过，但似乎无法在此直接排序。无法令最新项同之前所有项目进行比较。
@@ -233,12 +233,12 @@ public class GroupsOfMissionActivity extends AppCompatActivity
         @Override
         public void run() {
             //获取各分组原始数据
-            ArrayList<DBGroup> dbGroupsOrigin = memoryDbHelper.getAllGroupsByMissionId(missionFromIntent.getId(), tableItemSuffix);
+            ArrayList<Group> dbGroupsOrigin = memoryDbHelper.getAllGroupsByMissionId(missionFromIntent.getId(), tableItemSuffix);
             //将各分组原始数据转换为UI所需数据，比较耗时。相关数据直接设置给Activity的成员。
 
             ArrayList<RVGroup> tempRVGroups = new ArrayList<>();
             //暂时按记忆级别排序
-            for (DBGroup dbg : dbGroupsOrigin) {
+            for (Group dbg : dbGroupsOrigin) {
                 RVGroup RVGroup = new RVGroup(dbg);
                 tempRVGroups.add(RVGroup);
             }
@@ -631,17 +631,17 @@ public class GroupsOfMissionActivity extends AppCompatActivity
                }
 
                //构造数据类
-                DBGroup dbRwaGroup = new DBGroup();
+                Group dbRwaGroup = new Group();
                 dbRwaGroup.setDescription(groupDescriptionStr);
                 dbRwaGroup.setMission_id(missionFromIntent.getId());
                 dbRwaGroup.setSettingUptimeInLong(System.currentTimeMillis());
-//                Log.i(TAG, "onButtonClickingDfgInteraction: DBGroup created:"+dbRwaGroup.toString());
+//                Log.i(TAG, "onButtonClickingDfgInteraction: Group created:"+dbRwaGroup.toString());
                 //操作DB，生成
                 int gidCreated = memoryDbHelper.createGroup(dbRwaGroup,itemIds,tableItemSuffix);
 //                Log.i(TAG, "onButtonClickingDfgInteraction: group Db inserted, gid="+gidCreated);
                 //如果新增操作成功，通知adp变更。
                 if (gidCreated != 0) {
-                    DBGroup dGroup = memoryDbHelper.getGroupById(gidCreated, tableItemSuffix);
+                    Group dGroup = memoryDbHelper.getGroupById(gidCreated, tableItemSuffix);
                     RVGroup newRVGroup = new RVGroup(dGroup);
 
                     rvGroups.add(0, newRVGroup);//新增分组放在最前【逻辑便于处理】
@@ -694,12 +694,12 @@ public class GroupsOfMissionActivity extends AppCompatActivity
                 //接下来的操作可能耗时，所以提示一下
                 Toast.makeText(this, "正在努力准备数据……", Toast.LENGTH_SHORT).show();
 
-                ArrayList<DBGroup> dbGroups = memoryDbHelper.getAllGroupsByMissionId(rvGroups.get(position_2).getMission_id(),tableItemSuffix);
+                ArrayList<Group> dbGroups = memoryDbHelper.getAllGroupsByMissionId(rvGroups.get(position_2).getMission_id(),tableItemSuffix);
                 ArrayList<RvMergeGroup> rvMergeGroups = new ArrayList<>();
                 int positionKeep = 0;
                 boolean couldSkip = false;//找到就能跳过后续
 
-                for (DBGroup dbg :dbGroups) {
+                for (Group dbg :dbGroups) {
                     if(dbg.getEffectiveRePickingTimes() == rvGroups.get(position_2).getMemoryStage()){
                         rvMergeGroups.add(new RvMergeGroup(dbg));
                         if(dbg.getId() == rvGroups.get(position_2).getId() && !couldSkip){

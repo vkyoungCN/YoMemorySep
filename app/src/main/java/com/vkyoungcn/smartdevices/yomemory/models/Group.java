@@ -3,7 +3,6 @@ package com.vkyoungcn.smartdevices.yomemory.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
 /*
  * 作者：杨胜 @中国海洋大学
  * 别名：杨镇时
@@ -11,42 +10,42 @@ import java.util.ArrayList;
  * email: yangsheng@ouc.edu.cn
  * 2018.08.01
  * */
-public class DBGroup implements Parcelable{
+public class Group implements Parcelable{
 //* “分组”对应的数据模型，
 //* 分组对应两种数据模型DBGroup和RVGroup，其中DB版对应数据库操作，RV版对应UI中的快速直接显示。
 //* 对应DB中的三张表：group表全体；部分字段从logs表、items表获取数据。
 //* 若要将数据应用到UI，需转化为RVGroup类。
-    private static final String TAG = "DBGroup";
+    private static final String TAG = "Group";
 
     /* 字段 */
     //group表
-    private int id = 0;//DB列
-    private String description="";//DB列。默认填入该组“起始-末尾”词汇
-    private int mission_id=0;//v5新增。
-    private long settingUptimeInLong = 0;//初学时间，需据此记录计算已过时间和当前所处时间段的颜色。默认0.
+    int id = 0;//DB列
+    String description="";//DB列。默认填入该组“起始-末尾”词汇
+    int mission_id=0;//v5新增。
+    long settingUptimeInLong = 0;//初学时间，需据此记录计算已过时间和当前所处时间段的颜色。默认0.
 
     //以下两项由Logs表提供
-    private long lastLearningTime = 0;//最新的学习记录（是否有效m皆可；RMA的计算不需要持有整个Logs列表）。
+    long lastLearningTime = 0;//最新的学习记录（是否有效m皆可；RMA的计算不需要持有整个Logs列表）。
     private byte effectiveRePickingTimes = 0;//有效学习次数（*背后的设计原理：复习间隔过久时的新一次复习，只刷新记忆量，不抬升曲线，属“无效”复习，不增加有效次数）
     //可直接对应为RVGroup类的MS字段
 
     //以下字段由Items表提供
-    private short totalItemNum = 0;//本组下含多少项资源。
+    int totalItemsNum = 0;//本组下含多少项资源。
 
 
     //从DB读取数据时，需要先声明一个空的。
-    public DBGroup() {
+    public Group() {
     }
 
     //完全构造器
-    public DBGroup(int id, String description, int mission_id, long settingUptimeInLong, long lastLearningTime, byte effectiveRePickingTimes, short totalItemNum) {
+    public Group(int id, String description, int mission_id, long settingUptimeInLong, long lastLearningTime, byte effectiveRePickingTimes, short totalItemsNum) {
         this.id = id;
         this.description = description;
         this.mission_id = mission_id;
         this.settingUptimeInLong = settingUptimeInLong;
         this.lastLearningTime = lastLearningTime;
         this.effectiveRePickingTimes = effectiveRePickingTimes;
-        this.totalItemNum = totalItemNum;
+        this.totalItemsNum = totalItemsNum;
     }
 
     public int getId() {
@@ -97,12 +96,12 @@ public class DBGroup implements Parcelable{
         this.effectiveRePickingTimes = effectiveRePickingTimes;
     }
 
-    public short getTotalItemNum() {
-        return totalItemNum;
+    public int getTotalItemsNum() {
+        return totalItemsNum;
     }
 
-    public void setTotalItemNum(short totalItemNum) {
-        this.totalItemNum = totalItemNum;
+    public void setTotalItemsNum(int totalItemsNum) {
+        this.totalItemsNum = totalItemsNum;
     }
 
 
@@ -124,30 +123,30 @@ public class DBGroup implements Parcelable{
         parcel.writeLong(lastLearningTime);
         parcel.writeByte(effectiveRePickingTimes);
 
-        parcel.writeInt(totalItemNum);
+        parcel.writeInt(totalItemsNum);
 
     }
 
-    public static final Parcelable.Creator<DBGroup> CREATOR = new Parcelable.Creator<DBGroup>(){
+    public static final Parcelable.Creator<Group> CREATOR = new Parcelable.Creator<Group>(){
         @Override
-        public DBGroup createFromParcel(Parcel parcel) {
-            return new DBGroup(parcel);
+        public Group createFromParcel(Parcel parcel) {
+            return new Group(parcel);
         }
 
         @Override
-        public DBGroup[] newArray(int size) {
-            return new DBGroup[size];
+        public Group[] newArray(int size) {
+            return new Group[size];
         }
     };
 
-    private DBGroup(Parcel in){
+    private Group(Parcel in){
         id = in.readInt();
         description = in.readString();
         mission_id = in.readInt();
         settingUptimeInLong = in.readLong();
         lastLearningTime = in.readLong();
         effectiveRePickingTimes = in.readByte();
-        totalItemNum = (short)in.readInt();
+        totalItemsNum = (short)in.readInt();
     }
 
 

@@ -82,14 +82,14 @@ public class Ckbs2ChoseGroupsRvAdapter extends RecyclerView.Adapter<Ckbs2ChoseGr
                         idsList.add(f.getId());
                     }*/
                     int currentId = groups.get(getAdapterPosition()).getId();
-                    int currentSize = groups.get(getAdapterPosition()).getSize();
+                    int currentSize = groups.get(getAdapterPosition()).getTotalItemsNum();
                     if(idsList.indexOf(currentId) == -1){
                         //目前在结果列表内不存在本id，则加入
                         idsList.add(currentId);
                         choseAmount+=currentSize;
                     }
                     /* 【疑问】程序触发的全选，对于已经处于选中状态者是否会重复触发？*/
-                    Log.i(TAG, "onCheckedChanged: adapter position="+getAdapterPosition());
+//                    Log.i(TAG, "onCheckedChanged: adapter position="+getAdapterPosition());
 
                     //如果存在重复触发，则组的计数总量保持就比较困难
                     //其触发场景无非就是全选、全取消，因而直接设置下列数据
@@ -101,7 +101,7 @@ public class Ckbs2ChoseGroupsRvAdapter extends RecyclerView.Adapter<Ckbs2ChoseGr
 
                 }else {
                     int currentId = groups.get(getAdapterPosition()).getId();
-                    int currentSize = groups.get(getAdapterPosition()).getSize();
+                    int currentSize = groups.get(getAdapterPosition()).getTotalItemsNum();
                     if(idsList.indexOf(currentId) != -1){
                         //目前在结果列表内存在本id，则移除
                         idsList.remove((Integer) currentId);
@@ -120,7 +120,7 @@ public class Ckbs2ChoseGroupsRvAdapter extends RecyclerView.Adapter<Ckbs2ChoseGr
             if(isChecked) {
                 //将选中项目（的id）加入List
                 int currentId = groups.get(getAdapterPosition()).getId();
-                int currentSize = groups.get(getAdapterPosition()).getSize();
+                int currentSize = groups.get(getAdapterPosition()).getTotalItemsNum();
                 if(idsList.indexOf(currentId) == -1){
                     //目前在结果列表内不存在本id，则加入
                     idsList.add(currentId);
@@ -145,7 +145,7 @@ public class Ckbs2ChoseGroupsRvAdapter extends RecyclerView.Adapter<Ckbs2ChoseGr
                     return;
                 }
                 int currentId = groups.get(getAdapterPosition()).getId();
-                int currentSize = groups.get(getAdapterPosition()).getSize();
+                int currentSize = groups.get(getAdapterPosition()).getTotalItemsNum();
 
                 if(idsList.indexOf(currentId) != -1){
                     //目前在结果列表内存在本id，则移除
@@ -205,7 +205,7 @@ public class Ckbs2ChoseGroupsRvAdapter extends RecyclerView.Adapter<Ckbs2ChoseGr
         }
         holder.getgIndex().setText(String.valueOf(group.getId()));
         holder.getgDescription().setText(group.getDescription());
-        holder.getSize().setText(String.valueOf(group.getSize()));
+        holder.getSize().setText(String.valueOf(group.getTotalItemsNum()));
     }
 
     @Override
@@ -236,7 +236,7 @@ public class Ckbs2ChoseGroupsRvAdapter extends RecyclerView.Adapter<Ckbs2ChoseGr
         //再重算
         for (RvMergeGroup rm :groups) {
             if (rm.isChecked()) {
-                choseAmount+=rm.getSize();
+                choseAmount+=rm.getTotalItemsNum();
                 howManyGroupsChecked++;
                 idsList.add(rm.getId());
             }

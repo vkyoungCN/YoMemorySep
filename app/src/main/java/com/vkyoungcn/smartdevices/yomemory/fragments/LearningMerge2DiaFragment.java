@@ -246,7 +246,7 @@ public class LearningMerge2DiaFragment extends DialogFragment
                     //限定：发起组强制选中；不可改动ms，容量限值也不能低于本组
                     rvMergeGroups.get(fixedGroupPosition).setChecked(true);
 
-                    minTermAmount = rvMergeGroups.get(fixedGroupPosition).getSize();
+                    minTermAmount = rvMergeGroups.get(fixedGroupPosition).getTotalItemsNum();
                     tvMsMinus.setClickable(false);
                     tvMsAdd.setClickable(false);
                     et_MS.setFocusable(false);
@@ -378,7 +378,7 @@ public class LearningMerge2DiaFragment extends DialogFragment
                         //上限增加的话，不需要清空旧数据
                         int count = 0;//记录新增了多少项目
                         for (RvMergeGroup g :rvMergeGroups) {
-                            if (g.getSize() == term_amount) {
+                            if (g.getTotalItemsNum() == term_amount) {
                                 //上限（即允许小于+等于该值的所有项目）+1，只需将等于该值的项目加入即可
                                 groupsUnderFixedAmount.add(g);
                                 count++;
@@ -406,14 +406,14 @@ public class LearningMerge2DiaFragment extends DialogFragment
                         int count = 0;//记录移除了多少项目
                         //将旧上限对应数据移除
                         for(Iterator<RvMergeGroup> rmgIterator = groupsUnderFixedAmount.iterator(); rmgIterator.hasNext();){
-                            if(rmgIterator.next().getSize() ==term_amount){
+                            if(rmgIterator.next().getTotalItemsNum() ==term_amount){
                                 rmgIterator.remove();//注意要使用Iterator的删除方法。
                                 count++;
                             }
                         }
                         /* 不能采用这种方式移除，同步修改错误
                         for (RvMergeGroup g :groupsUnderFixedAmount) {
-                            if (g.getSize() == term_amount) {
+                            if (g.getTotalItemsNum() == term_amount) {
                                 //上限（即允许小于+等于该值的所有项目）+1，只需将等于该值的项目加入即可
                                 groupsUnderFixedAmount.remove(g);
                                 count++;
@@ -495,7 +495,7 @@ public class LearningMerge2DiaFragment extends DialogFragment
         groupsUnderFixedAmount.clear();
 
         for (RvMergeGroup g :rvMergeGroups) {
-            if (g.getSize() <= term_amount) {
+            if (g.getTotalItemsNum() <= term_amount) {
                 groupsUnderFixedAmount.add(g);
             }
         }
@@ -520,7 +520,7 @@ public class LearningMerge2DiaFragment extends DialogFragment
                 int totalNum = 0;//准备计数
                 for (RvMergeGroup f :groupsUnderFixedAmount) {
                     f.setChecked(true);//其中各项设为选中
-                     totalNum = totalNum + f.getSize();//计算数量
+                     totalNum = totalNum + f.getTotalItemsNum();//计算数量
                 }
                 Log.i(TAG, "onCheckedChanged: total Num = "+totalNum);
                 totalChoseNum = totalNum;//要保持数据和选择一致。
@@ -546,7 +546,7 @@ public class LearningMerge2DiaFragment extends DialogFragment
                         f.setChecked(false);
                     }
                     groupsUnderFixedAmount.get(fixedGroupPosition).setChecked(true);
-                    totalChoseNum = groupsUnderFixedAmount.get(fixedGroupPosition).getSize();
+                    totalChoseNum = groupsUnderFixedAmount.get(fixedGroupPosition).getTotalItemsNum();
 
                     adapter.notifyDataSetChanged();
                     tvInfos.setText(String.format(getResources().getString(R.string.hs_totalNum), totalChoseNum));

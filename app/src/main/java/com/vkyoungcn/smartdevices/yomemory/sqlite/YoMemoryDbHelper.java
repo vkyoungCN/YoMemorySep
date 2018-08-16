@@ -583,16 +583,16 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     * 新建的分组没由学习记录，不需要向Logs表写内容。
     * 新版Group类已不再持有所含Items的id列表，因而需要额外传入
     * */
-    public int createGroup(DBGroup dbGroup, ArrayList<Integer> subItemIds, String tableSuffix){
+    public int createGroup(Group group, ArrayList<Integer> subItemIds, String tableSuffix){
         long l;
         getWritableDatabaseIfClosedOrNull();
 
         mSQLiteDatabase.beginTransaction();
         ContentValues values = new ContentValues();
 
-        values.put(YoMemoryContract.Group.COLUMN_DESCRIPTION, dbGroup.getDescription());
-        values.put(YoMemoryContract.Group.COLUMN_MISSION_ID, dbGroup.getMission_id());
-        values.put(YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG, dbGroup.getSettingUptimeInLong());
+        values.put(YoMemoryContract.Group.COLUMN_DESCRIPTION, group.getDescription());
+        values.put(YoMemoryContract.Group.COLUMN_MISSION_ID, group.getMission_id());
+        values.put(YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG, group.getSettingUptimeInLong());
 
         l = mSQLiteDatabase.insert(YoMemoryContract.Group.TABLE_NAME, null, values);
 
@@ -600,7 +600,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         String strGetGid = "SELECT "+YoMemoryContract.Group._ID+" FROM "+
                 YoMemoryContract.Group.TABLE_NAME+" WHERE "+
                 YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG+
-                " = "+dbGroup.getSettingUptimeInLong();
+                " = "+ group.getSettingUptimeInLong();
         Cursor cursor = mSQLiteDatabase.rawQuery(strGetGid, null);
         int gid = 0;
         if(cursor.moveToFirst()){
@@ -627,22 +627,22 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     * 建立一个容量为0的分组，用于拆分分组时先行一步生成临时分组
     * 也用在LC最后生成时先产生分组记录（从而获取可用的gid）
     * */
-    public int createEmptyGroup(DBGroup dbGroup){
+    public int createEmptyGroup(Group group){
         int gid = 0;
         getWritableDatabaseIfClosedOrNull();
 
         ContentValues values = new ContentValues();
 
-        values.put(YoMemoryContract.Group.COLUMN_DESCRIPTION, dbGroup.getDescription());
-        values.put(YoMemoryContract.Group.COLUMN_MISSION_ID, dbGroup.getMission_id());
-        values.put(YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG, dbGroup.getSettingUptimeInLong());
+        values.put(YoMemoryContract.Group.COLUMN_DESCRIPTION, group.getDescription());
+        values.put(YoMemoryContract.Group.COLUMN_MISSION_ID, group.getMission_id());
+        values.put(YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG, group.getSettingUptimeInLong());
 
         mSQLiteDatabase.insert(YoMemoryContract.Group.TABLE_NAME, null, values);
 
         String queryNewGroupId = "SELECT "+YoMemoryContract.Group._ID+" FROM "
                 +YoMemoryContract.Group.TABLE_NAME+" WHERE "
                 +YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG +" = "
-                +dbGroup.getSettingUptimeInLong();
+                + group.getSettingUptimeInLong();
         Cursor cursor = mSQLiteDatabase.rawQuery(queryNewGroupId,null);
         if(cursor.moveToFirst()){
             gid = cursor.getInt(0);
@@ -723,9 +723,9 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     /*
     * 需要读取两个表，group表获取4个字段、Logs表（经计算）获取两个字段
     * */
-    public ArrayList<DBGroup> getAllGroupsByMissionId(int missionsId, String tableSuffix){
+    public ArrayList<Group> getAllGroupsByMissionId(int missionsId, String tableSuffix){
 //        Log.i(TAG, "getAllGroupsByMissionId: be");
-        ArrayList<DBGroup> groups = new ArrayList<>();
+        ArrayList<Group> groups = new ArrayList<>();
         String selectQuery = "SELECT * FROM "+ YoMemoryContract.Group.TABLE_NAME+
                 " WHERE "+ YoMemoryContract.Group.COLUMN_MISSION_ID+" = "+missionsId;
 
@@ -737,7 +737,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
         if(cursor.moveToFirst()){
             do{
-                DBGroup group = new DBGroup();
+                Group group = new Group();
                 int groupId = cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Group._ID));//需多次使用，改为实名变量。
                 group.setId(groupId);
                 group.setDescription(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Group.COLUMN_DESCRIPTION)));
@@ -748,7 +748,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
                 group.setLastLearningTime(getLastLearningTimeInLong(groupId));
                 group.setEffectiveRePickingTimes(getEffectiveLearningTime(groupId));
 
-                group.setTotalItemNum(getTotalSubItemsNumOfGroup(groupId,tableSuffix));
+                group.setTotalItemsNum(getTotalSubItemsNumOfGroup(groupId,tableSuffix));
 
                 groups.add(group);
             }while (cursor.moveToNext());
@@ -928,8 +928,8 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         return strDesp;
     }
 
-    public DBGroup getGroupById(int groupId,String tableSuffix){
-        DBGroup group = new DBGroup();
+    public Group getGroupById(int groupId, String tableSuffix){
+        Group group = new Group();
         String selectQuery = "SELECT * FROM "+ YoMemoryContract.Group.TABLE_NAME+
                 " WHERE "+ YoMemoryContract.Group._ID+" = "+groupId;
 
@@ -946,7 +946,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
             group.setLastLearningTime(getLastLearningTimeInLong(groupId));
             group.setEffectiveRePickingTimes(getEffectiveLearningTime(groupId));
 
-            group.setTotalItemNum(getTotalSubItemsNumOfGroup(groupId,tableSuffix));
+            group.setTotalItemsNum(getTotalSubItemsNumOfGroup(groupId,tableSuffix));
 
         }
 
@@ -1044,8 +1044,8 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     }
 
     //取指定第几行上的数据
-    public DBGroup getGroupByLine(long line,String tableSuffix){
-        DBGroup group = new DBGroup();
+    public Group getGroupByLine(long line, String tableSuffix){
+        Group group = new Group();
         String selectOneByLinesQuery = "SELECT * FROM "+ YoMemoryContract.Group.TABLE_NAME+
                 " LIMIT "+line+",1";
         //【取最后一条的写法：】 " LIMIT (SELECT COUNT(*) FROM "+YoMemoryContract.Group.TABLE_NAME+" )-1,1";
@@ -1065,7 +1065,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
             group.setLastLearningTime(getLastLearningTimeInLong(groupId));
             group.setEffectiveRePickingTimes(getEffectiveLearningTime(groupId));
 
-            group.setTotalItemNum(getTotalSubItemsNumOfGroup(groupId,tableSuffix));
+            group.setTotalItemsNum(getTotalSubItemsNumOfGroup(groupId,tableSuffix));
 
         }
 
