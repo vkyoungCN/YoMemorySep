@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BannerActivity"
+    android:background="#ffffff"
+    ><!--因为下方图片难以做成背景透明，因而父级控件背景设全白-->
+
+    <ImageView
+        android:id="@+id/imv_logoBanner"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.9"
+        android:contentDescription="@string/imvDscp_logo"
+        android:paddingTop="12dp"
+        android:layout_marginBottom="64dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/banner_quan" />
+
+    <!--下方是程序和作者信息，两层llt，外层负责对横向空间进行分配，使文字区域始终位于右侧三分之一-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom|end"
+        >
+        <Space
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="match_parent" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/author_plus_name"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="2dp"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:text="@string/author_info_1"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="2dp"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:text="@string/alpha_testing_string"
+                />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</FrameLayout>

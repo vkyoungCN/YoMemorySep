@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/icon_7_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LogoPageActivity">
+        <activity android:name=".BannerActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,7 +26,7 @@
         <activity android:name=".MissionDetailsActivity" />
         <activity android:name=".ConfigurationActivity" />
         <activity android:name=".ItemDetailActivity" />
-        <activity android:name=".GratitudeActivity"></activity>
+        <activity android:name=".GratitudeActivity"/>
     </application>
 
 </manifest>

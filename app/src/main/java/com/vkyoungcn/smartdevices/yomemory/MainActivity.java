@@ -97,26 +97,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /*public class UpdateHpbOnTimeRunnable implements Runnable{
-        @Override
-        public void run() {
-            while(count!=0){//时间未到
-                try {
-                        Thread.sleep(2000);     // sleep 2 秒；
-
-                        //消息发回UI，改变数值20
-                        Message message = new Message();
-                        message.what = MESSAGE_CHANGE_20;
-                        message.arg1 = 6-count;
-                        count--;
-                        handler.sendMessage(message);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }*/
-
 
     final static class MainActivityHandler extends Handler {
         private final WeakReference<MainActivity> activityWeakReference;

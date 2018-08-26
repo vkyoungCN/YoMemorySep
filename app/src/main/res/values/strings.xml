@@ -28,7 +28,7 @@
     <string name="preparing_data_please_wait">正在准备数据，请稍候……</string>
     <string name="YouMemoryCN">优记</string>
     <string name="YouMemoryDuDu_CN">优记嘟嘟</string>
-    <string name="alpha_testing_string">（工程测试α-0.7.9）</string>
+    <string name="alpha_testing_string">（工程测试α-0.8.1）</string>
     <string name="resource_list">资源列表</string>
     <string name="number_of_items">资源数量：</string>
     <string name="picked_percentage">已识记：</string>
@@ -250,6 +250,7 @@
     <string name="gratitude">赞赏页</string>
     <string name="author_and_cash">一个喜爱技术的年轻人(而且很穷)，做了一些应用！
         \n如果您觉得这款应用还不错，帮助了您记住了单词，那么希望您能赞赏一下。(*^▽^*)</string>
+    <string name="imvDscp_logo">just a logo.</string>
     <string name="author_Info_0">作者简介</string>
     <string name="open_VE">打开输入框练习拼写</string>
     <string name="close_VE">关闭输入框</string>
@@ -257,4 +258,8 @@
     <string name="click_card_to_VE_2">*正确拼写以完成词条学习</string>
     <string name="quit_query">确认退出</string>
     <string name="confirm_quit">点击确认后将退出！！</string>
+    <string name="app_name_2">程序：节奏库</string>
+    <string name="author_plus_name">created by 杨镇时</string>
+    <string name="author_info_1">yangsheng@ouc.edu.cn</string>
+
 </resources>
