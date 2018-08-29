@@ -29,37 +29,58 @@ public final class YoMemoryContract {
 
 //    防止类意外实例化，令构造器为private。
     private YoMemoryContract(){}
-
     public static YoMemoryContract getInstance(){
         return instance;
     }
 
+//    id列交由BC类自动设为_ID=_id。
+    /* 库不需要专门的记录表，一个库对应一个items资源表，相关的对应关系在服务器端进行厂商级维护即可*/
+    /* 内置的英语5W词库的items表*/
+    public static class EnglishCommonItems implements BaseColumns {
+        public static final String TABLE_NAME = "english_common_items";
+        public static final String COLUMN_WORD = "word";
+        public static final String COLUMN_PHONETIC = "phonetic";
+        public static final String COLUMN_DEFINITION = "definition";
+        public static final String COLUMN_TRANSLATION = "translation";
+//    public static final String COLUMN_TAG = "translation";
+         public static final String COLUMN_BNC = "bnc";
+         public static final String COLUMN_FRQ = "frq";
+//    public static final String COLUMN_DETAIL = "translation";
+//    public static final String COLUMN_AUDIO = "translation";
+    }
 
-//    id列交似乎是由BC类自动设为_ID=_id的。
-    /*任务表*/
-    public static class Mission implements BaseColumns {
+
+    /*任务表。任务记录是跨资源库存在的，不同资源库的mission可以记录在同一张mission表内*/
+    public static class Missions implements BaseColumns {
         public static final String TABLE_NAME = "missions";
-        public static final String COLUMN_NAME ="mission_name";
+        public static final String COLUMN_TITLE ="title";
         public static final String COLUMN_DESCRIPTION = "mission_description";
-        public static final String COLUMN_DETAIL_DESCRIPTION = "mission_detail";
-        public static final String COLUMN_TABLE_ITEM_SUFFIX = "table_item_suffix";
-        public static final String COLUMN_STAR = "star_color";//星标标记，数字形式对应不同的图片。
+        public static final String COLUMN_USING_CROSS_TABLE = "using_cross_table";
+        public static final String COLUMN_SOURCE_TABLE = "source_table";
+        public static final String COLUMN_STAR = "star";//星标标记，数字形式对应不同的图片。
+        public static final String COLUMN_IS_SHOWING = "is_showing";
     }
 
-
-
-    /* version 1 */
-    /*
-     * 分组表
-     * 分组的学习记录存储在单独的表中，所含items在Item表中反向记录。
-     * 注意，LAST_LEARNING_TIME_LONG、EFFECTIVE_LEARNING_TIMES不需设置，由Logs表计算得来。
-     * */
-    public static class Group implements BaseColumns {
-        public static final String TABLE_NAME = "group_table";
-        public static final String COLUMN_DESCRIPTION = "description";
-        public static final String COLUMN_MISSION_ID = "mission_id";//属于哪个任务
-        public static final String COLUMN_SETTING_UP_TIME_LONG = "init_setting_time";//long型（DB整型）；分组。
+    /*任务-库资源交叉表，含gid、含任务所属item的记录信息*/
+    public static class EnglishCross implements BaseColumns {
+        public static final String TABLE_NAME = "english_cross";
+        public static final String COLUMN_MID ="mid";
+        public static final String COLUMN_IID ="iid";
+        public static final String COLUMN_GID ="gid";
+        public static final String COLUMN_REMOVED ="removed";
+        public static final String COLUMN_LEARNED ="learned";
+        public static final String COLUMN_PRIORITY ="priority";
+        public static final String COLUMN_FAIL_TIMES ="fail_times";
     }
+
+    /* 分组表*/
+    public static class Groups implements BaseColumns {
+        public static final String TABLE_NAME = "groups";
+        public static final String COLUMN_DESCRIPTION ="description";
+        public static final String COLUMN_MID ="mid";
+        public static final String COLUMN_CREATE_TIME ="create_time";
+    }
+
 
     /*
     * 用于分组的各次复习时间的记录表
@@ -74,14 +95,7 @@ public final class YoMemoryContract {
     }//但是，仍然不需要使用专门的LOG类，在DB中将区分后的结果以long列表形式传出即可。
 
 
-
-
-    /*
-    * 外语词汇类资源的资源表模板，此类表结构一致，如下；
-    * （不同任务会一般对应不同Item表，各表以表名尾缀区分）
-    * 记忆时间的序列记录，由分组属性承担，Item不设此项记录。
-    * */
-    public static class ItemBasic implements BaseColumns {
+/*  public static class ItemBasic implements BaseColumns {
         public static final String TABLE_NAME = "item_";
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_PHONETIC = "phonetic";
@@ -92,7 +106,7 @@ public final class YoMemoryContract {
         public static final String COLUMN_GROUP_ID = "group_id";//原则上，不允许从属于多个分组
         public static final String COLUMN_PRIORITY = "priority";
         public static final String COLUMN_FAILED_SPELLING_TIMES = "times_failed_spelling";
-//        public static final String COLUMN_FAILED_REMINDING_TIMES = "times_failed_reminding";
     }
+*/
 
 }

@@ -20,6 +20,9 @@ public class BannerActivity extends AppCompatActivity {
 //* 程序第一个页面，过渡性页面（结束后不可返回）
 //* 功能：欢迎（Logo动画）；
 
+//    在首次运行时，执行一次DB操作，以便建立数据库，同时导入预设数据；下方显示进度条，
+//    在导入完成后执行动画，然后进入Main页。（非首次运行时，DB已建立，导入已执行过，因而无特别操作。）
+
     private static final String TAG = "BannerActivity";
 
     /* 控件*/

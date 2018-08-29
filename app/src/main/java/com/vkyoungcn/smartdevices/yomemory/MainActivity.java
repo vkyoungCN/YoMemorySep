@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity
             rvMissions = new ArrayList<>();
             for (Mission m :missions) {
                 rvMissions.add(new RvMission(getApplicationContext(),m));
-//                Log.i(TAG, "run: Mission.starType="+m.getStarType());
+//                Log.i(TAG, "run: Missions.starType="+m.getStarType());
             }
 
             Message message = new Message();

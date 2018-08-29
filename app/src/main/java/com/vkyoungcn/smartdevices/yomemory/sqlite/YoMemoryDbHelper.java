@@ -27,7 +27,7 @@ import java.util.List;
  * 2018.08.01
  * */
 public class YoMemoryDbHelper extends SQLiteOpenHelper {
-    private static final String TAG = "YoMemory-DbHelper";
+    private static final String TAG = "YoMemoryDbHelper";
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "YoMemory.db";
@@ -37,33 +37,34 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     //类内所有的DB操作均采用以下引用进行。通过同一的获取和关闭方法进行获取、关闭。
     private SQLiteDatabase mSQLiteDatabase;
 
-    private Context context = null;
-    public static final String DEFAULT_ITEM_SUFFIX = "default13531";
+//    private Context context = null;
+    private static final String DEFAULT_ITEM_SUFFIX = "default13531";
 
     /* 建表语句*/
-    // 初次运行时创建的表：Mission、Group、LearningLogs、Item_default13531；
+    // 初次运行时创建的表：Missions、Group、LearningLogs、Item_default13531；
     //任务表
-    public static final String SQL_CREATE_MISSION =
-            "CREATE TABLE " + YoMemoryContract.Mission.TABLE_NAME + " (" +
-                    YoMemoryContract.Mission._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    YoMemoryContract.Mission.COLUMN_NAME + " TEXT, "+
-                    YoMemoryContract.Mission.COLUMN_TABLE_ITEM_SUFFIX + " TEXT, "+
-                    YoMemoryContract.Mission.COLUMN_STAR + " INTEGER, "+
-                    YoMemoryContract.Mission.COLUMN_DETAIL_DESCRIPTION + " TEXT, "+
-                    YoMemoryContract.Mission.COLUMN_DESCRIPTION + " TEXT)";
+    private static final String SQL_CREATE_MISSIONS =
+            "CREATE TABLE " + YoMemoryContract.Missions.TABLE_NAME + " (" +
+                    YoMemoryContract.Missions._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    YoMemoryContract.Missions.COLUMN_TITLE + " TEXT, "+
+                    YoMemoryContract.Missions.COLUMN_DESCRIPTION + " TEXT, "+
+                    YoMemoryContract.Missions.COLUMN_USING_CROSS_TABLE + " BOOLEAN, "+
+                    YoMemoryContract.Missions.COLUMN_SOURCE_TABLE + " TEXT, "+
+                    YoMemoryContract.Missions.COLUMN_STAR + " INTEGER, "+
+                    YoMemoryContract.Missions.COLUMN_IS_SHOWING + " BOOLEAN)";
 
     //分组表
-    public static final String SQL_CREATE_GROUP =
-            "CREATE TABLE " + YoMemoryContract.Group.TABLE_NAME + " (" +
-                    YoMemoryContract.Group._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    YoMemoryContract.Group.COLUMN_DESCRIPTION + " TEXT, "+
-                    YoMemoryContract.Group.COLUMN_SETTING_UP_TIME_LONG + " INTEGER, "+
-                    YoMemoryContract.Group.COLUMN_MISSION_ID + " INTEGER, "+
-                    "FOREIGN KEY("+YoMemoryContract.Group.COLUMN_MISSION_ID +") REFERENCES "+
-                    YoMemoryContract.Mission.TABLE_NAME+"("+ YoMemoryContract.Mission._ID+") " +
+    private static final String SQL_CREATE_GROUP =
+            "CREATE TABLE " + YoMemoryContract.Groups.TABLE_NAME + " (" +
+                    YoMemoryContract.Groups._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    YoMemoryContract.Groups.COLUMN_DESCRIPTION + " TEXT, "+
+                    YoMemoryContract.Groups.COLUMN_MID + " INTEGER, "+
+                    YoMemoryContract.Groups.COLUMN_CREATE_TIME + " INTEGER, "+
+                    "FOREIGN KEY("+YoMemoryContract.Groups.COLUMN_MID +") REFERENCES "+
+                    YoMemoryContract.Missions.TABLE_NAME+"("+ YoMemoryContract.Missions._ID+") " +
                     "ON DELETE CASCADE)"; //外键采用级联删除
     //日志表
-    public static final String SQL_CREATE_LEARNING_LOGS =
+    private static final String SQL_CREATE_LEARNING_LOGS =
             "CREATE TABLE " + YoMemoryContract.LearningLogs.TABLE_NAME + " (" +
                     YoMemoryContract.LearningLogs._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     YoMemoryContract.LearningLogs.COLUMN_TIME_IN_LONG + " INTEGER, "+
@@ -71,49 +72,39 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
                     YoMemoryContract.LearningLogs.COLUMN_GROUP_ID + " INTEGER,"+
                     "FOREIGN KEY ("+YoMemoryContract.LearningLogs.COLUMN_GROUP_ID+
                     ") REFERENCES "+
-                    YoMemoryContract.Group.TABLE_NAME+"("+ YoMemoryContract.Group._ID+") " +
+                    YoMemoryContract.Groups.TABLE_NAME+"("+ YoMemoryContract.Groups._ID+") " +
                     "ON DELETE CASCADE)"; //外键采用级联删除
 
+    /* 内置英语5W词汇资源库的items表*/
+    public static final String SQL_CREATE_ENGLISH_COMMON_ITEMS =
+            "CREATE TABLE " + YoMemoryContract.EnglishCommonItems.TABLE_NAME + " (" +
+                    YoMemoryContract.EnglishCommonItems._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    YoMemoryContract.EnglishCommonItems.COLUMN_WORD + " TEXT, "+
+                    YoMemoryContract.EnglishCommonItems.COLUMN_PHONETIC + " TEXT, "+
+                    YoMemoryContract.EnglishCommonItems.COLUMN_DEFINITION + " BOOLEAN, "+
+                    YoMemoryContract.EnglishCommonItems.COLUMN_TRANSLATION + " TEXT, "+
+                    YoMemoryContract.EnglishCommonItems.COLUMN_BNC + " INTEGER, "+
+                    YoMemoryContract.EnglishCommonItems.COLUMN_FRQ + " INTEGER )";
 
 
-    //Items表需根据具体的任务提供的tableNameSuffix创建。
-    // 现提供其建表语句的动态生成方法
-    public String getSqlCreateItemWithSuffix(String suffix){
-        return "CREATE TABLE " +
-                YoMemoryContract.ItemBasic.TABLE_NAME + suffix+" (" +
-                YoMemoryContract.ItemBasic._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                YoMemoryContract.ItemBasic.COLUMN_NAME + " TEXT, " +
-                YoMemoryContract.ItemBasic.COLUMN_PHONETIC + " TEXT, " +
-                YoMemoryContract.ItemBasic.COLUMN_TRANSLATIONS + " TEXT, " +
-
-                YoMemoryContract.ItemBasic.COLUMN_IS_CHOSE + " BOOLEAN, " +
-                YoMemoryContract.ItemBasic.COLUMN_IS_LEARNED + " BOOLEAN, " +
-                YoMemoryContract.ItemBasic.COLUMN_PRIORITY + " INTEGER, " +
-                YoMemoryContract.ItemBasic.COLUMN_FAILED_SPELLING_TIMES + " INTEGER, " +
-                YoMemoryContract.ItemBasic.COLUMN_GROUP_ID + " INTEGER, " +
-                " FOREIGN KEY("+YoMemoryContract.ItemBasic.COLUMN_GROUP_ID+
-                ") REFERENCES "+
-                YoMemoryContract.Group.TABLE_NAME+"("+ YoMemoryContract.Group._ID+"))"; //外键无约束
-        //当Group表中删除分组时，需由程序负责所属Items的归属归零；DB似乎没有直接适用的外键约束规则。
-    }
 
     /* 删表语句*/
-    private static final String SQL_DROP_MISSION =
-            "DROP TABLE IF EXISTS " +  YoMemoryContract.Mission.TABLE_NAME;
-    private static final String SQL_DROP_GROUP =
-            "DROP TABLE IF EXISTS " + YoMemoryContract.Group.TABLE_NAME;
+    private static final String SQL_DROP_MISSIONS =
+            "DROP TABLE IF EXISTS " +  YoMemoryContract.Missions.TABLE_NAME;
+    private static final String SQL_DROP_GROUPS =
+            "DROP TABLE IF EXISTS " + YoMemoryContract.Groups.TABLE_NAME;
+    private static final String SQL_DROP_ENGLISH_COMMON_ITEMS =
+            "DROP TABLE IF EXISTS " + YoMemoryContract.EnglishCommonItems.TABLE_NAME;
     private static final String SQL_DROP_LEARNING_LOGS =
             "DROP TABLE IF EXISTS " + YoMemoryContract.LearningLogs.TABLE_NAME;
+    private static final String SQL_DROP_ENGLISH_CROSS =
+            "DROP TABLE IF EXISTS " + YoMemoryContract.EnglishCross.TABLE_NAME;
 
-    //各Items表删除语句的生成方法
-    public String getSqlDropItemWithSuffix(String suffix){
-        return "DROP TABLE IF EXISTS " +  YoMemoryContract.ItemBasic.TABLE_NAME + suffix;
-    }
 
     //构造器
     private YoMemoryDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.context = context;
+//        this.context = context;
 
         getWritableDatabaseIfClosedOrNull();
     }
@@ -139,13 +130,14 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         //此情景下，执行如下任务.
 //        Log.i(TAG, "onCreate: be");
         //建表
-        db.execSQL(SQL_CREATE_MISSION);
+        db.execSQL(SQL_CREATE_MISSIONS);
         db.execSQL(SQL_CREATE_GROUP);
         db.execSQL(SQL_CREATE_LEARNING_LOGS);
 
-        //建立items基础资源表并导入默认items数据
+//    只进行建表。导入数据的工作稍后再行处理。（这样可以避免在本类中持有context字段）
+//    由于本类对自身的持有是静态的，因而编译器提示在静态字段中持有context实例导致……忘了
 
-        dataInitialization(db);
+//        dataInitialization(db);
     }
 
     /*
@@ -154,7 +146,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     * ②为Mission表增添记录；
     * ③ 为Item_default13531表添加全部初始记录。
     * */
-    private void dataInitialization(SQLiteDatabase db){
+    /*private void dataInitialization(SQLiteDatabase db){
         db.execSQL(getSqlCreateItemWithSuffix(DEFAULT_ITEM_SUFFIX));
 
         //向Mission表增加默认记录
@@ -164,14 +156,14 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
         //Item_default13531表数据导入
         importToItemDefaultFromCSV("EbbingWords13531.csv",db);
-    }
+    }*/
 
     /*
      * 从csv文件向默认Item表导入数据；
      * 要求csv文件位于Assets目录、且为UTF-8编码。
      * csv文件首行要直接是数据，不能是列名。
      * */
-    private void importToItemDefaultFromCSV(String csvFileName, SQLiteDatabase db){
+  /*  private void importToItemDefaultFromCSV(String csvFileName, SQLiteDatabase db){
         String line = "";
 
         InputStream is = null;
@@ -228,7 +220,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         db.setTransactionSuccessful();
         db.endTransaction();
 
-    }
+    }*/
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
@@ -260,6 +252,9 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
     }
 
+    /* 需要一个可由外调用的“导入基础数据”的方法，待。*/
+
+
     /*CRUD部分*/
     public long createMission(Mission mission){
         long l;
@@ -267,13 +262,13 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         getWritableDatabaseIfClosedOrNull();
         ContentValues values = new ContentValues();
 
-        values.put(YoMemoryContract.Mission.COLUMN_NAME, mission.getName());
-        values.put(YoMemoryContract.Mission.COLUMN_DESCRIPTION, mission.getSimpleDescription());
-        values.put(YoMemoryContract.Mission.COLUMN_DETAIL_DESCRIPTION, mission.getDetailDescriptions());
-        values.put(YoMemoryContract.Mission.COLUMN_TABLE_ITEM_SUFFIX, mission.getTableItem_suffix());
-        values.put(YoMemoryContract.Mission.COLUMN_STAR,mission.getStarType());
+        values.put(YoMemoryContract.Missions.COLUMN_NAME, mission.getName());
+        values.put(YoMemoryContract.Missions.COLUMN_DESCRIPTION, mission.getSimpleDescription());
+        values.put(YoMemoryContract.Missions.COLUMN_DETAIL_DESCRIPTION, mission.getDetailDescriptions());
+        values.put(YoMemoryContract.Missions.COLUMN_TABLE_ITEM_SUFFIX, mission.getTableItem_suffix());
+        values.put(YoMemoryContract.Missions.COLUMN_STAR,mission.getStarType());
 
-        l = mSQLiteDatabase.insert(YoMemoryContract.Mission.TABLE_NAME, null, values);
+        l = mSQLiteDatabase.insert(YoMemoryContract.Missions.TABLE_NAME, null, values);
         closeDB();
 
         return l;
@@ -286,12 +281,12 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
     private void createMission(SQLiteDatabase db, Mission mission){
         ContentValues values = new ContentValues();
 
-        values.put(YoMemoryContract.Mission.COLUMN_NAME, mission.getName());
-        values.put(YoMemoryContract.Mission.COLUMN_DESCRIPTION, mission.getSimpleDescription());
-        values.put(YoMemoryContract.Mission.COLUMN_DETAIL_DESCRIPTION, mission.getDetailDescriptions());
-        values.put(YoMemoryContract.Mission.COLUMN_TABLE_ITEM_SUFFIX, mission.getTableItem_suffix());
+        values.put(YoMemoryContract.Missions.COLUMN_NAME, mission.getName());
+        values.put(YoMemoryContract.Missions.COLUMN_DESCRIPTION, mission.getSimpleDescription());
+        values.put(YoMemoryContract.Missions.COLUMN_DETAIL_DESCRIPTION, mission.getDetailDescriptions());
+        values.put(YoMemoryContract.Missions.COLUMN_TABLE_ITEM_SUFFIX, mission.getTableItem_suffix());
 
-        db.insert(YoMemoryContract.Mission.TABLE_NAME, null, values);
+        db.insert(YoMemoryContract.Missions.TABLE_NAME, null, values);
         closeDB();
     }
 
@@ -305,10 +300,10 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
         for (int i : positions) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(YoMemoryContract.Mission.COLUMN_STAR,missions.get(i).getStarType());
+            contentValues.put(YoMemoryContract.Missions.COLUMN_STAR,missions.get(i).getStarType());
 
-            affectedRows = mSQLiteDatabase.update(YoMemoryContract.Mission.TABLE_NAME,contentValues,
-                    YoMemoryContract.Mission._ID+" = ? ",new String[]{String.valueOf(missions.get(i).getId())} );
+            affectedRows = mSQLiteDatabase.update(YoMemoryContract.Missions.TABLE_NAME,contentValues,
+                    YoMemoryContract.Missions._ID+" = ? ",new String[]{String.valueOf(missions.get(i).getId())} );
         }
 
         closeDB();
@@ -321,13 +316,13 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         getReadableDatabaseIfClosedOrNull();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(YoMemoryContract.Mission.COLUMN_STAR,rvMission.getStarType());
+        contentValues.put(YoMemoryContract.Missions.COLUMN_STAR,rvMission.getStarType());
 
-        affectedRows = mSQLiteDatabase.update(YoMemoryContract.Mission.TABLE_NAME,contentValues,
-                YoMemoryContract.Mission._ID+" = ? ",new String[]{String.valueOf(rvMission.getId())} );
+        affectedRows = mSQLiteDatabase.update(YoMemoryContract.Missions.TABLE_NAME,contentValues,
+                YoMemoryContract.Missions._ID+" = ? ",new String[]{String.valueOf(rvMission.getId())} );
 //        Log.i(TAG, "updateMissionStart: rvm.starType="+rvMission.getStarType()+", affected　rows="+affectedRows);
-        /*String tempStr = "SELECT "+YoMemoryContract.Mission.COLUMN_STAR+" FROM "
-                +YoMemoryContract.Mission.TABLE_NAME+" WHERE "+YoMemoryContract.Mission._ID+" = "+rvMission.getId();
+        /*String tempStr = "SELECT "+YoMemoryContract.Missions.COLUMN_STAR+" FROM "
+                +YoMemoryContract.Missions.TABLE_NAME+" WHERE "+YoMemoryContract.Missions._ID+" = "+rvMission.getId();
         Cursor cursor =mSQLiteDatabase.rawQuery(tempStr,null);
         int startType = -1;
         if(cursor.moveToFirst()){
@@ -339,18 +334,18 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         return affectedRows;
     }
 
-    /*public Mission getMissionById(long mission_id){
-        Mission mission = new Mission();
-        String selectQuery = "SELECT * FROM "+ YoMemoryContract.Mission.TABLE_NAME+
-                " WHERE "+ YoMemoryContract.Mission._ID+" = "+mission_id;
+    /*public Missions getMissionById(long mission_id){
+        Missions mission = new Missions();
+        String selectQuery = "SELECT * FROM "+ YoMemoryContract.Missions.TABLE_NAME+
+                " WHERE "+ YoMemoryContract.Missions._ID+" = "+mission_id;
         getReadableDatabaseIfClosedOrNull();
         Cursor cursor = mSQLiteDatabase.rawQuery(selectQuery,null);
 
         if(cursor.moveToFirst()){
-            mission.setId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Mission._ID)));
-            mission.setName(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_NAME)));
-            mission.setSimpleDescription(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_DESCRIPTION)));
-            mission.setTableItem_suffix(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_TABLE_ITEM_SUFFIX)));
+            mission.setId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Missions._ID)));
+            mission.setName(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Missions.COLUMN_NAME)));
+            mission.setSimpleDescription(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Missions.COLUMN_DESCRIPTION)));
+            mission.setTableItem_suffix(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Missions.COLUMN_TABLE_ITEM_SUFFIX)));
         }else{
             return null;
         }
@@ -367,7 +362,7 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
     public List<Mission> getAllMissions(){
         List<Mission> missions = new ArrayList<>();
-        String selectQuery = "SELECT * FROM "+ YoMemoryContract.Mission.TABLE_NAME;
+        String selectQuery = "SELECT * FROM "+ YoMemoryContract.Missions.TABLE_NAME;
 
         getReadableDatabaseIfClosedOrNull();
         Cursor cursor = mSQLiteDatabase.rawQuery(selectQuery, null);
@@ -375,12 +370,12 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
         if(cursor.moveToFirst()){
             do{
                 Mission mission = new Mission();
-                mission.setId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Mission._ID)));
-                mission.setName(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_NAME)));
-                mission.setSimpleDescription(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_DESCRIPTION)));
-                mission.setDetailDescriptions(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_DETAIL_DESCRIPTION)));
-                mission.setTableItem_suffix(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_TABLE_ITEM_SUFFIX)));
-                mission.setStarType(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_STAR)));
+                mission.setId(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Missions._ID)));
+                mission.setName(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Missions.COLUMN_NAME)));
+                mission.setSimpleDescription(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Missions.COLUMN_DESCRIPTION)));
+                mission.setDetailDescriptions(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Missions.COLUMN_DETAIL_DESCRIPTION)));
+                mission.setTableItem_suffix(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Missions.COLUMN_TABLE_ITEM_SUFFIX)));
+                mission.setStarType(cursor.getInt(cursor.getColumnIndex(YoMemoryContract.Missions.COLUMN_STAR)));
                 missions.add(mission);
             }while (cursor.moveToNext());
         }
@@ -397,15 +392,15 @@ public class YoMemoryDbHelper extends SQLiteOpenHelper {
 
     /*public List<String> getAllMissionTitles(){
         List<String> missionTitles = new ArrayList<>();
-        String selectQuery = "SELECT "+ YoMemoryContract.Mission.COLUMN_NAME
-                +" FROM "+ YoMemoryContract.Mission.TABLE_NAME;
+        String selectQuery = "SELECT "+ YoMemoryContract.Missions.COLUMN_NAME
+                +" FROM "+ YoMemoryContract.Missions.TABLE_NAME;
 
         getReadableDatabaseIfClosedOrNull();
         Cursor cursor = mSQLiteDatabase.rawQuery(selectQuery, null);
 
         if(cursor.moveToFirst()){
             do{
-                missionTitles.add(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Mission.COLUMN_NAME)));
+                missionTitles.add(cursor.getString(cursor.getColumnIndex(YoMemoryContract.Missions.COLUMN_NAME)));
             }while (cursor.moveToNext());
         }
 
